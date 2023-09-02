@@ -1,5 +1,5 @@
 ;===============================================================================
-; Flickies (pássaros, esquilos) que aparecem ao destruir iminigos 
+; Flickies (pï¿½ssaros, esquilos) que aparecem ao destruir iminigos 
 ; ->>>      
 ;===============================================================================                   
 ; Offset_0x0238DA:
@@ -409,6 +409,6 @@ Offset_0x023E34:
                 subi.w  #$00B8, D0
                 rts                                                                                                                                                                                                                                                      
 ;===============================================================================
-; Flickies (pássaros, esquilos) que aparecem ao destruir iminigos  
+; Flickies (pï¿½ssaros, esquilos) que aparecem ao destruir iminigos  
 ; <<<-     
 ;===============================================================================  

@@ -228,7 +228,7 @@ Offset_0x01B636:
                 rts    
 ;-------------------------------------------------------------------------------                                                         
 Pal_Sphere_Test:                                               ; Offset_0x01B676   
-                incbin  'Data\SS_Test\SphrTest.pal'       
+                incbin  'data\ss_test\sphrtest.pal'       
 ;-------------------------------------------------------------------------------
 Obj_Sphere_Test_Main:                                          ; Offset_0x01B696
                 move.b  (Control_Ports_Buffer_Data+$02).w, D1        ; $FFFFF606

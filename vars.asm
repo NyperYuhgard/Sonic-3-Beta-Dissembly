@@ -20,7 +20,7 @@ Sonic_Alone           equ $01
 Miles_Alone           equ $02
 Knuckles_Alone        equ $03
 
-; Bot_es dos Controles
+; Botões dos Controles
 Btn_Up                equ $00    
 Btn_Down              equ $01  
 Btn_Left              equ $02    
@@ -30,7 +30,7 @@ Btn_C                 equ $05
 Btn_A                 equ $06
 Btn_Start             equ $07
 
-; Var_aveis de objetos
+; Varíaveis de objetos
 Obj_Pointer           equ $00     ; Longword      ; 00          ; 00..03
 Obj_Flags             equ $04     ; Byte          ; 01          ; 04
 Obj_Routine           equ $05     ; Byte          ; 24          ; 05
@@ -131,7 +131,7 @@ Obj_Player_LRB_Solid  equ $47     ; Byte          ; 3F          ; 47 ; Left / Ri
 Obj_Boss_Hit          equ $29
 
 
-; Status dos jogadores. Tamb_m usado pelos escudos para prote__o
+; Status dos jogadores. Também usado pelos escudos para proteção
 Classic_Type       equ $00
 Invincibility_Type equ $01
 Speed_Type         equ $02
@@ -206,7 +206,7 @@ Disabled_Level        equ $5555
 Reset_Game            equ $FFFF
 
 
-; M_sicas 
+; Músicas 
 Angel_Island_1_Snd       equ $0001
 Angel_Island_2_Snd       equ $0002
 Hydrocity_1_Snd          equ $0003
@@ -356,9 +356,9 @@ VDP_Control_Port               equ $00C00004
 
 ; RAM
 StackPointer                 equ $00000000  
-ROM_Checksum                 equ $18E
+
 M68K_Dev_RAM_Start           equ $FFFE0000  
-RAM_start                    equ M68K_RAM_Start
+
 M68K_RAM_Start               equ $FFFF0000  
 
 
@@ -685,7 +685,7 @@ Special_Stage_Id                 equ M68K_RAM_Start+$FE16
 Continue_Count                   equ M68K_RAM_Start+$FE18
 Super_Sonic_Flag                 equ M68K_RAM_Start+$FE19 
 Time_Over_Flag                   equ M68K_RAM_Start+$FE1A
-Ring_Status_Flag                 equ M68K_RAM_Start+$FE1B ; Vida extra com 100 e 200 an_is e continue
+Ring_Status_Flag                 equ M68K_RAM_Start+$FE1B ; Vida extra com 100 e 200 anéis e continue
 HUD_Life_Refresh_Flag            equ M68K_RAM_Start+$FE1C
 HUD_Rings_Refresh_Flag           equ M68K_RAM_Start+$FE1D
 HUD_Timer_Refresh_Flag           equ M68K_RAM_Start+$FE1E
@@ -727,7 +727,7 @@ Miles_Max_Speed                  equ M68K_RAM_Start+$FEC0
 Miles_Acceleration               equ M68K_RAM_Start+$FEC2
 Miles_Deceleration               equ M68K_RAM_Start+$FEC4
 Life_Count_P2                    equ M68K_RAM_Start+$FEC6
-Ring_Status_Flag_P2              equ M68K_RAM_Start+$FEC7 ; Vida extra com 100 e 200 an_is e continue
+Ring_Status_Flag_P2              equ M68K_RAM_Start+$FEC7 ; Vida extra com 100 e 200 anéis e continue
 HUD_Life_Refresh_Flag_P2         equ M68K_RAM_Start+$FEC8
 HUD_Rings_Refresh_Flag_P2        equ M68K_RAM_Start+$FEC9
 HUD_Timer_Refresh_Flag_P2        equ M68K_RAM_Start+$FECA
@@ -817,7 +817,7 @@ Init_Flag                        equ M68K_RAM_Start+$FFFC
 ; CRAM
 Color_RAM_Address              equ $C0000000
 
-; Variaveis para os menus exceto sele__o de fases que _ comprimido
+; Variaveis para os menus exceto seleção de fases que é comprimido
 __                      equ  $00
 _0                      equ  $10
 _1                      equ  $11

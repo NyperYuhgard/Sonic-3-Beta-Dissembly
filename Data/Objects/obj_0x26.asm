@@ -1,5 +1,5 @@
 ;===============================================================================
-; Objeto 0x26 - Objeto de controle de giro autom_tico nos t_neis
+; Objeto 0x26 - Objeto de controle de giro autom�tico nos t�neis
 ; ->>>
 ;===============================================================================      
 ; Offset_0x013FA8:
@@ -179,6 +179,6 @@ Offset_0x0141E0:
                 beq     MarkObjGone_3                          ; Offset_0x011B3E
                 jmp     (MarkObjGone)                          ; Offset_0x011AF2                                                                                                                          
 ;===============================================================================
-; Objeto 0x26 - Objeto de controle de giro autom_tico nos t_neis
+; Objeto 0x26 - Objeto de controle de giro autom�tico nos t�neis
 ; <<<-
 ;===============================================================================  

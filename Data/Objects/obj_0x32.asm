@@ -1,5 +1,5 @@
 ;===============================================================================
-; Objeto 0x32 - Ponte ap_s derrotar o chefe no final da Angel Island 2
+; Objeto 0x32 - Ponte ap�s derrotar o chefe no final da Angel Island 2
 ; ->>>           
 ;===============================================================================
 ; Offset_0x02235C:
@@ -321,6 +321,6 @@ Offset_0x022784:
                 dc.w    $0001
                 dc.w    $F805, $0122, $FFF8                                                                                                             
 ;===============================================================================
-; Objeto 0x32 - Ponte ap_s derrotar o chefe no final da Angel Island 2
+; Objeto 0x32 - Ponte ap�s derrotar o chefe no final da Angel Island 2
 ; <<<-  
 ;===============================================================================  

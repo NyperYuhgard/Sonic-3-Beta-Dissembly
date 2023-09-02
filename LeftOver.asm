@@ -1,5 +1,5 @@
 ;-------------------------------------------------------------------------------
-; C_digo compilado incompleto
+; Código compilado incompleto
 ; ->>>
 ;-------------------------------------------------------------------------------
 Offset_0x002484 equ $002484
@@ -7,7 +7,7 @@ Offset_0x0024C4 equ $0024C4
 Offset_0x002546 equ $002546    
 Offset_0x002576 equ $002576   
 Offset_0x0026B6 equ $0026B6                        
-                jsr     (Compiler_Place_Holder).l                ; Offset_0x000000
+                jsr     (Compiler_Place_Holder)                ; Offset_0x000000
                 tst.w   (Compiler_Place_Holder)                ; Offset_0x000000
                 bne.s   Offset_0x0EF223
                 move.w  (Compiler_Place_Holder), D0            ; Offset_0x000000
@@ -1055,6 +1055,6 @@ Offset_0x0EFFC7:
                 dc.b    $34           ; move.w ???
 Left_Over_Code_End:                                        
 ;-------------------------------------------------------------------------------   
-; C_digo compilado incompleto
+; Código compilado incompleto
 ; <<<-
 ;-------------------------------------------------------------------------------
