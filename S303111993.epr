@@ -1,0 +1,804 @@
+;
+; Arquivo de projeto Esrael Neto Assembler Editor para o Sonic 2 Final
+;
+;============================================================
+; O programa procurará o bloco de definições -> [Main]
+;============================================================
+
+[Main]
+  begin
+    Angel Island Zone Act 1
+    Angel Island Zone Act 2   
+    Hydrocity Zone Act 1
+    Hydrocity Zone Act 2      
+    Marble Garden Zone Act 1  
+    Marble Garden Zone Act 2  
+    Carnival Night Zone Act 1
+    Carnival Night Zone Act 2 
+    Flying Battery Zone Act 1
+    Flying Battery Zone Act 2
+    Icecap Zone Act 1
+    Icecap Zone Act 2
+    Launch Base Zone Act 1
+    Launch Base Zone Act 2        
+    Azure Lake Zone
+    Balloon Park Zone
+    Desert Palace Zone
+    Chrome Gadget Zone
+    Endless Mine Zone
+    Bonus Stage Gumball Machine
+    Bonus Stage Glowing Spheres
+    Bonus Stage Slot Machine
+    
+    Angel Island Zone Act 1 - Pal 2
+    Hydrocity Zone Act 1 - Pal 2
+    Hydrocity Zone Act 2 - Pal 2
+    Hydrocity Zone Act 1 - Pal 3
+    Hydrocity Zone Act 2 - Pal 3
+    Carnival Night Zone Act 1 - Pal 2
+    Carnival Night Zone Act 2 - Pal 2
+    Icecap Zone Act 1 - Pal 2
+    Icecap Zone Act 2 - Pal 2
+    Icecap Zone Act 1 - Pal 3
+    Icecap Zone Act 2 - Pal 3         
+    Launch Base Zone Act 1 - Pal 2
+    Launch Base Zone Act 2 - Pal 2
+    Launch Base Zone Act 2 - Pal 3
+    Azure Lake Zone - Alt
+    Azure Lake Zone - Alt 2          
+    Balloon Park Zone - Alt
+    Balloon Park Zone - Alt 2
+    Desert Palace Zone - Alt  
+    Desert Palace Zone - Alt 2  
+    Chrome Gadget Zone - Alt   
+    Chrome Gadget Zone - Alt 2   
+    Endless Mine Zone - Alt    
+    Bonus Stage Gumball Machine Alt 
+  end 
+
+[Assembler]
+  begin
+    Main = S303111993.asm
+  end;
+;============================================================
+; [Mode] is an session identifier
+; "Mode 0" is a identifier and can have Any Name
+; "Level Mode" is a session assigned to "Mode 0"
+;============================================================
+[Modes]
+  begin   
+    Mode 0 = Level Mode
+  end;
+;------------------------------------------------------------
+[Level Mode]
+  begin
+    Edit Mode   = Level    
+    Tiles       = Kosinski Moduled
+    Blocks      = Kosinski
+    Chunks      = kosinski
+    Layout      = Uncompressed
+    Chunk Mode  = 128x128
+    Map Mode    = Auto
+    Respaw Mode = Y HiBit
+    Ring Mode   = Y HiBit
+    Object Path = %Project%\Editor\Objects
+  end;
+;============================================================
+[Angel Island Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\AIz\AIz_1.Pal
+    Tiles       = Data\Aiz\Tl_Act1.kmd
+    Tiles2      = Data\Aiz\Tl2_Act1.kmd
+    Blocks      = Data\AIz\Bl_Act1.kos
+    Blocks2     = Data\AIz\Bl2_Act1.kos
+    Chunks      = Data\AIz\Ck_Act1.kos
+    Map         = Data\AIz\AIz_Map1.dat
+    Objects     = Data\Aiz\Obj_Act1.dat
+    Rings       = Data\Aiz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------  
+[Angel Island Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\AIz\AIz_2.Pal
+    Tiles       = Data\Aiz\Tl_Act2.kmd
+    Tiles2      = Data\Aiz\Tl2_Act2.kmd
+    Blocks      = Data\AIz\Bl_Act2.kos
+    Blocks2     = Data\AIz\Bl2_Act2.kos
+    Chunks      = Data\AIz\Ck_Act2.kos
+    Map         = Data\AIz\AIz_Map2.dat
+    Objects     = Data\Aiz\Obj_Act2.dat
+    Rings       = Data\Aiz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;    
+;------------------------------------------------------------  
+[Hydrocity Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_1.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act1.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act1.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act1.kos
+    Map         = Data\Hz\Hz_Map1.dat
+    Objects     = Data\Hz\Obj_Act1.dat
+    Rings       = Data\Hz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;       
+;------------------------------------------------------------  
+[Hydrocity Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_2.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act2.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act2.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act2.kos
+    Map         = Data\Hz\Hz_Map2.dat
+    Objects     = Data\Hz\Obj_Act2.dat
+    Rings       = Data\Hz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;       
+;------------------------------------------------------------  
+[Marble Garden Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\MGz\MGz.Pal
+    Tiles       = Data\MGz\Tiles.kmd
+    Tiles2      = Data\MGz\Tl2_Act1.kmd
+    Blocks      = Data\MGz\Blocks.kos
+    Blocks2     = Data\MGz\Bl2_Act1.kos
+    Chunks      = Data\MGz\Chunks.kos
+    Chunks2     = Data\MGz\Ck2_Act1.kos
+    Map         = Data\MGz\MGz_Map1.dat
+    Objects     = Data\MGz\Obj_Act1.dat
+    Rings       = Data\MGz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Marble Garden Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\MGz\MGz.Pal
+    Tiles       = Data\MGz\Tiles.kmd
+    Tiles2      = Data\MGz\Tl2_Act2.kmd
+    Blocks      = Data\MGz\Blocks.kos
+    Blocks2     = Data\MGz\Bl2_Act2.kos
+    Chunks      = Data\MGz\Chunks.kos
+    Chunks2     = Data\MGz\Ck2_Act2.kos
+    Map         = Data\MGz\MGz_Map2.dat
+    Objects     = Data\MGz\Obj_Act2.dat
+    Rings       = Data\MGz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;------------------------------------------------------------  
+[Carnival Night Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CNz\CNz.Pal
+    Tiles       = Data\CNz\Tiles.kmd
+    Blocks      = Data\CNz\Blocks.kos
+    Chunks      = Data\CNz\Chunks.kos
+    Map         = Data\CNz\CNz_Map1.dat
+    Objects     = Data\CNz\Obj_Act1.dat
+    Rings       = Data\CNz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;    
+;------------------------------------------------------------  
+[Carnival Night Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CNz\CNz.Pal
+    Tiles       = Data\CNz\Tiles.kmd
+    Blocks      = Data\CNz\Blocks.kos
+    Chunks      = Data\CNz\Chunks.kos
+    Map         = Data\CNz\CNz_Map2.dat
+    Objects     = Data\CNz\Obj_Act2.dat
+    Rings       = Data\CNz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Flying Battery Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\FBz\FBz.Pal
+    Tiles       = Data\FBz\Tl_Act1.kmd
+    Blocks      = Data\FBz\Bl_Act1.kos
+    Chunks      = Data\FBz\Ck_Act1.kos
+    Map         = Data\FBz\FBz_Map1.dat
+    Objects     = Data\FBz\Obj_Act1.dat
+    Rings       = Data\FBz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Flying Battery Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\FBz\FBz.Pal
+    Tiles       = Data\FBz\Tl_Act2.kmd
+    Blocks      = Data\FBz\Bl_Act2.kos
+    Chunks      = Data\FBz\Ck_Act2.kos
+    Map         = Data\FBz\FBz_Map2.dat
+    Objects     = Data\FBz\Obj_Act2.dat
+    Rings       = Data\FBz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;        
+;------------------------------------------------------------  
+[Icecap Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_1.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act1.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act1.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act1.kos
+    Map         = Data\Iz\Iz_Map1.dat
+    Objects     = Data\Iz\Obj_Act1.dat
+    Rings       = Data\Iz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Icecap Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_2.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act2.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act2.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act2.kos
+    Map         = Data\Iz\Iz_Map2.dat
+    Objects     = Data\Iz\Obj_Act2.dat
+    Rings       = Data\Iz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;    
+;------------------------------------------------------------  
+[Launch Base Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\LBz\LBz_1.Pal
+    Tiles       = Data\LBz\Tiles.kmd
+    Tiles2      = Data\LBz\Tl2_Act1.kmd
+    Blocks      = Data\LBz\Blocks.kos
+    Blocks2     = Data\LBz\Bl2_Act1.kos
+    Chunks      = Data\LBz\Ck_Act1.kos
+    Map         = Data\LBz\LBz_Map1.dat
+    Objects     = Data\LBz\Obj_Act1.dat
+    Rings       = Data\LBz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Launch Base Zone Act 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\LBz\LBz_2.Pal
+    Tiles       = Data\LBz\Tiles.kmd
+    Tiles2      = Data\LBz\Tl2_Act2.kmd
+    Blocks      = Data\LBz\Blocks.kos
+    Blocks2     = Data\LBz\Bl2_Act2.kos
+    Chunks      = Data\LBz\Ck_Act2.kos
+    Map         = Data\LBz\LBz_Map2.dat
+    Objects     = Data\LBz\Obj_Act2.dat
+    Rings       = Data\LBz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;          
+;------------------------------------------------------------  
+[Lava Reef Zone Act 1]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette     = Data\all\Sonic.Pal
+    Palette2    = Data\LBz\LBz_2.Pal
+    Tiles       = Data\unknown\tiles_6.kmd
+  ; Tiles2      = Data\LBz\Tl2_Act2.kmd
+    Blocks      = Data\unknown\Blocks_6.kos
+  ; Blocks2     = Data\LBz\Bl2_Act2.kos
+    Chunks      = Data\unknown\Chunks_6.kos
+    Map         = Data\LBz\LBz_Map2.dat
+    Objects     = Data\LBz\Obj_Act2.dat
+    Rings       = Data\LBz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;      
+;------------------------------------------------------------  
+[Azure Lake Zone]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\ALz\ALz.Pal
+    Tiles       = Data\Alz\Tiles.kmd
+    Blocks      = Data\ALz\Blocks.kos
+    Chunks      = Data\ALz\Chunks.kos
+    Map         = Data\ALz\ALz_Map.dat
+    Objects     = Data\ALz\Obj_Act1.dat
+    Rings       = Data\ALz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Balloon Park Zone]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BPz\BPz.Pal
+    Tiles       = Data\BPz\Tiles.kmd
+    Blocks      = Data\BPz\Blocks.kos
+    Chunks      = Data\BPz\Chunks.kos
+    Map         = Data\BPz\BPz_Map.dat
+    Objects     = Data\BPz\Obj_Act1.dat
+    Rings       = Data\BPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;------------------------------------------------------------  
+[Desert Palace Zone]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\DPz\DPz.Pal
+    Tiles       = Data\DPz\Tiles.kmd
+    Blocks      = Data\DPz\Blocks.kos
+    Chunks      = Data\DPz\Chunks.kos
+    Map         = Data\DPz\DPz_Map.dat
+    Objects     = Data\DPz\Obj_Act1.dat
+    Rings       = Data\DPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Chrome Gadget Zone]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CGz\CGz.Pal
+    Tiles       = Data\CGz\Tiles.kmd
+    Blocks      = Data\CGz\Blocks.kos
+    Chunks      = Data\CGz\Chunks.kos
+    Map         = Data\CGz\CGz_Map.dat
+    Objects     = Data\CGz\Obj_Act1.dat
+    Rings       = Data\CGz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Endless Mine Zone]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\EMz\EMz.Pal
+    Tiles       = Data\EMz\Tiles.kmd
+    Blocks      = Data\EMz\Blocks.kos
+    Chunks      = Data\EMz\Chunks.kos
+    Map         = Data\EMz\EMz_Map.dat
+    Objects     = Data\EMz\Obj_Act1.dat
+    Rings       = Data\EMz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Bonus Stage Gumball Machine]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BS_GM\BS_GM.Pal
+    Tiles       = Data\BS_GM\Tiles.kmd
+    Blocks      = Data\BS_GM\Blocks.kos
+    Chunks      = Data\BS_GM\Chunks.kos
+    Map         = Data\BS_GM\BSGM_Map.dat
+    Objects     = Data\BS_GM\Obj_Act1.dat
+    Rings       = Data\BS_GM\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;        
+;------------------------------------------------------------  
+[Bonus Stage Glowing Spheres]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BS_GS\BS_GS.Pal
+    Tiles       = Data\BS_GS\Tiles.kmd
+    Blocks      = Data\BS_GS\Blocks.kos
+    Chunks      = Data\BS_GS\Chunks.kos
+    Map         = Data\BS_GS\BSGS_Map.dat
+    Objects     = Data\BS_GS\Obj_Act1.dat
+    Rings       = Data\BS_GS\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;             
+;------------------------------------------------------------  
+[Bonus Stage Slot Machine]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BS_SM\BS_SM.Pal
+    Tiles       = Data\BS_SM\Tiles.kmd
+    Blocks      = Data\BS_SM\Blocks.kos
+    Chunks      = Data\BS_SM\Chunks.kos
+    Map         = Data\BS_SM\BSSM_Map.dat
+    Objects     = Data\BS_SM\Obj_Act1.dat
+    Rings       = Data\BS_SM\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;------------------------------------------------------------
+[Hydrocity Zone Act 1 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_1_LO.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act1.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act1.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act1.kos
+    Map         = Data\Hz\Hz_Map1.dat
+    Objects     = Data\Hz\Obj_Act1.dat
+    Rings       = Data\Hz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------
+[Hydrocity Zone Act 1 - Pal 3]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_1_LO2.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act1.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act1.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act1.kos
+    Map         = Data\Hz\Hz_Map1.dat
+    Objects     = Data\Hz\Obj_Act1.dat
+    Rings       = Data\Hz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;         
+;------------------------------------------------------------  
+[Hydrocity Zone Act 2 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_2_LO.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act2.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act2.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act2.kos
+    Map         = Data\Hz\Hz_Map2.dat
+    Objects     = Data\Hz\Obj_Act2.dat
+    Rings       = Data\Hz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;      
+;------------------------------------------------------------  
+[Hydrocity Zone Act 2 - Pal 3]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Hz\Hz_2_LO2.Pal
+    Tiles       = Data\Hz\Tiles.kmd
+    Tiles2      = Data\Hz\Tl2_Act2.kmd
+    Blocks      = Data\Hz\Blocks.kos
+    Blocks2     = Data\Hz\Bl2_Act2.kos
+    Chunks      = Data\Hz\Chunks.kos
+    Chunks2     = Data\Hz\Ck2_Act2.kos
+    Map         = Data\Hz\Hz_Map2.dat
+    Objects     = Data\Hz\Obj_Act2.dat
+    Rings       = Data\Hz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Carnival Night Zone Act 1 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CNz\CNz_LO.Pal
+    Tiles       = Data\CNz\Tiles.kmd
+    Blocks      = Data\CNz\Blocks.kos
+    Chunks      = Data\CNz\Chunks.kos
+    Map         = Data\CNz\CNz_Map1.dat
+    Objects     = Data\CNz\Obj_Act1.dat
+    Rings       = Data\CNz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------  
+[Carnival Night Zone Act 2 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CNz\CNz_LO.Pal
+    Tiles       = Data\CNz\Tiles.kmd
+    Blocks      = Data\CNz\Blocks.kos
+    Chunks      = Data\CNz\Chunks.kos
+    Map         = Data\CNz\CNz_Map2.dat
+    Objects     = Data\CNz\Obj_Act2.dat
+    Rings       = Data\CNz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;       
+;------------------------------------------------------------  
+[Icecap Zone Act 1 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_LO.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act1.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act1.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act1.kos
+    Map         = Data\Iz\Iz_Map1.dat
+    Objects     = Data\Iz\Obj_Act1.dat
+    Rings       = Data\Iz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Icecap Zone Act 2 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_LO.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act2.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act2.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act2.kos
+    Map         = Data\Iz\Iz_Map2.dat
+    Objects     = Data\Iz\Obj_Act2.dat
+    Rings       = Data\Iz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;      
+;------------------------------------------------------------  
+[Icecap Zone Act 1 - Pal 3]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_1_LO.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act1.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act1.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act1.kos
+    Map         = Data\Iz\Iz_Map1.dat
+    Objects     = Data\Iz\Obj_Act1.dat
+    Rings       = Data\Iz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end; 
+;------------------------------------------------------------  
+[Icecap Zone Act 2 - Pal 3]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\Iz\Iz_2_LO.Pal
+    Tiles       = Data\Iz\Tiles.kmd
+    Tiles2      = Data\Iz\Tl2_Act2.kmd
+    Blocks      = Data\Iz\Blocks.kos
+    Blocks2     = Data\Iz\Bl2_Act2.kos
+    Chunks      = Data\Iz\Chunks.kos
+    Chunks2     = Data\Iz\Ck2_Act2.kos
+    Map         = Data\Iz\Iz_Map2.dat
+    Objects     = Data\Iz\Obj_Act2.dat
+    Rings       = Data\Iz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------  
+[Launch Base Zone Act 1 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\LBz\LBz_1_LO.Pal
+    Tiles       = Data\LBz\Tiles.kmd
+    Tiles2      = Data\LBz\Tl2_Act1.kmd
+    Blocks      = Data\LBz\Blocks.kos
+    Blocks2     = Data\LBz\Bl2_Act1.kos
+    Chunks      = Data\LBz\Ck_Act1.kos
+    Map         = Data\LBz\LBz_Map1.dat
+    Objects     = Data\LBz\Obj_Act1.dat
+    Rings       = Data\LBz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;------------------------------------------------------------  
+[Launch Base Zone Act 2 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\LBz\LBz_2_LO.Pal
+    Tiles       = Data\LBz\Tiles.kmd
+    Tiles2      = Data\LBz\Tl2_Act2.kmd
+    Blocks      = Data\LBz\Blocks.kos
+    Blocks2     = Data\LBz\Bl2_Act2.kos
+    Chunks      = Data\LBz\Ck_Act2.kos
+    Map         = Data\LBz\LBz_Map2.dat
+    Objects     = Data\LBz\Obj_Act2.dat
+    Rings       = Data\LBz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;      
+;------------------------------------------------------------  
+[Launch Base Zone Act 2 - Pal 3]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\LBz\LBz2_LO2.Pal
+    Tiles       = Data\LBz\Tiles.kmd
+    Tiles2      = Data\LBz\Tl2_Act2.kmd
+    Blocks      = Data\LBz\Blocks.kos
+    Blocks2     = Data\LBz\Bl2_Act2.kos
+    Chunks      = Data\LBz\Ck_Act2.kos
+    Map         = Data\LBz\LBz_Map2.dat
+    Objects     = Data\LBz\Obj_Act2.dat
+    Rings       = Data\LBz\Rng_Act2.dat
+  ; Table       = Editor\Objects.def
+  end;   
+;-------------------------------------------------------------------------------  
+[Angel Island Zone Act 1 - Pal 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\AIz\AIz_1_LO.Pal
+    Tiles       = Data\Aiz\Tl_Act1.kmd
+    Tiles2      = Data\Aiz\Tl2_Act1.kmd
+    Blocks      = Data\AIz\Bl_Act1.kos
+    Blocks2     = Data\AIz\Bl2_Act1.kos
+    Chunks      = Data\AIz\Ck_Act1.kos
+    Map         = Data\AIz\AIz_Map1.dat
+    Objects     = Data\Aiz\Obj_Act1.dat
+    Rings       = Data\Aiz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def     
+;------------------------------------------------------------  
+[Azure Lake Zone - Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\ALz\ALz_LO.Pal
+    Tiles       = Data\Alz\Tiles.kmd
+    Blocks      = Data\ALz\Blocks.kos
+    Chunks      = Data\ALz\Chunks.kos
+    Map         = Data\ALz\ALz_Map.dat
+    Objects     = Data\ALz\Obj_Act1.dat
+    Rings       = Data\ALz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;------------------------------------------------------------  
+[Azure Lake Zone - Alt 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\ALz\ALz_LO_2.Pal
+    Tiles       = Data\Alz\Tiles.kmd
+    Blocks      = Data\ALz\Blocks.kos
+    Chunks      = Data\ALz\Chunks.kos
+    Map         = Data\ALz\LO_Map.dat
+    Objects     = Data\ALz\Obj_Act1.dat
+    Rings       = Data\ALz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;-------------------------------------------------------------------------------  
+[Balloon Park Zone - Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BPz\BPz_LO.Pal
+    Tiles       = Data\BPz\Tiles.kmd
+    Blocks      = Data\BPz\Blocks.kos
+    Chunks      = Data\BPz\Chunks.kos
+    Map         = Data\BPz\LO_Map.dat
+    Objects     = Data\BPz\Obj_Act1.dat
+    Rings       = Data\BPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;-------------------------------------------------------------------------------  
+[Balloon Park Zone - Alt 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BPz\BPz_LO.Pal
+    Tiles       = Data\BPz\Tiles.kmd
+    Blocks      = Data\BPz\Blocks.kos
+    Chunks      = Data\BPz\Chunks.kos
+    Map         = Data\BPz\LO_Map_2.dat
+    Objects     = Data\BPz\Obj_Act1.dat
+    Rings       = Data\BPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;     
+;------------------------------------------------------------  
+[Desert Palace Zone - Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\DPz\DPz_LO.Pal
+    Tiles       = Data\DPz\Tiles.kmd
+    Blocks      = Data\DPz\Blocks.kos
+    Chunks      = Data\DPz\Chunks.kos
+    Map         = Data\DPz\LO_Map.dat
+    Objects     = Data\DPz\Obj_Act1.dat
+    Rings       = Data\DPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------  
+[Desert Palace Zone - Alt 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\DPz\DPz_LO.Pal
+    Tiles       = Data\DPz\Tiles.kmd
+    Blocks      = Data\DPz\Blocks.kos
+    Chunks      = Data\DPz\Chunks.kos
+    Map         = Data\DPz\LO_Map_2.dat
+    Objects     = Data\DPz\Obj_Act1.dat
+    Rings       = Data\DPz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;    
+;------------------------------------------------------------  
+[Chrome Gadget Zone - Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CGz\CGz_LO.Pal
+    Tiles       = Data\CGz\Tiles.kmd
+    Blocks      = Data\CGz\Blocks.kos
+    Chunks      = Data\CGz\Chunks.kos
+    Map         = Data\CGz\LO_Map.dat
+    Objects     = Data\CGz\Obj_Act1.dat
+    Rings       = Data\CGz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;  
+;------------------------------------------------------------  
+[Chrome Gadget Zone - Alt 2]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\CGz\CGz_LO.Pal
+    Tiles       = Data\CGz\Tiles.kmd
+    Blocks      = Data\CGz\Blocks.kos
+    Chunks      = Data\CGz\Chunks.kos
+    Map         = Data\CGz\LO_Map_2.dat
+    Objects     = Data\CGz\Obj_Act1.dat
+    Rings       = Data\CGz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;
+;------------------------------------------------------------  
+[Endless Mine Zone - Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\EMz\EMz.Pal
+    Tiles       = Data\EMz\Tiles.kmd
+    Blocks      = Data\EMz\Blocks.kos
+    Chunks      = Data\EMz\Chunks.kos
+    Map         = Data\EMz\LO_Map.dat
+    Objects     = Data\EMz\Obj_Act1.dat
+    Rings       = Data\EMz\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;      
+;------------------------------------------------------------  
+[Bonus Stage Gumball Machine Alt]
+  begin
+    Edit Type   = Mode 0 
+    Folder      = .\
+    Palette2    = Data\BS_GM\BS_GM.Pal
+    Tiles       = Data\BS_GM\Tiles.kmd
+    Blocks      = Data\BS_GM\Blocks.kos
+    Chunks      = Data\BS_GM\Chunks.kos
+    Map         = Data\BS_GM\LO_Map.dat
+    Objects     = Data\BS_GM\Obj_Act1.dat
+    Rings       = Data\BS_GM\Rng_Act1.dat
+  ; Table       = Editor\Objects.def
+  end;         
+end;  
