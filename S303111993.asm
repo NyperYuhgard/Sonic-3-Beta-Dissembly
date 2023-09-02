@@ -31537,7 +31537,8 @@ Offset_0x0EDF30:
                 incbin  'data\unknown\dummy5.dat'   
 ;-------------------------------------------------------------------------------
 Left_Over_Code:                                                ; Offset_0x0EF1DD
-                include 'leftover.asm'
+                incbin 'leftover.bin' ;If you want to remove this, uncomment the next line and comment the previous one.
+                ;align $8000
 ;-------------------------------------------------------------------------------
 DAC_81_Ptr      equ (DAC_81_Setup&$FFFF)|$8000
 DAC_82_Ptr      equ (DAC_82_Setup&$FFFF)|$8000
