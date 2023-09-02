@@ -1,5 +1,5 @@
 ;===============================================================================
-; Objeto 0x58 - Bola de espinhos girat�ria na Marble Garden.
+; Objeto 0x58 - Bola de espinhos girat_ria na Marble Garden.
 ; ->>>           
 ;===============================================================================
 ; Offset_0x02A390:
@@ -159,6 +159,6 @@ Offset_0x02A5A2:
                 dc.w    $000F, $006B, $FFE0
                 dc.w    $000F, $086B, $0000
 ;===============================================================================
-; Objeto 0x58 - Bola de espinhos girat�ria na Marble Garden.
+; Objeto 0x58 - Bola de espinhos girat_ria na Marble Garden.
 ; <<<-  
 ;===============================================================================  

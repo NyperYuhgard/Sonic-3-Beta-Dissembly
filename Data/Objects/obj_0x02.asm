@@ -1,5 +1,5 @@
 ;===============================================================================
-; Objeto 0x02 - Alterna o plano do cen�rio em rela��o ao jogador
+; Objeto 0x02 - Alterna o plano do cen_rio em rela__o ao jogador
 ; ->>>
 ;===============================================================================      
 ; Offset_0x012AE8:
@@ -325,6 +325,6 @@ Offset_0x012F2A:
                 dc.w    $F805, $0000, $0000
                 dc.w    $F805, $0000, $0070                                                                                                                                              
 ;===============================================================================
-; Objeto 0x02 - Alterna o plano do cen�rio em rela��o ao jogador
+; Objeto 0x02 - Alterna o plano do cen_rio em rela__o ao jogador
 ; <<<-
 ;===============================================================================  
