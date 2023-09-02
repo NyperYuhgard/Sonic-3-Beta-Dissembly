@@ -24,9 +24,11 @@
 ; 0x132802 - Art_Hz_Enemies
 ; 0x1885CA - Chunks n_o usados na Launch Base
 ; 0x1E9814 - Segunda linha da paleta do Sonic n_o _ usada   
-align macro
-     cnop 0,\1
-     endm   
+align        macro Address
+        if *%(\1)<>0
+            dcb.b    (\1)-(*%(\1)),$FF
+        endif
+        endm  
                 include 'vars.asm'    
                                     
 Prog_Start_Vector:
@@ -43814,7 +43816,7 @@ Left_Over_Incomplete_LRz_Rocks_Layout_2:                       ; Offset_0x1F6840
 Left_Over_LRz_Rocks_Layout_2a:                                ; Offset_0x1F5D0A                                      
                 incbin  'data\lrz\rockpos2.dat'
 ;-------------------------------------------------------------------------------                                                                                                                                                         
-                align 1
+                align    $1F7000  ; $FF Fill
 ;-------------------------------------------------------------------------------
 Player_Start_Speed_Array:                                      ; Offset_0x1F7000
                 dc.w    $0600, $0010, $0020, $0000
