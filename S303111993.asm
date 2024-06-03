@@ -274,19 +274,19 @@ MainGameLoop:                                                  ; Offset_0x00039E
                 jsr     GameModeArray(PC, D0)                  ; Offset_0x0003AC
                 bra.s   MainGameLoop                           ; Offset_0x00039E                 
 GameModeArray:                                                 ; Offset_0x0003AC
-                bra     SEGA_Screen                            ; Offset_0x00300A
-                bra     Title_Screen                           ; Offset_0x0031D4
-                bra     Level                                  ; Offset_0x00399E
-                bra     Level                                  ; Offset_0x00399E
-                bra     S2_Special_Stage                       ; Offset_0x0003E0
-                bra     S2_Continue                            ; Offset_0x0003E0
-                bra     S2_Two_Player_Results                  ; Offset_0x0003E0
-                bra     S2_Versus_Mode_Menu                    ; Offset_0x0052CC
-                bra     S2_Ending_Sequence                     ; Offset_0x0003E0
-                bra     S2_Options_Menu                        ; Offset_0x0052CC
-                bra     S2_Level_Select_Menu                   ; Offset_0x0052CC
-                bra     Special_Stage_Test_1                   ; Offset_0x00662A
-                bra     Special_Stage_Test_2                   ; Offset_0x0070DC
+                bra.w     SEGA_Screen                            ; Offset_0x00300A
+                bra.w     Title_Screen                           ; Offset_0x0031D4
+                bra.w     Level                                  ; Offset_0x00399E
+                bra.w     Level                                  ; Offset_0x00399E
+                bra.w     S2_Special_Stage                       ; Offset_0x0003E0
+                bra.w     S2_Continue                            ; Offset_0x0003E0
+                bra.w     S2_Two_Player_Results                  ; Offset_0x0003E0
+                bra.w     S2_Versus_Mode_Menu                    ; Offset_0x0052CC
+                bra.w     S2_Ending_Sequence                     ; Offset_0x0003E0
+                bra.w     S2_Options_Menu                        ; Offset_0x0052CC
+                bra.w     S2_Level_Select_Menu                   ; Offset_0x0052CC
+                bra.w     Special_Stage_Test_1                   ; Offset_0x00662A
+                bra.w     Special_Stage_Test_2                   ; Offset_0x0070DC
 ;=============================================================================== 
 S2_Special_Stage:
 S2_Continue:
