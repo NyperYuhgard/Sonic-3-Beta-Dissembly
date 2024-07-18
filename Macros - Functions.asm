@@ -14,3 +14,9 @@ startZ80 macro
 rom_ptr_z80 macro addr
 	dc.w	(((addr>>8)|(addr<<8))&$FFFF)
     endm
+
+; we don't have bytesToLcnt or bytesToWcnt yet, so here's examples of when they are used
+; bytesToLcnt
+; #(XX>>2-YY>>2)-1
+; bytesToWcnt
+; #(XX>>1-YY>>1)-1

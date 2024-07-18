@@ -33,6 +33,7 @@
 
 		include	"vars.asm"
 
+StartOfRom:
                 dc.l    StackPointer            ; Initial stack pointer value
 Prog_Start_Vector:                 
                 dc.l    ROM_Prog_Start          ; Start of our program in ROM
@@ -101,36 +102,25 @@ Interrupt_0D:
                 dc.l    ErrorTrap               ; Unused (reserved)
                 dc.l    ErrorTrap               ; Unused (reserved)
                 dc.l    ErrorTrap               ; Unused (reserved)   
-Console:
-                dc.b    'SEGA GENESIS    (C)'
-Date:                
-                dc.b    'SEGA 1993.OCT'
-Title_Local:                                                                          
-                dc.b    'SONIC THE             HEDGEHOG 3                '
-Title_International:                
-                dc.b    'SONIC THE             HEDGEHOG 3                '                                                
-ROM_Serial:
-                dc.b    'GM 00001079-00' 
-ROM_Checksum:
-                dc.w    $1019
-IOSupport:                
-                dc.b    'J               '
-ROM_Start:                
-                dc.l    $00000000                
-ROM_End:                
-                dc.l    $001FFFFF
-RAMStart:                
-                dc.l    $00FF0000
-RAMEnd:                
-                dc.l    $00FFFFFF
-SRAMSupport:    
-                dc.b    '                '
+Console:	dc.b	'SEGA GENESIS    (C)'
+Date:		dc.b	'SEGA 1993.OCT'
+Title_Local:	dc.b	'SONIC THE             HEDGEHOG 3                '
+Title_Int:	dc.b	'SONIC THE             HEDGEHOG 3                '
+ROMSerial:	dc.b	'GM 00001079-00' 
+Checksum:	dc.w	$1019
+IOSupport:	dc.b	'J               '
+ROMStartLoc:	dc.l	StartOfRom
+ROMEndLoc:	dc.l	EndOfRom-1
+RAMStart:	dc.l	$FF0000
+RAMEnd:		dc.l	$FFFFFF
+SRAMSupport:	dc.b	'                '
 Notes:                  
                 dc.b    $00, $01, $02, $03, $04, $05, $06, $07
                 dc.b    $08, $09, $0A, $0B, $0C, $0D, $0E, $0F              
                 dc.b    '                                '
-Region:                
-                dc.b    'JUE             '
+Region:		dc.b	'JUE             '
+EndOfHeader:
+
 ;-------------------------------------------------------------------------------
 ROM_Data_Start:                                                ; Offset_0x000200
 ErrorTrap:                                                     
@@ -202,7 +192,7 @@ PSGInitLoop:                                                   ; Offset_0x000284
                 movem.l (A6), D0-D7/A0-A6
                 move    #$2700, SR
 PortC_OK:                                                      ; Offset_0x000296
-                bra.s   Game_Program                           ; Offset_0x000304                
+                bra.s   GameProgram                           ; Offset_0x000304                
 ;-------------------------------------------------------------------------------
 InitValues:                                                    ; Offset_0x000298                 
                 dc.w    $8000, $3FFF, $0100 
@@ -223,74 +213,83 @@ InitValues:                                                    ; Offset_0x000298
                 dc.l    Color_RAM_Address           ; $C0000000
                 dc.l    $40000010
                 dc.b    $9F, $BF, $DF, $FF          ; PSG Data
-;===============================================================================                
-Game_Program:                                                  ; Offset_0x000304
-                tst.w   (VDP_Control_Port)                           ; $00C00004
-WaitForVDP:                                                    ; Offset_0x00030A
-                move.w  (VDP_Control_Port), D1                       ; $00C00004
-                btst    #$01, D1
-                bne.s   WaitForVDP                             ; Offset_0x00030A
-                btst    #$06, (IO_Expansion_Control+$0001)           ; $00A1000D
-                beq.s   ChecksumCheck                          ; Offset_0x00032C
-                cmpi.l  #'init', (Init_Flag).w                       ; $FFFFFFFC
-                beq     AlreadyInit                            ; Offset_0x000376
-ChecksumCheck:                                                 ; Offset_0x00032C
-                move.l  #ROM_Data_Start, A0                    ; Offset_0x000200
-                move.l  #ROM_End, A1                           ; Offset_0x0001A4
-                move.l  (A1), D0
-                moveq   #$00, D1
-                add.w   (A0)+, D1
-                cmp.l   A0, D0
-                nop
-                nop
-                move.l  #ROM_Checksum, A1                      ; Offset_0x00018E
-                cmp.w   (A1), D1
-                nop
-                nop
-                lea     (Stack_Area_End).w, A6                       ; $FFFFFE00
-                moveq   #$00, D7
-                move.w  #$007F, D6
-ClearSomeRAMLoop:                                              ; Offset_0x00035A
-                move.l  D7, (A6)+
-                dbra    D6, ClearSomeRAMLoop                   ; Offset_0x00035A
-                move.b  (IO_Hardware_Version), D0                    ; $00A10001
-                andi.b  #$C0, D0
-                move.b  D0, (Hardware_Id).w                          ; $FFFFFFF8
-                move.l  #'init', (Init_Flag).w                       ; $FFFFFFFC
-AlreadyInit:                                                   ; Offset_0x000376
-                bsr     Check_VDP_Frequency                    ; Offset_0x00041E
-                lea     (M68K_RAM_Start&$00FFFFFF), A6               ; $00FF0000
-                moveq   #$00, D7
-                move.w  #$3F7F, D6                             
-ClearRemainingRAMLoop:                                         ; Offset_0x000386
-                move.l  D7, (A6)+
-                dbra    D6, ClearRemainingRAMLoop              ; Offset_0x000386
+; ===========================================================================
+; Offset_0x000304:
+GameProgram:
+		tst.w	(VDP_Control_Port).l
+; Offset_00030A:
+WaitForVDP:
+		move.w	(VDP_Control_Port),d1
+		btst	#1,d1
+		bne.s	WaitForVDP
+		btst	#6,(IO_Expansion_Control+1).l
+		beq.s	ChecksumCheck
+		cmpi.l	#'init',(Init_Flag).w
+		beq.w	AlreadyInit
+; Offset_00032C:
+ChecksumCheck:
+		movea.l	#EndOfHeader,a0
+		movea.l	#ROMEndLoc,a1
+		move.l	(a1),d0
+		moveq	#0,d1
+		add.w	(a0)+,d1
+		cmp.l	a0,d0
+		nop
+		nop
+		move.l	#Checksum,a1
+		cmp.w	(a1),d1
+		nop
+		nop
+		lea	(Stack_Area_End).w,a6
+		moveq	#0,d7
+		move.w	#$7F,d6
+; Offset_0x00035A:
+ClearSomeRAMLoop:
+		move.l	d7,(a6)+
+		dbra	d6,ClearSomeRAMLoop
+		move.b	(IO_Hardware_Version),d0
+		andi.b	#$C0,d0
+		move.b	d0,(Hardware_Id).w
+		move.l	#'init',(Init_Flag).w
+; Offset_0x000376:
+AlreadyInit:
+		bsr.w	Check_VDP_Frequency
+		lea	(M68K_RAM_Start&$FFFFFF).l,a6
+		moveq	#0,d7
+		move.w	#(Stack_Area_End>>2-M68K_RAM_Start>>2)-1,d6
+; Offset_0x000386:
+ClearRemainingRAMLoop:
+		move.l	d7,(a6)+
+		dbra	d6,ClearRemainingRAMLoop
 
 		bsr.w	VDPRegSetup
 		bsr.w	SoundDriverLoad
 		bsr.w	JoypadInit
 		move.b	#gm_SEGALogo,(Game_Mode).w
-;-------------------------------------------------------------------------------                
-MainGameLoop:                                                  ; Offset_0x00039E                             
-                move.b  (Game_Mode).w, D0                            ; $FFFFF600
-                andi.w  #$003C, D0
-                jsr     GameModeArray(PC, D0)                  ; Offset_0x0003AC
-                bra.s   MainGameLoop                           ; Offset_0x00039E                 
-GameModeArray:                                                 ; Offset_0x0003AC
-                bra.w     SEGA_Screen                            ; Offset_0x00300A
-                bra.w     Title_Screen                           ; Offset_0x0031D4
-                bra.w     Level                                  ; Offset_0x00399E
-                bra.w     Level                                  ; Offset_0x00399E
-                bra.w     S2_Special_Stage                       ; Offset_0x0003E0
-                bra.w     S2_Continue                            ; Offset_0x0003E0
-                bra.w     S2_Two_Player_Results                  ; Offset_0x0003E0
-                bra.w     S2_Versus_Mode_Menu                    ; Offset_0x0052CC
-                bra.w     S2_Ending_Sequence                     ; Offset_0x0003E0
-                bra.w     S2_Options_Menu                        ; Offset_0x0052CC
-                bra.w     S2_Level_Select_Menu                   ; Offset_0x0052CC
-                bra.w     Special_Stage_Test_1                   ; Offset_0x00662A
-                bra.w     Special_Stage_Test_2                   ; Offset_0x0070DC
-;=============================================================================== 
+; Offset_0x00039E:
+MainGameLoop:                       
+		move.b	(Game_Mode).w,d0
+		andi.w	#$3C,d0
+		jsr	GameModeArray(pc,d0.w)
+		bra.s	MainGameLoop
+; ===========================================================================
+; Offset_0x0003AC:
+GameModeArray:
+		bra.w	SEGA_Screen
+		bra.w	Title_Screen
+		bra.w	Level
+		bra.w	Level
+		bra.w	S2_Special_Stage
+		bra.w	S2_Continue
+		bra.w	S2_Two_Player_Results
+		bra.w	S2_Versus_Mode_Menu
+		bra.w	S2_Ending_Sequence
+		bra.w	S2_Options_Menu
+		bra.w	S2_Level_Select_Menu
+		bra.w	Special_Stage_Test_1
+		bra.w	Special_Stage_Test_2
+; ===========================================================================
+
 S2_Special_Stage:
 S2_Continue:
 S2_Two_Player_Results:
@@ -44896,4 +44895,7 @@ HPz_Rng_2:                                                     ; Offset_0x1FFBD2
                 dc.w    $00D0, $0028
                 dc.w    $3F40, $0250
                 dc.w    $3F40, $0260
-                dc.w    $3F30, $0270                     
+                dc.w    $3F30, $0270
+
+EndOfRom:
+		END                
