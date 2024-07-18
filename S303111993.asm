@@ -23,14 +23,20 @@
 ; 0x10E5B6 - Ponteiro de mapeamento sobrescrito
 ; 0x132802 - Art_Hz_Enemies
 ; 0x1885CA - Chunks n�o usados na Launch Base
-; 0x1E9814 - Segunda linha da paleta do Sonic n�o � usada   
+; 0x1E9814 - Segunda linha da paleta do Sonic n�o � usada
+
+; ---------------------------------------------------------------------------
+		include	"Macros - More CPUs.asm"
+		CPU 68000
+
 align        macro Address
         if *%(\1)<>0
             dcb.b    (\1)-(*%(\1)),$FF
         endif
         endm
 
-                include 'vars.asm'                           
+		include	"vars.asm"
+
                 dc.l    StackPointer            ; Initial stack pointer value
 Prog_Start_Vector:                 
                 dc.l    ROM_Prog_Start          ; Start of our program in ROM
