@@ -1,7 +1,10 @@
-; Sonic 3 Beta 03/11/1993 Disassembly (Version 1.0) By Neto ( Esrael L. G. Neto ) (https://www.neto-games.com.br) 
-; 
-; "Sonic The Hedgehog 3 (Nov 03, 1993) (hidden-palace.org).bin" Rom by drx (http://www.hidden-palace.org/)
+; ---------------------------------------------------------------------------
+; Sonic the Hedgehog 3 - November 3, 1993 GitHub disassembly
 ;
+; Based on Esrael L.G. Neto's disassembly
+; Current editors: NyperYuhgard, MarkeyJester, and Alex Field
+; ROM released by hiddenpalace.org on November 16, 2019, by drx
+; ---------------------------------------------------------------------------
 ; Dados n�o usados (left over ???):
 ; 0x00F972 - Obj_Classic_Shield
 ; 0x010C60 - Obj_S1_0x4B_Big_Ring
@@ -24,7 +27,6 @@
 ; 0x132802 - Art_Hz_Enemies
 ; 0x1885CA - Chunks n�o usados na Launch Base
 ; 0x1E9814 - Segunda linha da paleta do Sonic n�o � usada
-
 ; ---------------------------------------------------------------------------
 		include	"Macros - Setup.asm"
 		include	"Macros - More CPUs.asm"
