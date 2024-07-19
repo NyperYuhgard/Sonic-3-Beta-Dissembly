@@ -4572,7 +4572,7 @@ Offset_0x003BA8:
 Offset_0x003BAE:
                 moveq   #$03, D0
                 bsr     PalLoad1                               ; Offset_0x002F9E
-                jsr     (Level_Size_Load)                      ; Offset_0x011E64
+                jsr     (LevelSizeLoad)                      ; Offset_0x011E64
                 jsr     (Background_Scroll_Speed)              ; Offset_0x0120D4
                 bsr     Main_Level_Load_8x8_Tiles              ; Offset_0x004FEA
                 jsr     (Main_Level_Load_16_128_Blocks)        ; Offset_0x0123DE
@@ -12915,37 +12915,40 @@ Sprite_Table_2:                                                ; Offset_0x011DFC
 ; <<<-
 ;-------------------------------------------------------------------------------
 
-;-------------------------------------------------------------------------------
-; Rotina para carregar o tamanho das fases
-; ->>>
-;-------------------------------------------------------------------------------  
-Level_Size_Load:                                               ; Offset_0x011E64
-                clr.b   (Rasters_Flag).w                             ; $FFFFEE30
-                clr.b   (Tmp_EE08).w                                 ; $FFFFEE08
-                clr.b   (Sonic_Scroll_Lock_Flag).w                   ; $FFFFEE0A
-                clr.b   (Miles_Scroll_Lock_Flag).w                   ; $FFFFEE0B
-                clr.b   (Fast_Vertical_Scroll_Flag).w                ; $FFFFEE39
-                moveq   #$00, D0
-                move.b  D0, (Dynamic_Resize_Routine).w               ; $FFFFEE33
-                move.w  D0, (PalCycle_Done_Flag).w                   ; $FFFFF660
-                move.w  D0, (VBlank_Subroutine).w                    ; $FFFFF662
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$04, D0
-                lea     Level_Size_Array(PC, D0), A0           ; Offset_0x011ECA
-                move.l  (A0)+, D0
-                move.l  D0, (Sonic_Level_Limits_Min_X).w             ; $FFFFEE14
-                move.l  D0, (Level_Limits_Min_X).w                   ; $FFFFEE0C
-                move.l  D0, (Miles_Level_Limits_Min_X).w             ; $FFFFEE1C
-                move.l  (A0)+, D0
-                move.l  D0, (Sonic_Level_Limits_Min_Y).w             ; $FFFFEE18
-                move.l  D0, (Level_Limits_Min_Y).w                   ; $FFFFEE10
-                move.l  D0, (Miles_Level_Limits_Min_Y).w             ; $FFFFEE20
-                move.w  #$0060, (Distance_From_Top).w                ; $FFFFEE2C
-                move.w  #$0060, (Distance_From_Top_P2).w             ; $FFFFEE2E
-                move.w  #$FFFF, (Screen_Wrap_X).w                    ; $FFFFEEA8
-                move.w  #$FFFF, (Screen_Wrap_Y).w                    ; $FFFFEEAA
-                bra     Level_Size_Check_Star_Post             ; Offset_0x01204A       
+; ---------------------------------------------------------------------------
+; Subroutine to load level boundaries and start locations
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x011E64:
+LevelSizeLoad:
+		clr.b	(Rasters_Flag).w
+		clr.b	(Tmp_EE08).w
+		clr.b	(Sonic_Scroll_Lock_Flag).w
+		clr.b	(Miles_Scroll_Lock_Flag).w
+		clr.b	(Fast_Vertical_Scroll_Flag).w
+		moveq	#0,d0
+		move.b	d0,(Dynamic_Resize_Routine).w
+		move.w	d0,(PalCycle_Done_Flag).w
+		move.w	d0,(VBlank_Subroutine).w
+		move.w	(Level_Id).w,d0
+		ror.b	#1,d0
+		lsr.w	#4,d0
+		lea	Level_Size_Array(pc,d0.w),a0
+		move.l	(a0)+,d0
+		move.l	d0,(Sonic_Level_Limits_Min_X).w
+		move.l	d0,(Level_Limits_Min_X).w
+		move.l	d0,(Miles_Level_Limits_Min_X).w
+		move.l	(a0)+,d0
+		move.l	d0,(Sonic_Level_Limits_Min_Y).w
+		move.l	d0,(Level_Limits_Min_Y).w
+		move.l	d0,(Miles_Level_Limits_Min_Y).w
+		move.w	#$60,(Distance_From_Top).w
+		move.w	#$60,(Distance_From_Top_P2).w
+		move.w	#-1,(Screen_Wrap_X).w
+		move.w	#-1,(Screen_Wrap_Y).w
+		bra.w	Level_Size_Check_Star_Post
 ;-------------------------------------------------------------------------------
 Level_Size_Array:                                              ; Offset_0x011ECA
                 dc.l    $00006000, $00000390, $00004640, $000004F0 ; AIz
