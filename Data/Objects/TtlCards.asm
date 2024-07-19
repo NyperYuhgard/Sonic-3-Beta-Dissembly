@@ -17,21 +17,21 @@ Offset_0x024554:
 Offset_0x02455C:
                 lea     (Title_Card_ZONE_ACT), A1              ; Offset_0x13AD10
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Title_Card_Number_1), A1              ; Offset_0x13AB6C
                 tst.b   (Act_Id_2).w                                 ; $FFFFEE55
                 beq.s   Offset_0x02457E
                 lea     (Title_Card_Number_2), A1              ; Offset_0x13AC2E
 Offset_0x02457E:
                 move.w  #$A7A0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     Title_Card_Letters_Ptr(PC), A1         ; Offset_0x024764
                 moveq   #$00, D0
                 move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
                 lsl.w   #$02, D0
                 move.l  $00(A1, D0), A1
                 move.w  #$A9A0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 move.w  #$005A, Obj_Timer(A0)                            ; $002E
                 move.w  #$0004, Obj_Control_Var_00(A0)                   ; $0030
                 clr.w   Obj_Control_Var_02(A0)                           ; $0032

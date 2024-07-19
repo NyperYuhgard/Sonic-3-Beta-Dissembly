@@ -17,7 +17,7 @@ Offset_0x0247DE:
 Offset_0x0247E6:
                 lea     (Title_Card_Results), A1               ; Offset_0x13A8DA
                 move.w  #$A400, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Title_Card_Number_1), A1              ; Offset_0x13AB6C
                 move.w  #$B000, D2
                 tst.b   (Act_Id_2).w                                 ; $FFFFEE55
@@ -25,7 +25,7 @@ Offset_0x0247E6:
                 lea     (Title_Card_Number_2), A1              ; Offset_0x13AC2E
                 move.w  #$B400, D2
 Offset_0x024810:
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Level_Results_Sonic), A1              ; Offset_0x13A272
                 cmpi.w  #Sonic_Alone, (Player_Selected_Flag).w ; $0001, $FFFFFF08
                 bls.s   Offset_0x024844
@@ -38,7 +38,7 @@ Offset_0x024810:
                 lea     (Level_Results_Tails), A1              ; Offset_0x13A526
 Offset_0x024844:
                 move.w  #$AC20, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$00, D0
                 move.b  (Timer_Minute_Count_Address).w, D0           ; $FFFFFE23
                 mulu.w  #$003C, D0

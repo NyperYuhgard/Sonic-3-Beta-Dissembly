@@ -613,10 +613,10 @@ Offset_0x000838:
                 cmpi.b  #$5C, (Scanline_Counter).w                   ; $FFFFF625
                 bcc.s   Offset_0x000872
                 move.b  #$01, (H_Int_Update_Flag).w                  ; $FFFFF64F
-                jmp     (Set_Kosinski_Bookmark)                ; Offset_0x0019C6
+                jmp     (Set_Kos_Bookmark)                ; Offset_0x0019C6
 Offset_0x000872:
                 bsr.s   Offset_0x00087A
-                jmp     (Set_Kosinski_Bookmark)                ; Offset_0x0019C6
+                jmp     (Set_Kos_Bookmark)                ; Offset_0x0019C6
 Offset_0x00087A:
                 jsr     (HUD_Update)                           ; Offset_0x007B34
                 move.w  #$0000, (VBlank_0_Run_Count).w               ; $FFFFF628
@@ -670,7 +670,7 @@ Offset_0x0008FE:
 		jsr	(SoundDriverInput_Null).l
 		startZ80
                 bsr     Process_Nemesis_Queue                  ; Offset_0x0015AE
-                jmp     (Set_Kosinski_Bookmark)                ; Offset_0x0019C6
+                jmp     (Set_Kos_Bookmark)                ; Offset_0x0019C6
 ;-------------------------------------------------------------------------------
 VBlank_0E:                                                     ; Offset_0x00096C
                 bsr     Offset_0x000B80
@@ -2176,235 +2176,319 @@ Offset_0x0018A4:
 ; Rotina de descompress�o no formato Kosinski
 ; <<<-
 ;=============================================================================== 
-              
-;===============================================================================
-; Rotina de descompress�o no formato Kosinski modulado
-; ->>>
-;===============================================================================               
-Kosinski_Moduled_Dec:                                          ; Offset_0x0018A8
-                lea     (Kosinski_Mod_Queue).w, A2                   ; $FFFFFF64
-                tst.l   (A2)
-                beq.s   Offset_0x0018C0
-                addq.w  #$06, A2
-Offset_0x0018B2:
-                tst.l   (A2)
-                beq.s   Offset_0x0018BA
-                addq.w  #$06, A2
-                bra.s   Offset_0x0018B2
-Offset_0x0018BA:
-                move.l  A1, (A2)+
-                move.w  D2, (A2)+
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Adds a Kosinski Moduled archive to the module queue
+; Inputs:
+; a1 = address of the archive
+; d2 = destination in VRAM
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0018A8: Kosinski_Moduled_Dec:
+Queue_Kos_Module:
+                lea	(Kosinski_Mod_Queue).w,a2
+                tst.l	(a2)			; is the first slot free?
+                beq.s	Process_Kos_Module_Queue_Init		; if yes, branch
+                addq.w	#6,a2			; otherwise, check next slot
+; Offset_0x0018B2:
+@findFreeSlot:
+                tst.l	(a2)
+                beq.s	@freeSlotFound
+                addq.w	#6,a2
+                bra.s	@findFreeSlot
+; ---------------------------------------------------------------------------
+; Offset_0x0018BA:
+@freeSlotFound:
+		move.l  a1,(a2)+		; store source address
+		move.w  d2,(a2)+		; store destination VRAM address
+		rts
+; End of function Queue_Kos_Module
+
+; ---------------------------------------------------------------------------
+; Initializes processing of the first module on the queue
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0018C0:
+Process_Kos_Module_Queue_Init:
+		move.w	(a1)+,d3		; get uncompressed size
+		cmpi.w	#$A000,d3
+		bne.s	@gotSize
+		move.w	#$8000,d3		; $A000 means $8000 for some reason
+; Offset_0x0018CC:
+@gotSize:
+		lsr.w	#1,d3
+		move.w	d3,d0
+		rol.w	#5,d0
+		andi.w	#$1F,d0			; get number of complete modules
+		move.b	d0,(Kosinski_Modules_Left).w
+		andi.l	#$7FF,d3		; get size of last module in words
+		bne.s	@gotLeftover		; branch if it's non-zero
+		subq.b	#1,(Kosinski_Modules_Left).w	; otherwise decrement the number of modules
+		move.l	#$800,d3	; and take the size of the last module to be $800 words
+; Offset_0x0018EC:
+@gotLeftover:
+		move.w	d3,(Kosinski_Module_Size).w
+		move.w	d2,(Kosinski_Mod_Destination).w
+		move.l	a1,(Kosinski_Mod_Queue).w
+		addq.b	#1,(Kosinski_Modules_Left).w	; store total number of modules
+		rts
+; End of function Process_Kos_Module_Queue_Init
+
+; ---------------------------------------------------------------------------
+; Processes the first module on the queue
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0018FE: Process_Kosinski_Queue:
+Process_Kos_Module_Queue:
+		tst.b	(Kosinski_Modules_Left).w
+		bne.s	@modulesLeft
+; Offset_0x001904:
+@done:
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x001906:
+@modulesLeft:
+		bmi.s	@decompressionStarted
+		cmpi.w	#4,(Kosinski_Mod_Queue_Count).w
+		bcc.s	@done					; branch if the Kosinski decompression queue is full
+		move.l	(Kosinski_Mod_Queue).w,a1
+		lea	(Kosinski_Decomp_Buffer).w,a2
+		bsr.w	Queue_Kos				; add current module to decompression queue
+		ori.b	#$80, (Kosinski_Modules_Left).w		; and set bit to signify decompression in progress
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x001924:
+@decompressionStarted:
+		tst.w	(Kosinski_Mod_Queue_Count).w
+		bne.s	@done					; branch if the decompression isn't complete
+
+		; otherwise, DMA the decompressed data to VRAM
+		andi.b	#$7F,(Kosinski_Modules_Left).w
+		move.l	#$800,d3
+		subq.b	#1,(Kosinski_Modules_Left).w
+		bne.s	@skip					; branch if it isn't the last module
+		move.w	(Kosinski_Module_Size).w,d3
+; Offset_0x001940:
+@skip:
+		move.w	(Kosinski_Mod_Destination).w,d2
+		move.w	d2,d0
+		add.w	d3,d0
+		add.w	d3,d0
+		move.w	d0,(Kosinski_Mod_Destination).w		; set new destination
+		move.l	(Kosinski_Mod_Queue).w,d0
+		move.l	(Kosinski_Decomp_Queue).w,d1
+		sub.l	d1,d0
+		andi.l	#$F,d0
+		add.l	d0,d1					; round to the nearest $10 boundary
+		move.l	d1,(Kosinski_Mod_Queue).w		; and set new source
+		move.l	#Kosinski_Decomp_Buffer,d1
+		andi.l	#$FFFFFF,d1
+		jsr	(DMA_68KtoVRAM).l
+		tst.b	(Kosinski_Modules_Left).w
+		bne.s	@exit					; return if this wasn't the last module
+		lea	(Kosinski_Mod_Queue).w,a0
+		lea	(Kosinski_Mod_Queue+6).w,a1
+		move.l	(a1)+,(a0)+				; otherwise, shift all entries up
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.l	#0,(a0)+				; and mark the last slot as free
+		move.w	#0,(a0)+
+		move.l	(Kosinski_Mod_Queue).w,d0
+		beq.s	@exit					; return if the queue is now empty
+		move.l	d0,a1
+		move.w	(Kosinski_Mod_Destination).w,d2
+		jmp	(Process_Kos_Module_Queue_Init).l
+; Offset_0x0019AC:
+@exit:
                 rts
-Offset_0x0018C0:
-                move.w  (A1)+, D3
-                cmpi.w  #$A000, D3
-                bne.s   Offset_0x0018CC
-                move.w  #$8000, D3
-Offset_0x0018CC:
-                lsr.w   #$01, D3
-                move.w  D3, D0
-                rol.w   #$05, D0
-                andi.w  #$001F, D0
-                move.b  D0, (Kosinski_Modules_Left).w                ; $FFFFFF60
-                andi.l  #$000007FF, D3
-                bne.s   Offset_0x0018EC
-                subq.b  #$01, (Kosinski_Modules_Left).w              ; $FFFFFF60
-                move.l  #$00000800, D3
-Offset_0x0018EC:
-                move.w  D3, (Kosinski_Module_Size).w                 ; $FFFFFF62
-                move.w  D2, (Kosinski_Mod_Destination).w             ; $FFFFFF68
-                move.l  A1, (Kosinski_Mod_Queue).w                   ; $FFFFFF64
-                addq.b  #$01, (Kosinski_Modules_Left).w              ; $FFFFFF60
-                rts   
-;===============================================================================
-; Rotina de descompress�o no formato Kosinski modulado
-; <<<-
-;===============================================================================
-Process_Kosinski_Queue:                                        ; Offset_0x0018FE
-                tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
-                bne.s   Offset_0x001906
-Offset_0x001904:
+; End of function Process_Kos_Module_Queue
+
+; ---------------------------------------------------------------------------
+; Adds Kosinski-compressed data to the decompression queue
+; Inputs:
+; a1 = compressed data address
+; a2 = decompression destination in RAM
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0019AE: Update_Kosinski_Queue_Count:
+Queue_Kos:
+		move.w	(Kosinski_Mod_Queue_Count).w,d0
+		lsl.w	#3,d0
+		lea	(Kosinski_Decomp_Queue).w,a3
+		move.l	a1,(a3,d0.w)				; store source
+		move.l	a2,4(a3,d0.w)				; store destination
+		addq.w	#1,(Kosinski_Mod_Queue_Count).w
+		rts
+; End of function Queue_Kos
+
+; ---------------------------------------------------------------------------
+; Checks if V-int occured in the middle of Kosinski queue processing
+; and stores the location from which processing is to resume if it did
+; ---------------------------------------------------------------------------
+
+; Offset_0x0019C6: Set_Kosinski_Bookmark:
+Set_Kos_Bookmark:
+                tst.w	(Kosinski_Mod_Queue_Count).w
+                bpl.s	@return					; branch if decompression wasn't in progress
+                move.l	$42(sp),d0				; check address V-int is supposed to return to
+                cmpi.l	#Process_Kos_Queue,d0
+                bcs.s	@return
+                cmpi.l	#Process_Kos_Queue_Done,d0
+                bcc.s	@return
+                move.l	$42(sp),(Kosinski_Bookmark).w
+                move.l	#Backup_Kos_Registers,$42(sp)	; force V-int to return here instead if needed
+; Offset_0x0019EE:
+@return:
                 rts
-Offset_0x001906:
-                bmi.s   Offset_0x001924
-                cmpi.w  #$0004, (Kosinski_Mod_Queue_Count).w         ; $FFFFFF0E
-                bcc.s   Offset_0x001904
-                move.l  (Kosinski_Mod_Queue).w, A1                   ; $FFFFFF64
-                lea     (Kosinski_Decomp_Buffer).w, A2               ; $FFFFD000
-                bsr     Update_Kosinski_Queue_Count            ; Offset_0x0019AE
-                ori.b   #$80, (Kosinski_Modules_Left).w              ; $FFFFFF60
-                rts
-Offset_0x001924:
-                tst.w   (Kosinski_Mod_Queue_Count).w                 ; $FFFFFF0E
-                bne.s   Offset_0x001904
-                andi.b  #$7F, (Kosinski_Modules_Left).w              ; $FFFFFF60
-                move.l  #$00000800, D3
-                subq.b  #$01, (Kosinski_Modules_Left).w              ; $FFFFFF60
-                bne.s   Offset_0x001940
-                move.w  (Kosinski_Module_Size).w, D3                 ; $FFFFFF62
-Offset_0x001940:
-                move.w  (Kosinski_Mod_Destination).w, D2             ; $FFFFFF68
-                move.w  D2, D0
-                add.w   D3, D0
-                add.w   D3, D0
-                move.w  D0, (Kosinski_Mod_Destination).w             ; $FFFFFF68
-                move.l  (Kosinski_Mod_Queue).w, D0                   ; $FFFFFF64
-                move.l  (Kosinski_Decomp_Queue).w, D1                ; $FFFFFF40
-                sub.l   D1, D0
-                andi.l  #$0000000F, D0
-                add.l   D0, D1
-                move.l  D1, (Kosinski_Mod_Queue).w                   ; $FFFFFF64
-                move.l  #Kosinski_Decomp_Buffer, D1                  ; $FFFFD000
-                andi.l  #$00FFFFFF, D1
-                jsr     (DMA_68KtoVRAM)                        ; Offset_0x0012FC
-                tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
-                bne.s   Offset_0x0019AC
-                lea     (Kosinski_Mod_Queue).w, A0                   ; $FFFFFF64
-                lea     (Kosinski_Mod_Queue+$06).w, A1               ; $FFFFFF6A
-                move.l  (A1)+, (A0)+
-                move.w  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.w  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.w  (A1)+, (A0)+
-                move.l  #$00000000, (A0)+
-                move.w  #$0000, (A0)+
-                move.l  (Kosinski_Mod_Queue).w, D0                   ; $FFFFFF64
-                beq.s   Offset_0x0019AC
-                move.l  D0, A1
-                move.w  (Kosinski_Mod_Destination).w, D2             ; $FFFFFF68
-                jmp     (Offset_0x0018C0)
-Offset_0x0019AC:
-                rts
-Update_Kosinski_Queue_Count:                                   ; Offset_0x0019AE
-                move.w  (Kosinski_Mod_Queue_Count).w, D0             ; $FFFFFF0E
-                lsl.w   #$03, D0
-                lea     (Kosinski_Decomp_Queue).w, A3                ; $FFFFFF40
-                move.l  A1, $00(A3, D0)
-                move.l  A2, $04(A3, D0)
-                addq.w  #$01, (Kosinski_Mod_Queue_Count).w           ; $FFFFFF0E
-                rts                  
-;-------------------------------------------------------------------------------                  
-Set_Kosinski_Bookmark:                                         ; Offset_0x0019C6
-                tst.w   (Kosinski_Mod_Queue_Count).w                 ; $FFFFFF0E
-                bpl.s   Offset_0x0019EE
-                move.l  $0042(A7), D0
-                cmpi.l  #Process_Kosinski_Queue_Main, D0       ; Offset_0x0019F0
-                bcs.s   Offset_0x0019EE
-                cmpi.l  #Exit_Process_Kosinski_Queue_Main, D0  ; Offset_0x001AD0
-                bcc.s   Offset_0x0019EE
-                move.l  $0042(A7), (Kosinski_Bookmark).w             ; $FFFFFF3A
-                move.l  #Kosinski_Save_Registers, $0042(A7)    ; Offset_0x001AE2
-Offset_0x0019EE:
-                rts    
-;-------------------------------------------------------------------------------
-Process_Kosinski_Queue_Main:                                   ; Offset_0x0019F0
-                tst.w   (Kosinski_Mod_Queue_Count).w                 ; $FFFFFF0E
-                beq     Exit_Process_Kosinski_Queue_Main       ; Offset_0x001AD0
-                bmi     Offset_0x001AD2
-                ori.w   #$8000, (Kosinski_Mod_Queue_Count).w         ; $FFFFFF0E
-                move.l  (Kosinski_Decomp_Queue).w, A0                ; $FFFFFF40
-                move.l  (Kosinski_Decomp_Destination).w, A1          ; $FFFFFF44
-                lea     (Kosinski_Description_Field).w, A2           ; $FFFFFF3E
-                move.b  (A0)+, $0001(A2)
-                move.b  (A0)+, (A2)
-                move.w  (A2), D5
-                moveq   #$0F, D4
-Offset_0x001A18:
-                lsr.w   #$01, D5
-                move    SR, D6
-                dbra    D4, Offset_0x001A2A
-                move.b  (A0)+, $0001(A2)
-                move.b  (A0)+, (A2)
-                move.w  (A2), D5
-                moveq   #$0F, D4
-Offset_0x001A2A:
-                move    D6, CCR
-                bcc.s   Offset_0x001A32
-                move.b  (A0)+, (A1)+
-                bra.s   Offset_0x001A18
-Offset_0x001A32:
-                moveq   #$00, D3
-                lsr.w   #$01, D5
-                move    SR, D6
-                dbra    D4, Offset_0x001A46
-                move.b  (A0)+, $0001(A2)
-                move.b  (A0)+, (A2)
-                move.w  (A2), D5
-                moveq   #$0F, D4
-Offset_0x001A46:
-                move    D6, CCR
-                bcs.s   Offset_0x001A76
-                lsr.w   #$01, D5
-                dbra    D4, Offset_0x001A5A
-                move.b  (A0)+, $0001(A2)
-                move.b  (A0)+, (A2)
-                move.w  (A2), D5
-                moveq   #$0F, D4
+; End of function Set_Kos_Bookmark
+
+; ---------------------------------------------------------------------------
+; Processes the first entry in the Kosinski decompression queue
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0019F0: Process_Kosinski_Queue_Main:
+Process_Kos_Queue:
+		tst.w	(Kosinski_Mod_Queue_Count).w
+		beq.w	Process_Kos_Queue_Done
+		bmi.w	Restore_Kos_Bookmark			; branch if decompression was interrupted by V-int
+		ori.w	#$8000,(Kosinski_Mod_Queue_Count).w	; set sign bit to signify decompression in progress
+		move.l	(Kosinski_Decomp_Queue).w,a0
+		move.l	(Kosinski_Decomp_Destination).w,a1
+
+		; what follows is identical to the normal Kosinski decompressor except for using Kosinski_Description_Field instead of the stack
+		lea	(Kosinski_Description_Field).w,a2
+		move.b	(a0)+,1(a2)
+		move.b	(a0)+,(a2)
+		move.w	(a2),d5
+		moveq	#$F,d4
+; Offset_0x001A18:
+Process_Kos_Queue_Loop:
+		lsr.w	#1,d5
+		move	sr,d6
+		dbf	d4,Process_Kos_Queue_ChkBit
+		move.b	(a0)+,1(a2)
+		move.b	(a0)+,(a2)
+		move.w	(a2),d5
+		moveq	#$F,d4
+; Offset_0x001A2A:
+Process_Kos_Queue_ChkBit:
+		move	d6,ccr
+		bcc.s	Process_Kos_Queue_RLE
+		move.b	(a0)+,(a1)+
+		bra.s	Process_Kos_Queue_Loop
+; ---------------------------------------------------------------------------
+; Offset_0x001A32:
+Process_Kos_Queue_RLE:
+		moveq	#0,d3
+		lsr.w	#1,d5
+		move	sr,d6
+		dbf	d4,Process_Kos_Queue_ChkBit2
+		move.b	(a0)+,1(a2)
+		move.b	(a0)+,(a2)
+		move.w	(a2),d5
+		moveq	#$F,d4
+; Offset_0x001A46:
+Process_Kos_Queue_ChkBit2:
+		move	d6,ccr
+		bcs.s	Process_Kos_Queue_SeparateRLE
+		lsr.w	#1,d5
+		dbf	d4,Offset_0x001A5A
+		move.b	(a0)+,1(a2)
+		move.b	(a0)+,(a2)
+		move.w	(a2),d5
+		moveq	#$F,d4
+
 Offset_0x001A5A:
-                roxl.w  #$01, D3
-                lsr.w   #$01, D5
-                dbra    D4, Offset_0x001A6C
-                move.b  (A0)+, $0001(A2)
-                move.b  (A0)+, (A2)
-                move.w  (A2), D5
-                moveq   #$0F, D4
+		roxl.w	#1,d3
+		lsr.w	#1,d5
+		dbf	d4,Offset_0x001A6C
+		move.b	(a0)+,1(a2)
+		move.b	(a0)+,(a2)
+		move.w	(a2),d5
+		moveq	#$F,d4
+
 Offset_0x001A6C:
-                roxl.w  #$01, D3
-                addq.w  #$01, D3
-                moveq   #-$01, D2
-                move.b  (A0)+, D2
-                bra.s   Offset_0x001A8C
-Offset_0x001A76:
-                move.b  (A0)+, D0
-                move.b  (A0)+, D1
-                moveq   #-$01, D2
-                move.b  D1, D2
-                lsl.w   #$05, D2
-                move.b  D0, D2
-                andi.w  #$0007, D1
-                beq.s   Offset_0x001A98
-                move.b  D1, D3
-                addq.w  #$01, D3
-Offset_0x001A8C:
-                move.b  $00(A1, D2), D0
-                move.b  D0, (A1)+
-                dbra    D3, Offset_0x001A8C
-                bra.s   Offset_0x001A18
-Offset_0x001A98:
-                move.b  (A0)+, D1
-                beq.s   Offset_0x001AA8
-                cmpi.b  #$01, D1
-                beq     Offset_0x001A18
-                move.b  D1, D3
-                bra.s   Offset_0x001A8C
-Offset_0x001AA8:
-                move.l  A0, (Kosinski_Decomp_Queue).w                ; $FFFFFF40
-                move.l  A1, (Kosinski_Decomp_Destination).w          ; $FFFFFF44
-                andi.w  #$7FFF, (Kosinski_Mod_Queue_Count).w         ; $FFFFFF0E
-                subq.w  #$01, (Kosinski_Mod_Queue_Count).w           ; $FFFFFF0E
-                beq.s   Exit_Process_Kosinski_Queue_Main       ; Offset_0x001AD0
-                lea     (Kosinski_Decomp_Queue).w, A0                ; $FFFFFF40
-                lea     (Kosinski_Decomp_Queue+$08).w, A1            ; $FFFFFF48
-                move.l  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-                move.l  (A1)+, (A0)+
-Exit_Process_Kosinski_Queue_Main:                              ; Offset_0x001AD0
-                rts
-Offset_0x001AD2:
-                movem.l (Kosinski_Saved_Registers).w, D0-D6/A0-A2    ; $FFFFFF10
-                move.l  (Kosinski_Bookmark).w, -(A7)                 ; $FFFFFF3A
-                move.w  (Kosinski_Saved_SR).w, -(A7)                 ; $FFFFFF38
-                rte  
+		roxl.w	#1,d3
+		addq.w	#1,d3
+		moveq	#-1,d2
+		move.b	(a0)+,d2
+		bra.s	Process_Kos_Queue_RLELoop
+; ---------------------------------------------------------------------------
+; Offset_0x001A76:
+Process_Kos_Queue_SeparateRLE:
+		move.b	(a0)+,d0
+		move.b	(a0)+,d1
+		moveq	#-1,d2
+		move.b	d1,d2
+		lsl.w	#5,d2
+		move.b	d0,d2
+		andi.w	#7,d1
+		beq.s	Process_Kos_Queue_SeparateRLE2
+		move.b	d1,d3
+		addq.w	#1,d3
+; Offset_0x001A8C:
+Process_Kos_Queue_RLELoop:
+		move.b	(a1,d2.w),d0
+		move.b	d0,(a1)+
+		dbf	d3,Process_Kos_Queue_RLELoop
+		bra.s	Process_Kos_Queue_Loop
+; ---------------------------------------------------------------------------
+; Offset_0x001A98:
+Process_Kos_Queue_SeparateRLE2:
+		move.b	(a0)+,d1
+		beq.s	Process_Kos_Queue_EndReached
+		cmpi.b	#1,d1
+		beq.w	Process_Kos_Queue_Loop
+		move.b	d1,d3
+		bra.s	Process_Kos_Queue_RLELoop
+; ---------------------------------------------------------------------------
+; Offset_0x001AA8:
+Process_Kos_Queue_EndReached:
+		move.l	a0,(Kosinski_Decomp_Queue).w
+		move.l	a1,(Kosinski_Decomp_Destination).w
+		andi.w	#$7FFF,(Kosinski_Mod_Queue_Count).w	; clear decompression in progress bit
+		subq.w	#1,(Kosinski_Mod_Queue_Count).w
+		beq.s	Process_Kos_Queue_Done			; branch if there aren't any entries remaining in the queue
+		lea	(Kosinski_Decomp_Queue).w,a0
+		lea	(Kosinski_Decomp_Queue+8).w,a1		; otherwise, shift all entries up
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+; Offset_0x001AD0: Exit_Process_Kosinski_Queue_Main:
+Process_Kos_Queue_Done:
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x001AD2:
+Restore_Kos_Bookmark:
+		movem.l	(Kosinski_Saved_Registers).w,d0-d6/a0-a2
+		move.l	(Kosinski_Bookmark).w,-(sp)
+		move.w	(Kosinski_Saved_SR).w,-(sp)
+		rte  
 ;-------------------------------------------------------------------------------
-Kosinski_Save_Registers:                                       ; Offset_0x001AE2
-                move    SR, (Kosinski_Saved_SR).w                    ; $FFFFFF38
-                movem.l D0-D6/A0-A2, (Kosinski_Saved_Registers).w    ; $FFFFFF10
-                rts   
-                                                        
+; Offset_0x001AE2: Kosinski_Save_Registers:
+Backup_Kos_Registers:
+		move    sr,(Kosinski_Saved_SR).w
+		movem.l d0-d6/a0-a2,(Kosinski_Saved_Registers).w
+		rts
+; End of function Process_Kos_Queue
+
 ;===============================================================================
 ; Aguarda pela conclus�o do procedimento de interrup��o vertical
 ; ->>>
@@ -4409,57 +4493,65 @@ PlayList:                                                      ; Offset_0x00396E
                 dc.b    Special_Stage_Snd                                  ; $1C
                 dc.b    Special_Stage_Snd                                  ; $1C
                 dc.b    Special_Stage_Snd                                  ; $1C 
-;-------------------------------------------------------------------------------                
-Level:                                                         ; Offset_0x00399E
-                bset    #$07, (Game_Mode).w                          ; $FFFFF600
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                bmi.s   Offset_0x0039B2
-                move.b  #Stop_Sound, D0                                    ; $E1
-                bsr     Play_Music                             ; Offset_0x001176
+; ===========================================================================
+; Offset_0x00399E:
+Level:
+		bset	#7,(Game_Mode).w
+		tst.w	(Auto_Control_Player_Flag).w
+		bmi.s	Offset_0x0039B2
+		move.b	#Stop_Sound,d0
+		bsr.w	Play_Music
+
 Offset_0x0039B2:
-                clr.w   (Kosinski_Mod_Queue_Count).w                 ; $FFFFFF0E
-                lea     (Kosinski_Saved_Registers).w, A1             ; $FFFFFF10
-                moveq   #$00, D0
-                move.w  #$001A, D1
+		clr.w	(Kosinski_Mod_Queue_Count).w
+		lea	(Kosinski_Saved_Registers).w,a1
+		moveq	#0,d0
+		move.w	#$1A,d1
+
 Offset_0x0039C0:
-                move.l  D0, (A1)+
-                dbra    D1, Offset_0x0039C0
-                bsr     ClearPLC                               ; Offset_0x001548
-                bsr     Pal_FadeFrom                           ; Offset_0x002DE8
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                bmi.s   Offset_0x003A32
-                move    #$2700, SR
-                bsr     ClearScreen                            ; Offset_0x001002
-                move    #$2300, SR
-                moveq   #$00, D0
-                move.w  D0, (Level_Frame_Count).w                    ; $FFFFFE04
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$04, D0
-                andi.w  #$01F8, D0
-                move.w  D0, D1
-                add.w   D0, D0
-                add.w   D0, D1
-                lea     (TilesMainTable), A2                   ; Offset_0x04A77E
-                moveq   #$00, D0
-                move.b  $00(A2, D1), D0
-                beq.s   Offset_0x003A0A
-                bsr     LoadPLC                                ; Offset_0x0014D0
+		move.l	d0,(a1)+
+		dbf	d1,Offset_0x0039C0
+		bsr.w	ClearPLC
+		bsr.w	Pal_FadeFrom
+		tst.w	(Auto_Control_Player_Flag).w
+		bmi.s	Offset_0x003A32
+		move	#$2700,sr
+		bsr.w	ClearScreen
+		move	#$2300,sr
+		moveq	#0,d0
+		move.w	d0,(Level_Frame_Count).w
+		move.w	(Level_Id).w,d0
+		ror.b	#1,d0
+		lsr.w	#4,d0
+		andi.w	#$1F8,d0
+		move.w	d0,d1
+		add.w	d0,d0
+		add.w	d0,d1
+		lea	(TilesMainTable).l,a2
+		moveq	#0,d0
+		move.b	(a2,d1.w),d0
+		beq.s	Offset_0x003A0A
+		bsr.w	LoadPLC
+
 Offset_0x003A0A:
-                bsr     Init_Player_Selected                   ; Offset_0x004058
-                moveq   #$06, D0
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                bne.s   Offset_0x003A2E
-                moveq   #$01, D0
-                bsr     LoadPLC                                ; Offset_0x0014D0
-                cmpi.w  #$0002, (Player_Selected_Flag).w             ; $FFFFFF08
-                bne.s   Offset_0x003A32
-                addq.w  #$01, D0
-                tst.b   (Hardware_Id).w                              ; $FFFFFFF8
-                bpl.s   Offset_0x003A2E
-                addq.w  #$02, D0
+		bsr.w	Init_Player_Selected
+		moveq	#6,d0
+		tst.w	(Two_Player_Flag).w
+		bne.s	Offset_0x003A2E
+		moveq	#1,d0
+		bsr.w	LoadPLC
+		cmpi.w	#2,(Player_Selected_Flag).w
+		bne.s	Offset_0x003A32
+		addq.w	#1,d0
+		; for some reason, Sonic 3 final is missing this and the Miles
+		; graphic, meaning it displays Tails even on a Japanese console
+		tst.b	(Hardware_Id).w
+		bpl.s	Offset_0x003A2E
+		addq.w	#2,d0
+
 Offset_0x003A2E:
-                bsr     LoadPLC                                ; Offset_0x0014D0
+		bsr.w	LoadPLC
+
 Offset_0x003A32:
                 lea     (Sprite_Table_Input).w, A1                   ; $FFFFAC00
                 moveq   #$00, D0
@@ -4497,245 +4589,273 @@ Offset_0x003A7C:
 Offset_0x003A8C:
                 move.l  D0, (A1)+
                 dbra    D1, Offset_0x003A8C
-                jsr     (Init_Sprite_Table)                    ; Offset_0x011042
-                lea     (VDP_Control_Port), A6                       ; $00C00004
-                move.w  #$8B03, (A6)
-                move.w  #$8230, (A6)
-                move.w  #$8407, (A6)
-                move.w  #$857C, (A6)
-                move.w  #$9001, (A6)
-                move.w  #$8004, (A6)
-                move.w  #$8720, (A6)
-                move.w  #$8C81, (A6)
-                tst.b   (Debug_Mode_Flag).w                          ; $FFFFFFD2
-                beq.s   Offset_0x003ADE
-                btst    #$05, (Control_Ports_Buffer_Data).w          ; $FFFFF604
-                beq.s   Offset_0x003AD0
-                move.w  #$8C89, (A6)
-Offset_0x003AD0:
-                btst    #$06, (Control_Ports_Buffer_Data).w          ; $FFFFF604
-                beq.s   Offset_0x003ADE
-                move.b  #$01, (Debug_Mode_Active).w                  ; $FFFFFFFA
-Offset_0x003ADE:
-                move.w  #$8AFF, (Horizontal_Int_Count_Cmd).w         ; $FFFFF624
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                beq.s   Offset_0x003B1A
-                move.w  #$4EF9, (HBlank_Ptr).w                       ; $FFFFF608
-                move.l  #HBlank_00, (HBlank_Ptr+$02).w ; Offset_0x000C44, $FFFFF60A
-                move.w  #$8014, (A6)
-                move.w  #$8220, (A6)
-                move.w  #$8405, (A6)
-                move.w  #$8A6B, (Horizontal_Int_Count_Cmd).w         ; $FFFFF624
-                move.w  #$9003, (A6)
-                cmpi.b  #BPz_Id, (Level_Id).w                   ; $0F, $FFFFFE10
-                bne.s   Offset_0x003B1A
-                move.w  #$9011, (A6)
-Offset_0x003B1A:
-                move.w  (Horizontal_Int_Count_Cmd).w, (A6)           ; $FFFFF624
-                clr.w   (DMA_Buffer_List).w                          ; $FFFFE700
-                move.l  #DMA_Buffer_List, (DMA_Buffer_List_End).w  ; $FFFFE700, $FFFFE8F8
-                moveq   #$03, D0
-                bsr     PalLoad2                               ; Offset_0x002FBA
-                bsr     Init_Water_Levels                      ; Offset_0x005056
-                tst.b   (Water_Level_Flag).w                         ; $FFFFF730
-                beq.s   Offset_0x003B3E
-                move.w  #$8014, (A6)
-Offset_0x003B3E:
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                bmi.s   Offset_0x003BAE
-                moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$07, D0
-                lea     (PlayList), A1                         ; Offset_0x00396E
-                move.b  $00(A1, D0), D0
-                move.w  D0, (Level_Music_Buffer).w                   ; $FFFFFF90
-                bsr     Play_Music                             ; Offset_0x001176
-                move.b  #$00, (Title_Card_Flag).w                    ; $FFFFF711
-                cmpi.b  #S2_CNz_Id, (Level_Id).w                ; $0C, $FFFFFE10
-                bhi.s   Offset_0x003BA8
-                move.l  #Obj_Title_Cards, (Obj_08_Mem_Address).w ; Offset_0x024546, $FFFFB250
-Offset_0x003B76:
-                move.b  #$0C, (VBlank_Index).w                       ; $FFFFF62A
-                jsr     (Process_Kosinski_Queue_Main)          ; Offset_0x0019F0
-                bsr     Wait_For_VSync                         ; Offset_0x001AEE
-                jsr     (Load_Objects)                         ; Offset_0x0110AE
-                jsr     (Build_Sprites)                        ; Offset_0x011296
-                bsr     RunPLC                                 ; Offset_0x001556
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
-                tst.w   (Obj_08_Mem_Address+Obj_Respaw_Ref).w        ; $FFFFB298
-                beq.s   Offset_0x003B76
-                tst.l   (PLC_Data_Buffer).w                          ; $FFFFF680
-                bne.s   Offset_0x003B76
-Offset_0x003BA8:
-                jsr     (Head_Up_Display_Base)                 ; Offset_0x007DD4
+
+		jsr	(Init_Sprite_Table).l
+		lea	(VDP_Control_Port).l,a6
+		move.w	#$8B03,(a6)
+		move.w	#$8230,(a6)
+		move.w	#$8407,(a6)
+		move.w	#$857C,(a6)
+		move.w	#$9001,(a6)
+		move.w	#$8004,(a6)
+		move.w	#$8720,(a6)
+		move.w	#$8C81,(a6)
+		tst.b	(Debug_Mode_Flag).w
+		beq.s	Level_ChkMode
+; Level_ChkNight:
+		btst	#5,(Control_Ports_Buffer_Data).w
+		beq.s	Level_ChkDebug
+		move.w  #$8C89,(a6)
+; Offset_0x003AD0:
+Level_ChkDebug:
+		btst	#6,(Control_Ports_Buffer_Data).w
+		beq.s	Level_ChkMode
+		move.b	#1,(Debug_Mode_Active).w
+; Offset_0x003ADE:
+Level_ChkMode:
+		move.w	#$8AFF,(Horizontal_Int_Count_Cmd).w
+		tst.w	(Two_Player_Flag).w
+		beq.s	Level_LoadPal
+		move.w	#$4EF9,(HBlank_Ptr).w
+		move.l	#HBlank_00,(HBlank_Ptr+$02).w
+		move.w	#$8014,(a6)
+		move.w	#$8220,(a6)
+		move.w	#$8405,(a6)
+		move.w	#$8A6B,(Horizontal_Int_Count_Cmd).w
+		move.w	#$9003,(a6)
+		cmpi.b	#BPz_Id,(Level_Id).w
+		bne.s	Level_LoadPal
+                move.w	#$9011,(a6)
+; Offset_0x003B1A:
+Level_LoadPal:
+		move.w	(Horizontal_Int_Count_Cmd).w,(a6)
+		clr.w	(DMA_Buffer_List).w
+		move.l	#DMA_Buffer_List,(DMA_Buffer_List_End).w
+		moveq	#3,d0
+		bsr.w	PalLoad2
+		bsr.w	Init_Water_Levels
+		tst.b	(Water_Level_Flag).w
+		beq.s	Level_GetBgm
+		move.w	#$8014,(a6)
+; Offset_0x003B3E:
+Level_GetBgm:
+		tst.w	(Auto_Control_Player_Flag).w
+		bmi.s	Offset_0x003BAE
+		moveq	#0,d0
+		move.w	(Level_Id).w,d0
+		ror.b	#1,d0
+		lsr.w	#7,d0
+		lea	(PlayList).l,a1
+		move.b	(a1,d0.w),d0
+		move.w	d0,(Level_Music_Buffer).w
+		bsr.w	Play_Music
+		move.b	#0,(Title_Card_Flag).w
+		cmpi.b	#DDz_Id,(Level_Id).w		; is this Doomsday Zone?
+		bhi.s	Level_CreateHUD			; if not (but is Zone 0D or above), branch
+		move.l	#Obj_Title_Cards,(Obj_08_Mem_Address).w
+; Offset_0x003B76:
+Level_TtlCard:
+		move.b	#$C,(VBlank_Index).w
+		jsr	(Process_Kos_Queue).l
+		bsr.w	Wait_For_VSync
+		jsr	(Load_Objects).l
+		jsr	(Build_Sprites).l
+		bsr.w	RunPLC
+		jsr	(Process_Kos_Module_Queue).l
+		tst.w	(Obj_08_Mem_Address+Obj_Respaw_Ref).w
+		beq.s	Level_TtlCard
+		tst.l	(PLC_Data_Buffer).w
+		bne.s	Level_TtlCard
+; Offset_0x003BA8:
+Level_CreateHUD:
+                jsr	(Head_Up_Display_Base).l
+
 Offset_0x003BAE:
-                moveq   #$03, D0
-                bsr     PalLoad1                               ; Offset_0x002F9E
-                jsr     (LevelSizeLoad)                      ; Offset_0x011E64
-                jsr     (Background_Scroll_Speed)              ; Offset_0x0120D4
-                bsr     Main_Level_Load_8x8_Tiles              ; Offset_0x004FEA
-                jsr     (Main_Level_Load_16_128_Blocks)        ; Offset_0x0123DE
-                jsr     (Animate_Counters_Init)                ; Offset_0x01F55A
-                move    #$2700, SR
-                jsr     (Load_Tiles_From_Start_Ptr)            ; Offset_0x0123D8
-                move    #$2300, SR
-                jsr     (S2_FloorLog_Unk)                      ; Offset_0x009B18
-                bsr     Load_Collision_Index                   ; Offset_0x0049B2
-                bsr     Water_Effects                          ; Offset_0x0041B0
-                bsr     Load_Player_Selected                   ; Offset_0x004076
-                move.w  (Control_Ports_Buffer_Data+$02).w, (Tmp_FF7C).w ; $FFFFF606, $FFFFFF7C
-                move.w  #$0000, (Control_Ports_Logical_Data).w       ; $FFFFF602
-                move.w  #$0000, (Control_Ports_Logical_Data_2).w     ; $FFFFF66A
-                move.w  #$0000, (Control_Ports_Buffer_Data).w        ; $FFFFF604
-                move.w  #$0000, (Control_Ports_Buffer_Data+$02).w    ; $FFFFF606
-                move.b  #$01, (Control_Locked_Flag_P1).w             ; $FFFFF7CC
-                move.b  #$01, (Control_Locked_Flag_P2).w             ; $FFFFF7CF
-                move.b  #$00, (Title_Card_Flag).w                    ; $FFFFF711
-                tst.b   (Water_Level_Flag).w                         ; $FFFFF730
-                beq.s   Offset_0x003C4C
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
-                beq.s   Offset_0x003C36
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
-                bne.s   Offset_0x003C4C
+ 		moveq	#3,d0
+		bsr.w	PalLoad1
+		jsr	(LevelSizeLoad).l
+		jsr	(Background_Scroll_Speed).l
+		bsr.w	Main_Level_Load_8x8_Tiles
+		jsr	(Main_Level_Load_16_128_Blocks).l
+		jsr	(Animate_Counters_Init).l
+		move	#$2700,sr
+		jsr	(Load_Tiles_From_Start_Ptr).l
+		move	#$2300,sr
+		jsr	(S2_FloorLog_Unk).l
+		bsr.w	Load_Collision_Index
+		bsr.w	Water_Effects
+		bsr.w	Load_Player_Selected
+		move.w	(Control_Ports_Buffer_Data+2).w,(Tmp_FF7C).w
+		move.w	#0,(Control_Ports_Logical_Data).w
+		move.w	#0,(Control_Ports_Logical_Data_2).w
+		move.w	#0,(Control_Ports_Buffer_Data).w
+		move.w	#0,(Control_Ports_Buffer_Data+2).w
+		move.b	#1,(Control_Locked_Flag_P1).w
+		move.b	#1,(Control_Locked_Flag_P2).w
+		move.b	#0,(Title_Card_Flag).w
+; Level_ChkWater:
+		tst.b	(Water_Level_Flag).w
+		beq.s	Level_ClrHUD
+		cmpi.b	#Hz_Id,(Level_Id).w
+		beq.s	Offset_0x003C36
+		cmpi.b	#Hz_Id,(Level_Id).w
+		bne.s	Level_ClrHUD
+
 Offset_0x003C36:
-                move.l  #Obj_Wave_Splash, (Obj_04_Mem_Address).w ; Offset_0x014926, $FFFFB128
-                move.l  #Obj_0x6D_Hz_Water_Splash, (Obj_05_Mem_Address).w ; Offset_0x02E22E, $FFFFB172
-                move.b  #$01, (Obj_05_Mem_Address+Obj_Subtype).w     ; $FFFFB19E
-Offset_0x003C4C:
-                moveq   #$00, D0
-                tst.b   (Saved_Level_Flag).w                         ; $FFFFFE30
-                bne.s   Offset_0x003C6C
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
-                move.l  D0, (Time_Count_Address).w                   ; $FFFFFE22
-                move.b  D0, (Ring_Status_Flag).w                     ; $FFFFFE1B
-                move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
-                move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
-                move.b  D0, (Ring_Status_Flag_P2).w                  ; $FFFFFEC7
-Offset_0x003C6C:
-                move.b  D0, (Time_Over_Flag).w                       ; $FFFFFE1A
-                move.b  D0, (Time_Over_Flag_P2).w                    ; $FFFFFECC
-                move.w  D0, (Debug_Mode_Flag_Index).w                ; $FFFFFE08
-                move.w  D0, (Restart_Level_Flag).w                   ; $FFFFFE02
-                move.b  D0, (S2_Teleport_Timer).w                    ; $FFFFF622
-                move.b  D0, (S2_Teleport_Flag).w                     ; $FFFFF623
-                move.w  D0, (Total_Ring_Count_Address).w             ; $FFFFFEF0
-                move.w  D0, (Total_Ring_Count_Address_P2).w          ; $FFFFFEF2
-                move.w  D0, (Monitors_Broken).w                      ; $FFFFFEF4
-                move.w  D0, (Monitors_Broken_P2).w                   ; $FFFFFEF6
-                move.w  D0, (Loser_Timer_Left).w                     ; $FFFFFEF8
-                move.b  D0, (LRz_Rocks_Routine).w                    ; $FFFFFEB0
-                bsr     Oscillate_Num_Init                     ; Offset_0x0049DE
-                move.b  #$01, (HUD_Score_Refresh_Flag).w             ; $FFFFFE1F
-                move.b  #$01, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
-                move.b  #$01, (HUD_Timer_Refresh_Flag).w             ; $FFFFFE1E
-                move.b  #$01, (HUD_Timer_Refresh_Flag_P2).w          ; $FFFFFECA
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                beq.s   Offset_0x003CCC
-                tst.w   (Level_Id).w                                 ; $FFFFFE10
-                bne.s   Offset_0x003CCC
-                move.l  #Obj_AIz_Intro_Surfboard, (Obj_05_Mem_Address).w ; Offset_0x0185D6, $FFFFB172
+		move.l	#Obj_Wave_Splash, (Obj_04_Mem_Address).w
+		move.l	#Obj_0x6D_Hz_Water_Splash, (Obj_05_Mem_Address).w
+		move.b	#1,(Obj_05_Mem_Address+Obj_Subtype).w
+; Offset_0x003C4C:
+Level_ClrHUD:
+		moveq	#0,d0
+		tst.b	(Saved_Level_Flag).w
+		bne.s	Level_FromCheckpoint
+		move.w	d0,(Ring_Count_Address).w
+		move.l	d0,(Time_Count_Address).w
+		move.b	d0,(Ring_Status_Flag).w
+		move.w	d0,(Ring_Count_Address_P2).w
+		move.l	d0,(Time_Count_Address_P2).w
+		move.b	d0,(Ring_Status_Flag_P2).w
+; Offset_0x003C6C:
+Level_FromCheckpoint:
+		move.b	d0,(Time_Over_Flag).w
+		move.b	d0,(Time_Over_Flag_P2).w
+		move.w	d0,(Debug_Mode_Flag_Index).w
+		move.w	d0,(Restart_Level_Flag).w
+		move.b	d0,(S2_Teleport_Timer).w
+		move.b	d0,(S2_Teleport_Flag).w
+		move.w	d0,(Total_Ring_Count_Address).w
+		move.w	d0,(Total_Ring_Count_Address_P2).w
+		move.w	d0,(Monitors_Broken).w
+		move.w	d0,(Monitors_Broken_P2).w
+		move.w	d0,(Loser_Timer_Left).w
+		move.b	d0,(LRz_Rocks_Routine).w
+		bsr.w	Oscillate_Num_Init
+		move.b	#1,(HUD_Score_Refresh_Flag).w
+		move.b	#1,(HUD_Rings_Refresh_Flag).w
+		move.b	#1,(HUD_Timer_Refresh_Flag).w
+		move.b	#1,(HUD_Timer_Refresh_Flag_P2).w
+		tst.w	(Auto_Control_Player_Flag).w
+		beq.s	Offset_0x003CCC
+		tst.w	(Level_Id).w
+		bne.s	Offset_0x003CCC
+		move.l	#Obj_AIz_Intro_Surfboard, (Obj_05_Mem_Address).w
+
 Offset_0x003CCC:
-                jsr     (Load_Object_Pos)                      ; Offset_0x011BF8
-                jsr     (Load_Ring_Pos)                        ; Offset_0x0087DA
-                jsr     (S2_Load_Triangle_Pos)                 ; Offset_0x008A5E
-                jsr     (LRz_Load_Rock_Pos)                    ; Offset_0x0129AA
-                jsr     (Load_Objects)                         ; Offset_0x0110AE
-                jsr     (Build_Sprites)                        ; Offset_0x011296
-                jsr     (Dynamic_Art_Cues)                     ; Offset_0x01E85A
-                bsr     Clear_End_Level_Art_Load_Flag          ; Offset_0x004B0A
-                move.w  #$0000, (Demo_Button_Index).w                ; $FFFFF790
-                move.w  #$0000, (Demo_Button_Index_2P).w             ; $FFFFF732
-                lea     (Demo_Index), A1                       ; Offset_0x00491E
-                moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
-                lsl.w   #$02, D0
-                move.l  $00(A1, D0), A1
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                bpl.s   Offset_0x003D30
-                lea     (Demo_End_Index), A1                   ; Offset_0x004982
-                move.w  (End_Demo_Sequence_Idx).w, D0                ; $FFFFFFF4
-                subq.w  #$01, D0
-                lsl.w   #$02, D0
-                move.l  $00(A1, D0), A1
+		jsr	(Load_Object_Pos).l
+		jsr	(Load_Ring_Pos).l
+		jsr	(S2_Load_Triangle_Pos).l
+		jsr	(LRz_Load_Rock_Pos).l
+		jsr	(Load_Objects).l
+		jsr	(Build_Sprites).l
+		jsr	(Dynamic_Art_Cues).l
+		bsr.w	Clear_End_Level_Art_Load_Flag
+		move.w	#0,(Demo_Button_Index).w
+		move.w	#0,(Demo_Button_Index_2P).w
+		lea	(Demo_Index),a1
+		moveq	#0,d0
+		move.b	(Level_Id).w,d0
+		lsl.w	#2,d0
+		move.l	(a1,d0.w),a1
+		tst.w	(Auto_Control_Player_Flag).w
+		bpl.s	Offset_0x003D30
+		lea	(Demo_End_Index),a1
+		move.w	(End_Demo_Sequence_Idx).w,d0
+		subq.w	#1,d0
+		lsl.w	#2,d0
+		move.l	(a1,d0.w),a1
+
 Offset_0x003D30:
-                move.b  $0001(A1), (Demo_Button_Press_Counter).w     ; $FFFFF792
-                tst.b   (Level_Id).w                                 ; $FFFFFE10
-                bne.s   Offset_0x003D48
-                lea     (Demo_Angel_Island), A1                ; Offset_0x004BEA
-                move.b  $0001(A1), (Demo_Button_Press_Counter_2P).w  ; $FFFFF734
+		move.b	1(a1),(Demo_Button_Press_Counter).w
+		tst.b	(Level_Id).w
+		bne.s	Offset_0x003D48
+		lea	(Demo_Angel_Island),a1
+		move.b	1(a1),(Demo_Button_Press_Counter_2P).w
+
 Offset_0x003D48:
-                move.w  #$1194, (Demo_Timer).w                       ; $FFFFF614
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                bpl.s   Offset_0x003D68
-                move.w  #$021C, (Demo_Timer).w                       ; $FFFFF614
-                cmpi.w  #$0004, (End_Demo_Sequence_Idx).w            ; $FFFFFFF4
-                bne.s   Offset_0x003D68
-                move.w  #$01FE, (Demo_Timer).w                       ; $FFFFF614
+		move.w	#$1194,(Demo_Timer).w
+		tst.w	(Auto_Control_Player_Flag).w
+		bpl.s	Offset_0x003D68
+		move.w	#$21C,(Demo_Timer).w
+		cmpi.w	#4,(End_Demo_Sequence_Idx).w
+		bne.s	Offset_0x003D68
+		move.w	#$1FE,(Demo_Timer).w
+
 Offset_0x003D68:
-                bsr     LevelInit_UndewaterPalette             ; Offset_0x0050F0
-                move.b  #$00, (Control_Locked_Flag_P1).w             ; $FFFFF7CC
-                move.b  #$00, (Control_Locked_Flag_P2).w             ; $FFFFF7CF
-                move.b  #$01, (Title_Card_Flag).w                    ; $FFFFF711
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                bne     Offset_0x003EE2
-                cmpi.b  #ALz_Id, (Level_Id).w                   ; $0E, $FFFFFE10
-                bcc.s   Offset_0x003D94
-                moveq   #$02, D0
-                bsr     LoadPLC                                ; Offset_0x0014D0
-Offset_0x003D94:
-                move.w  #$202F, (Palette_Fade_Info).w                ; $FFFFF626
-                jsr     (Pal_Clear)                            ; Offset_0x002DB0
-                move.w  #$0016, (Palette_Fade_Timer).w               ; $FFFFEE56
-                move.w  #$0016, (Obj_08_Mem_Address+Obj_Timer).w     ; $FFFFB27E
-                bclr    #$07, (Game_Mode).w                          ; $FFFFF600
-Offset_0x003DB2:
-                bsr     Pause                                  ; Offset_0x0011E0
-                move.b  #$08, (VBlank_Index).w                       ; $FFFFF62A
-                jsr     (Process_Kosinski_Queue_Main)          ; Offset_0x0019F0
-                bsr     Wait_For_VSync                         ; Offset_0x001AEE
-                addq.w  #$01, (Level_Frame_Count).w                  ; $FFFFFE04
-                bsr     Init_Demo_Control                      ; Offset_0x0047F6
-                jsr     (Animate_Palette)                      ; Offset_0x002DD4
-                jsr     (Load_Tiles_As_You_Move_Loop)          ; Offset_0x02FF54
-                jsr     (Load_Objects)                         ; Offset_0x0110AE
-                tst.w   (Restart_Level_Flag).w                       ; $FFFFFE02
-                bne     Level                                  ; Offset_0x00399E
-                jsr     (Background_Scroll_Speed)              ; Offset_0x0120D4
-                jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
-                bsr     Water_Effects                          ; Offset_0x0041B0
-                bsr     S2_Change_Water_Surface_Pos            ; Offset_0x00418C
-                jsr     (Load_Ring_Pos)                        ; Offset_0x0087DA
-                cmpi.b  #S2_CNz_Id, (Level_Id).w                ; $0C, $FFFFFE10
-                bne.s   Offset_0x003E10
-                jsr     (S2_Load_Triangle_Pos)                 ; Offset_0x008A5E
+		bsr.w	LevelInit_UndewaterPalette
+		move.b	#0,(Control_Locked_Flag_P1).w
+		move.b	#0,(Control_Locked_Flag_P2).w
+		move.b	#1,(Title_Card_Flag).w
+		tst.w	(Two_Player_Flag).w
+		bne.w	Offset_0x003EE2
+		cmpi.b	#ALz_Id,(Level_Id).w
+		bcc.s	Level_StartGame
+		moveq	#2,d0
+		bsr.w	LoadPLC
+; Offset_0x003D94:
+Level_StartGame:
+		move.w	#$202F,(Palette_Fade_Info).w
+		jsr	(Pal_Clear).l
+		move.w	#$16,(Palette_Fade_Timer).w
+		move.w	#$16,(Obj_08_Mem_Address+Obj_Timer).w
+		bclr	#7,(Game_Mode).w
+; ---------------------------------------------------------------------------
+; Main level loop (when all title card and loading sequences are finished)
+; ---------------------------------------------------------------------------
+; Offset_0x003DB2:
+Level_MainLoop:
+		bsr.w	Pause
+		move.b	#8,(VBlank_Index).w
+		jsr	(Process_Kos_Queue).l
+		bsr.w	Wait_For_VSync
+		addq.w	#1,(Level_Frame_Count).w
+		bsr.w	Init_Demo_Control
+		jsr	(Animate_Palette).l
+		jsr	(Load_Tiles_As_You_Move_Loop).l
+		jsr	(Load_Objects).l
+		tst.w	(Restart_Level_Flag).w
+		bne.w	Level
+		jsr	(Background_Scroll_Speed).l
+		jsr	(Background_Scroll_Layer).l
+		bsr.w	Water_Effects
+		bsr.w	S2_Change_Water_Surface_Pos
+		jsr	(Load_Ring_Pos).l
+		cmpi.b	#S2_CNz_Id,(Level_Id).w
+		bne.s	Offset_0x003E10
+		jsr	(S2_Load_Triangle_Pos).l
+
 Offset_0x003E10:
-                cmpi.b  #LRz_Id, (Level_Id).w                   ; $09, $FFFFFE10
-                bne.s   Offset_0x003E1E
-                jsr     (LRz_Load_Rock_Pos)                    ; Offset_0x0129AA
+		cmpi.b	#LRz_Id,(Level_Id).w
+		bne.s	Offset_0x003E1E
+		jsr	(LRz_Load_Rock_Pos).l
+
 Offset_0x003E1E:
-                jsr     (Dynamic_Art_Cues)                     ; Offset_0x01E85A
-                bsr     RunPLC                                 ; Offset_0x001556
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
-                bsr     Oscillate_Num_Do                       ; Offset_0x004A34
-                bsr     Change_Object_Frame                    ; Offset_0x004ACA
-                bsr     Check_End_Level_Art_Load               ; Offset_0x004B88
-                jsr     (Build_Sprites)                        ; Offset_0x011296
-                jsr     (Load_Object_Pos)                      ; Offset_0x011BF8
-                cmpi.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
-                beq.s   Offset_0x003E5A
-                cmpi.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
-                beq     Offset_0x003DB2
-                rts
+		jsr	(Dynamic_Art_Cues).l
+		bsr.w	RunPLC
+		jsr	(Process_Kos_Module_Queue).l
+		bsr.w	Oscillate_Num_Do
+		bsr.w	Change_Object_Frame
+		bsr.w	Check_End_Level_Art_Load
+		jsr	(Build_Sprites).l
+		jsr	(Load_Object_Pos).l
+		cmpi.b	#gm_DemoMode,(Game_Mode).w
+		beq.s	Offset_0x003E5A
+		cmpi.b	#gm_PlayMode,(Game_Mode).w
+		beq.w	Level_MainLoop
+		rts
+; ---------------------------------------------------------------------------
+
 Offset_0x003E5A:
-                tst.w   (Restart_Level_Flag).w                       ; $FFFFFE02
-                bne.s   Offset_0x003E78
-                tst.w   (Demo_Timer).w                               ; $FFFFF614
-                beq.s   Offset_0x003E78
-                cmpi.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
-                beq     Offset_0x003DB2
-                move.b  #gm_SEGALogo, (Game_Mode).w             ; $00, $FFFFF600
-                rts
+		tst.w	(Restart_Level_Flag).w
+		bne.s	Offset_0x003E78
+		tst.w	(Demo_Timer).w
+		beq.s	Offset_0x003E78
+		cmpi.b	#gm_DemoMode,(Game_Mode).w
+		beq.w	Level_MainLoop
+		move.b	#gm_SEGALogo,(Game_Mode).w
+		rts
+; ---------------------------------------------------------------------------
+
 Offset_0x003E78:
                 cmpi.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
                 bne.s   Offset_0x003E88
@@ -4754,7 +4874,7 @@ Offset_0x003E98:
                 jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (Load_Object_Pos)                      ; Offset_0x011BF8
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
+                jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
                 subq.w  #$01, (Demo_Pal_FadeOut_Counter).w           ; $FFFFF794
                 bpl.s   Offset_0x003EDA
                 move.w  #$0002, (Demo_Pal_FadeOut_Counter).w         ; $FFFFF794
@@ -4780,7 +4900,7 @@ Offset_0x003EFC:
 Level_Main_Loop:                                               ; Offset_0x003F1A                
                 bsr     Pause                                  ; Offset_0x0011E0
                 move.b  #$08, (VBlank_Index).w                       ; $FFFFF62A
-                jsr     (Process_Kosinski_Queue_Main)          ; Offset_0x0019F0
+                jsr     (Process_Kos_Queue)          ; Offset_0x0019F0
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 addq.w  #$01, (Level_Frame_Count).w                  ; $FFFFFE04
                 move.w  #$0004, -(A7)
@@ -4818,7 +4938,7 @@ Offset_0x003F8C:
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (Animate_Palette)                      ; Offset_0x002DD4
                 bsr     RunPLC                                 ; Offset_0x001556
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
+                jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
                 cmpi.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
                 beq.s   Offset_0x003FD0
                 cmpi.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
@@ -4851,7 +4971,7 @@ Offset_0x00400E:
                 jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (Load_Object_Pos)                      ; Offset_0x011BF8
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
+                jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
                 subq.w  #$01, (Demo_Pal_FadeOut_Counter).w           ; $FFFFF794
                 bpl.s   Offset_0x004050
                 move.w  #$0002, (Demo_Pal_FadeOut_Counter).w         ; $FFFFF794
@@ -5889,20 +6009,20 @@ Main_Level_Load_8x8_Tiles:                                     ; Offset_0x004FEA
                 move.l  D0, A1
                 move.w  (A1), D4
                 move.w  #$0000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 move.l  (A4)+, D0
                 andi.l  #$00FFFFFF, D0
                 cmp.l   D0, D7
                 beq.s   Offset_0x005034
                 move.l  D0, A1
                 move.w  D4, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
 Offset_0x005034:
                 move.b  #$0C, (VBlank_Index).w                       ; $FFFFF62A
-                jsr     (Process_Kosinski_Queue_Main)          ; Offset_0x0019F0
+                jsr     (Process_Kos_Queue)          ; Offset_0x0019F0
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 bsr     RunPLC                                 ; Offset_0x001556
-                jsr     (Process_Kosinski_Queue)               ; Offset_0x0018FE
+                jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
                 bne.s   Offset_0x005034
                 rts
@@ -13581,10 +13701,10 @@ Offset_0x0125DA:
                 bcs.s   Offset_0x012612
                 lea     (Angel_Island_1_Blocks_3), A1          ; Offset_0x13C680
                 lea     (Blocks_Mem_Address+$0268).w, A2             ; $FFFF9268
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Angel_Island_1_Tiles_3), A1           ; Offset_0x141584
                 move.w  #$1760, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$2A, D0
                 jsr     (PalLoad2)                             ; Offset_0x002FBA
                 st      (Level_Events_Buffer_5).w                    ; $FFFFEEC6
@@ -13618,7 +13738,7 @@ Offset_0x01264E:
                 bne.s   Offset_0x01267A
                 lea     (Angel_Island_1_Flames), A1            ; Offset_0x1476A6
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 addq.b  #$02, (Dynamic_Resize_Routine).w             ; $FFFFEE33
 Offset_0x01267A:
                 rts  
@@ -13717,13 +13837,13 @@ Offset_0x01276A:
                 bne.s   Offset_0x0127B8
                 lea     (Angel_Island_2_Blocks_3), A1          ; Offset_0x149448
                 lea     (Blocks_Mem_Address+$0AA0).w, A2             ; $FFFF9AA0
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Angel_Island_2_Tiles_3), A1           ; Offset_0x14CA3C
                 move.w  #$16A0, D2                       
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Angel_Island_2_Boss_Ship), A1         ; Offset_0x1397B0
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$30, D0
                 jsr     (PalLoad2)                             ; Offset_0x002FBA
                 st      (Level_Events_Buffer_5).w                    ; $FFFFEEC6
@@ -13914,13 +14034,13 @@ Offset_0x01293E:
                 addq.b  #$02, (Dynamic_Resize_Routine).w             ; $FFFFEE33
                 lea     (Launch_Base_2_Blocks_3), A1           ; Offset_0x18C21A
                 lea     (Blocks_Mem_Address).w, A2                   ; $FFFF9000
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Launch_Base_2_Chunks_3), A1           ; Offset_0x192F2E
                 lea     (M68K_RAM_Start), A2                         ; $FFFF0000
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Launch_Base_2_Tiles_3), A1            ; Offset_0x18EB6C
                 move.w  #$0000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
 Offset_0x012982:
                 rts      
 ;-------------------------------------------------------------------------------
@@ -16558,7 +16678,7 @@ Level_Load_Enemies_Art:                                        ; Offset_0x024F46
 Offset_0x024F5A:
                 move.l  (A6)+, A1
                 move.w  (A6)+, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 dbra    D6, Offset_0x024F5A
 Offset_0x024F68:
                 rts        
@@ -19121,19 +19241,19 @@ Offset_0x030856:
                 movem.l D7/A0/A2/A3, -(A7)
                 lea     (Angel_Island_2_Chunks), A1            ; Offset_0x14EA6E
                 lea     (M68K_RAM_Start), A2                         ; $FFFF0000
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Angel_Island_2_Blocks), A1            ; Offset_0x148128
                 lea     (Blocks_Mem_Address).w, A2                   ; $FFFF9000
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Angel_Island_2_Blocks_2), A1          ; Offset_0x1489A8
                 lea     (Blocks_Mem_Address+$0AA0).w, A2             ; $FFFF9AA0
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Angel_Island_2_Tiles), A1             ; Offset_0x1496B8
                 move.w  #$0000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Angel_Island_2_Tiles_2), A1           ; Offset_0x14A1BA
                 move.w  #$16A0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (PLC_Spikes_Springs), A1               ; Offset_0x04192C
                 jsr     (LoadPLC_A1)                           ; Offset_0x001502
                 movem.l (A7)+, D7/A0/A2/A3
@@ -20463,13 +20583,13 @@ MGz_1_Normal:                                                  ; Offset_0x031F54
                 movem.l D7/A0/A2/A3, -(A7)
                 lea     (Marble_Garden_2_Chunks_2), A1         ; Offset_0x16403A
                 lea     (M68K_RAM_Start+$6B80), A2                   ; $FFFF6B80
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Marble_Garden_2_Blocks_2), A1         ; Offset_0x162E58
                 lea     (Blocks_Mem_Address+$0C78).w, A2             ; $FFFF9C78
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Marble_Garden_2_Tiles_2), A1          ; Offset_0x1632A8
                 move.w  #$4FC0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$14, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 movem.l (A7)+, D7/A0/A2/A3
@@ -21667,13 +21787,13 @@ Iz_1_Normal_2:                                                 ; Offset_0x032EE2
                 movem.l D7/A0/A2/A3, -(A7)
                 lea     (Icecap_2_Chunks_2), A1                ; Offset_0x182746
                 lea     (M68K_RAM_Start+$0B80), A2                   ; $FFFF0B80
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Icecap_2_Blocks_2), A1                ; Offset_0x17FB24
                 lea     (Blocks_Mem_Address+$0418).w, A2             ; $FFFF9418
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Icecap_2_Tiles_2), A1                 ; Offset_0x180734
                 move.w  #$23E0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$20, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 movem.l (A7)+, D7/A0/A2/A3
@@ -22409,13 +22529,13 @@ LBz_1_Normal:                                                  ; Offset_0x03376E
                 movem.l D7/A0/A2/A3, -(A7)
                 lea     (Launch_Base_2_Chunks), A1             ; Offset_0x190A3E
                 lea     (M68K_RAM_Start), A2                         ; $FFFF0000
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Launch_Base_2_Blocks_2), A1           ; Offset_0x18B6DA
                 lea     (Blocks_Mem_Address+$0628).w, A2             ; $FFFF9628
-                jsr     (Update_Kosinski_Queue_Count)          ; Offset_0x0019AE
+                jsr     (Queue_Kos)          ; Offset_0x0019AE
                 lea     (Launch_Base_2_Tiles_2), A1            ; Offset_0x18D03A
                 move.w  #$2D60, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$24, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 moveq   #$25, D0
