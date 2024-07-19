@@ -42282,13 +42282,10 @@ Angel_Island_1_Blocks_3:                                       ; Offset_0x13C680
                 dc.w     $0000, $0000, $0000
 Angel_Island_1_Tiles:                                          ; Offset_0x13D750
                 incbin  'data\aiz\tl_act1.kmd'
-                dc.w     $0000, $0000, $0000, $0000, $0000
 Angel_Island_1_Tiles_2:                                        ; Offset_0x13E552
                 incbin  'data\aiz\tl2_act1.kmd'
-                dc.w     $0000, $0000, $0000, $0000, $0000, $0000  
 Angel_Island_1_Tiles_3:                                        ; Offset_0x141584
                 incbin  'data\aiz\tl3_act1.kmd'
-                dc.w     $0000, $0000, $0000, $0000
 Angel_Island_1_Chunks:                                         ; Offset_0x143D96
 Angel_Island_1_Chunks_2:                                       ; Offset_0x143D96
                 incbin  'data\aiz\ck_act1.kos'
@@ -42297,21 +42294,16 @@ Angel_Island_1_Flames:                                         ; Offset_0x1476A6
                 dc.w     $0000, $0000, $0000, $0000, $0000, $0000, $0000
 Angel_Island_2_Blocks:                                         ; Offset_0x148128
                 incbin  'data\aiz\bl_act2.kos'
-                dc.w     $0000, $0000, $0000, $0000
 Angel_Island_2_Blocks_2:                                       ; Offset_0x1489A8
                 incbin  'data\aiz\bl2_act2.kos'
-                dc.w     $0000, $0000
 Angel_Island_2_Blocks_3:                                       ; Offset_0x149448
                 incbin  'data\aiz\bl3_act2.kos'
 Angel_Island_2_Tiles:                                          ; Offset_0x1496B8
                 incbin  'data\aiz\tl_act2.kmd'
-                dc.w     $0000, $0000
 Angel_Island_2_Tiles_2:                                        ; Offset_0x14A1BA
                 incbin  'data\aiz\tl2_act2.kmd'
-                dc.w     $0000, $0000, $0000, $0000, $0000, $0000
 Angel_Island_2_Tiles_3:                                        ; Offset_0x14CA3C
                 incbin  'data\aiz\tl3_act2.kmd'
-                dc.w     $0000, $0000, $0000, $0000, $0000, $0000
 Angel_Island_2_Chunks:                                         ; Offset_0x14EA6E
 Angel_Island_2_Chunks_2:                                       ; Offset_0x14EA6E
                 incbin  'data\aiz\ck_act2.kos'       
