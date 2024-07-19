@@ -278,7 +278,7 @@ MainGameLoop:
 ; Offset_0x0003AC:
 GameModeArray:
 		bra.w	SEGA_Screen
-		bra.w	Title_Screen
+		bra.w	TitleScreen
 		bra.w	Level
 		bra.w	Level
 		bra.w	S2_Special_Stage
@@ -1261,39 +1261,54 @@ ClearScreen_ClearBuffer2:                                      ; Offset_0x0010F6
 ; ClearScreen
 ; <<<-                           
 ;===============================================================================
- 
-;===============================================================================                  
-; SoundDriverLoad
-; ->>>                           
-;===============================================================================
-SoundDriverLoad:                                               ; Offset_0x001106
-                nop
-                move.w  #$0100, (Z80_Bus_Request)                    ; $00A11100
-                move.w  #$0100, (Z80_Reset)                          ; $00A11200
-                lea     (Z80_Driver), A0                       ; Offset_0x0E0000
-                lea     (Z80_RAM_Start), A1                          ; $00A00000
-                move.w  #$1851, D0
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to load the sound driver into Z80 memory
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x001106:
+SoundDriverLoad:
+		nop
+		move.w	#$100,(Z80_Bus_Request).l
+		move.w	#$100,(Z80_Reset).l		; release Z80 reset
+		; load SMPS sound driver
+		lea	(Z80_Driver).l,a0
+		lea	(Z80_RAM_Start).l,a1
+		move.w	#$1851,d0
+
 Offset_0x001128:
-                move.b  (A0)+, (A1)+
-                dbra    D0, Offset_0x001128
-                lea     (Sound_Driver_Init_Data), A0           ; Offset_0x001166
-                lea     ($00A01C00), A1
-                move.w  #$000F, D0
+		move.b	(a0)+, (a1)+
+		dbf	d0,Offset_0x001128
+		; load default variables
+		lea	(Sound_Driver_Init_Data).l,a0
+		lea	($A01C00).l,a1
+		move.w	#$F,d0
+
 Offset_0x00113E:
-                move.b  (A0)+, (A1)+
-                dbra    D0, Offset_0x00113E
-                move.w  #$0000, (Z80_Reset)                          ; $00A11200
-                nop
-                nop
-                nop
-                nop
-                move.w  #$0100, (Z80_Reset)                          ; $00A11200
+		move.b	(a0)+,(a1)+
+		dbf	d0,Offset_0x00113E
+		; PAL optimization hasn't been added yet
+		move.w	#0,(Z80_Reset).l		; reset Z80
+		nop
+		nop
+		nop
+		nop
+		move.w	#$100,(Z80_Reset).l		; release reset
 		startZ80
-                rts 
-;-------------------------------------------------------------------------------
-Sound_Driver_Init_Data:                                        ; Offset_0x001166
-                dc.b    $00, $00, $00, $12, $00, $00, $00, $00
-                dc.b    $00, $00, $00, $00, $00, $00, $00, $00                     
+		rts
+; End of function SoundDriverLoad
+
+; ---------------------------------------------------------------------------
+; Default Z80 variables; only the fourth value is set to anything
+; meaningful (which is more than can be said for the final)
+; Offset_0x001166:
+Sound_Driver_Init_Data:
+		dc.b	$00, $00, $00, $12, $00, $00, $00, $00
+		dc.b	$00, $00, $00, $00, $00, $00, $00, $00
+
 ;===============================================================================                  
 ; SoundDriverLoad
 ; <<<-                           
@@ -3739,210 +3754,236 @@ Offset_0x0031C6:
 ; <<<-
 ;===============================================================================
 
-;===============================================================================
-; Tela t�tulo
-; ->>>
-;===============================================================================   
-Title_Screen:                                                  ; Offset_0x0031D4
-                moveq   #Volume_Down, D0                                  ; -$20
-                bsr     Play_Music                             ; Offset_0x001176
-                bsr     ClearPLC                               ; Offset_0x001548
-                bsr     Pal_FadeFrom                           ; Offset_0x002DE8
-                move    #$2700, SR
-                lea     (VDP_Control_Port), A6                       ; $00C00004
-                move.w  #$8004, (A6)
-                move.w  #$8230, (A6)
-                move.w  #$8407, (A6)
-                move.w  #$9011, (A6)
-                move.w  #$9200, (A6)
-                move.w  #$8B03, (A6)
-                move.w  #$8720, (A6)
-                clr.b   (Underwater_Flag).w                          ; $FFFFF64E
-                move.w  #$8C81, (A6)
-                bsr     ClearScreen                            ; Offset_0x001002
-                lea     (Sprite_Table_Input).w, A1                   ; $FFFFAC00
-                moveq   #$00, D0
-                move.w  #$00FF, D1
+; ===========================================================================
+; Offset_0x0031D4:
+TitleScreen:
+		moveq	#Volume_Down,d0
+		bsr.w	Play_Music
+		bsr.w	ClearPLC
+		bsr.w	Pal_FadeFrom
+		move	#$2700,sr
+		lea	(VDP_Control_Port),a6
+		move.w	#$8004,(a6)
+		move.w	#$8230,(a6)
+		move.w	#$8407,(a6)
+		move.w	#$9011,(a6)
+		move.w	#$9200,(a6)
+		move.w	#$8B03,(a6)
+		move.w	#$8720,(a6)
+		clr.b	(Underwater_Flag).w
+		move.w	#$8C81,(a6)
+		bsr.w	ClearScreen
+		lea	(Sprite_Table_Input).w,a1
+		moveq	#0,d0
+		move.w	#$FF,d1
+
 Offset_0x00321E:
-                move.l  D0, (A1)+
-                dbra    D1, Offset_0x00321E
-                lea     (Obj_Memory_Address).w, A1                   ; $FFFFB000
-                moveq   #$00, D0
-                move.w  #$07FF, D1
+		move.l	d0,(a1)+
+		dbf	d1, Offset_0x00321E
+		lea	(Obj_Memory_Address).w,a1
+		moveq	#0,d0
+		move.w	#$7FF,d1
+
 Offset_0x00322E:
                 move.l  D0, (A1)+
                 dbra    D1, Offset_0x00322E
                 lea     (Miles_Control_Vars).w, A1                   ; $FFFFF700
                 moveq   #$00, D0
                 move.w  #$003F, D1
+
 Offset_0x00323E:
                 move.l  D0, (A1)+
                 dbra    D1, Offset_0x00323E
                 lea     (Camera_RAM).w, A1                           ; $FFFFEE00
                 moveq   #$00, D0
                 move.w  #$003F, D1
+
 Offset_0x00324E:
-                move.l  D0, (A1)+
-                dbra    D1, Offset_0x00324E
-                jsr     (Init_Sprite_Table)                    ; Offset_0x011042
-                lea     (Palette_Buffer).w, A1                       ; $FFFFED00
-                moveq   #$00, D0
-                move.w  #$003F, D1
+		move.l	d0,(a1)+
+		dbf	d1, Offset_0x00324E
+		jsr	(Init_Sprite_Table).l
+		lea	(Palette_Buffer).w,a1
+		moveq	#0,d0
+		move.w	#$3F,d1
+
 Offset_0x003264:
-                move.l  D0, (A1)+
-                dbra    D1, Offset_0x003264
-                move.b  #$00, (Saved_Level_Flag).w                   ; $FFFFFE30
-                move.b  #$00, (Saved_Level_Flag_P2).w                ; $FFFFFEE0
-                move.w  #$0000, (Debug_Mode_Flag_Index).w            ; $FFFFFE08
-                move.w  #$0000, (Auto_Control_Player_Flag).w         ; $FFFFFFF0
-                move.w  #$0000, (Palette_Cycle_Count_1).w            ; $FFFFF634
-                move.w  #$0000, (Two_Player_Flag).w                  ; $FFFFFFD8
-                move.b  #$00, (Title_Card_Flag).w                    ; $FFFFF711
-                move.b  #$00, (Debug_Mode_Active).w                  ; $FFFFFFFA
-                move.w  #$0000, (Two_Player_Flag).w                  ; $FFFFFFD8
-                move.w  #$0167, (Demo_Timer).w                       ; $FFFFF614
-                clr.w   (DMA_Buffer_List).w                          ; $FFFFE700
-                move.l  #DMA_Buffer_List, (DMA_Buffer_List_End).w    ; $FFFFE700, $FFFFE8F8
-                lea     (Title_Screen_Sonic_3_Data), A2        ; Offset_0x00375E
-                move.l  (A2)+, D0
-                andi.l  #$00FFFFFF, D0
-                move.l  D0, A0
-                lea     (M68K_RAM_Start), A1                         ; $FFFF0000
-                bsr     KosinskiDec                            ; Offset_0x001808
-                move.w  A1, D3
-                lsr.w   #$01, D3
-                move.l  #M68K_RAM_Start, D1                          ; $FFFF0000
-                move.w  #$8000, D2
-                andi.l  #$00FFFFFF, D1
-                jsr     (DMA_68KtoVRAM)                        ; Offset_0x0012FC
-                move.l  (A2)+, A0
-                lea     (Palette_Row_3_Offset).w, A1                 ; $FFFFED60
-                moveq   #$07, D0
+		move.l	d0,(a1)+
+		dbf	d1, Offset_0x003264
+
+		move.b	#0,(Saved_Level_Flag).w
+		move.b	#0,(Saved_Level_Flag_P2).w
+		move.w	#0,(Debug_Mode_Flag_Index).w
+		move.w	#0,(Auto_Control_Player_Flag).w
+		move.w	#0,(Palette_Cycle_Count_1).w
+		move.w	#0,(Two_Player_Flag).w
+		move.b	#0,(Title_Card_Flag).w
+		move.b	#0,(Debug_Mode_Active).w
+		move.w	#0,(Two_Player_Flag).w
+		move.w	#$167,(Demo_Timer).w
+		clr.w	(DMA_Buffer_List).w
+		move.l	#DMA_Buffer_List,(DMA_Buffer_List_End).w
+
+		lea	(TitleBanner_Frames).l,a2
+		move.l	(a2)+,d0
+		andi.l	#$FFFFFF,d0
+		move.l	d0,a0
+		lea	(M68K_RAM_Start),a1
+		bsr.w	KosinskiDec
+		move.w	a1,d3
+		lsr.w	#1,d3
+		move.l	#M68K_RAM_Start,d1
+		move.w	#$8000,d2
+		andi.l	#$FFFFFF,d1
+		jsr	(DMA_68KtoVRAM).l
+		move.l	(a2)+,a0
+		lea	(Palette_Row_3_Offset).w,a1
+		moveq	#7,d0
+
 Offset_0x0032EE:
-                move.l  (A0)+, (A1)+
-                dbra    D0, Offset_0x0032EE
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                moveq   #$00, D0
-                move.w  #$04FF, D1
+		move.l	(a0)+,(a1)+
+		dbf	D0, Offset_0x0032EE
+		lea	(M68K_RAM_Start+$4000).l,a1
+		moveq	#0,d0
+		move.w	#$4FF,d1
+
 Offset_0x003300:
-                move.l  D0, (A1)+
-                dbra    D1, Offset_0x003300
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  (A2)+, A0
-                move.w  #$6400, D0
-                bsr     EnigmaDec                              ; Offset_0x00168A
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  #$40000003, D0
-                moveq   #$27, D1
-                moveq   #$3F, D2
-                jsr     (ShowVDPGraphics)                      ; Offset_0x0012BC
-                move.b  #$02, (Title_Screen_Animate_Delay).w         ; $FFFFFFBD
-                move.w  #$FFA0, (Vertical_Scroll_Value).w            ; $FFFFF616
-                move.w  #$0400, (Vertical_Scrolling).w               ; $FFFFEE02
-                move.l  #$FFA00000, (Camera_Y).w                     ; $FFFFEE7C
-                move.b  #$04, (VBlank_Index).w                       ; $FFFFF62A
-                bsr     Wait_For_VSync                         ; Offset_0x001AEE
-                move.b  #$FF, (Title_Screen_Animate_Buffer).w        ; $FFFFFFBC
-                move.b  #$01, (Title_Screen_Animate_Delay).w         ; $FFFFFFBD
-                move.w  #$0001, (Title_Screen_Animate_Frame).w       ; $FFFFFFBE
-                moveq   #$00, D0
-                bsr     Offset_0x00369E
-                move.b  #$04, (VBlank_Index).w                       ; $FFFFF62A
-                bsr     Wait_For_VSync                         ; Offset_0x001AEE
-                moveq   #$00, D0
-                bsr     LoadPLC2                               ; Offset_0x00151C
-                move.w  #$0000, (Secret_Code_Input_Entries).w        ; $FFFFFFD4
-                move.w  #$0000, (Secret_Code_Input_Entries_2).w      ; $FFFFFFD6
-                move.w  #$0101, (Level_Select_Flag).w                ; $FFFFFFD0
-                nop
-                nop
-                nop
-                moveq   #Title_Screen_Snd, D0                              ; $25
-                bsr     Play_Music                             ; Offset_0x001176
-                move.w  (VDP_Register_1_Command).w, D0               ; $FFFFF60E
-                ori.b   #$40, D0
-                move.w  D0, (VDP_Control_Port)                       ; $00C00004
-Offset_0x0033A4:
-                move.b  #$04, (VBlank_Index).w                       ; $FFFFF62A
-                bsr     Wait_For_VSync                         ; Offset_0x001AEE
-                bsr     Offset_0x0035EA
-                jsr     (Load_Objects)                         ; Offset_0x0110AE
-                jsr     (Build_Sprites)                        ; Offset_0x011296
-                bsr     RunPLC                                 ; Offset_0x001556
-                bsr     Secret_Codes_Test                      ; Offset_0x003554
-                tst.w   (Demo_Timer).w                               ; $FFFFF614
-                beq     Offset_0x0034D2
-                move.b  (Control_Ports_Buffer_Data+$0001).w, D0      ; $FFFFF605
-                or.b    (Control_Ports_Buffer_Data+$0003).w, D0      ; $FFFFF607
-                andi.b  #$80, D0
-                beq     Offset_0x0033A4
-                move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
-                move.b  #$03, (Life_Count).w                         ; $FFFFFE12
-                move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
-                moveq   #$00, D0
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
-                move.l  D0, (Time_Count_Address).w                   ; $FFFFFE22
-                move.l  D0, (Score_Count_Address).w                  ; $FFFFFE26
-                move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
-                move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
-                move.l  D0, (Score_Count_Address_P2).w               ; $FFFFFED6
-                move.b  D0, (Continue_Count).w                       ; $FFFFFE18
-                move.l  #$00001388, (Next_Extra_Life_Score).w        ; $FFFFFFC0
-                move.l  #$00001388, (Next_Extra_Life_Score_P2).w     ; $FFFFFFC4
-                moveq   #Volume_Down, D0                                  ; -$20
-                bsr     Play_Music                             ; Offset_0x001176
-                moveq   #$00, D0
-                move.b  (Title_Screen_Menu_Cursor).w, D0             ; $FFFFFF86
-                bne.s   Title_Screen_Check_2_Player_Vs         ; Offset_0x00349A
-                moveq   #$00, D0
-                move.w  D0, (Two_Player_Flag_2).w                    ; $FFFFFF8A
-                move.w  D0, (Two_Player_Flag).w                      ; $FFFFFFD8
-                move.w  D0, (Level_Id).w                             ; $FFFFFE10
-                move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
-                move.w  #AIz_Act_1, (Level_Id).w              ; $0000, $FFFFFE10
-                move.w  #AIz_Act_1, (Level_Id_2).w            ; $0000, $FFFFEE54
-                tst.b   (Level_Select_Flag).w                        ; $FFFFFFD0
-                beq.s   Offset_0x003488
-                move.b  #gm_Level_Select_Menu, (Game_Mode).w    ; $28, $FFFFF600
-                btst    #Btn_A, (Control_Ports_Buffer_Data).w   ; $06, $FFFFF604
-                beq.s   Offset_0x003466
-                move.w  #Sonic_And_Miles, (Player_Select_Flag).w ; $0000, $FFFFFF0A
-                rts
-Offset_0x003466:
-                btst    #Btn_B, (Control_Ports_Buffer_Data).w   ; $04, $FFFFF604
-                beq.s   Offset_0x003476
-                move.w  #Sonic_Alone, (Player_Select_Flag).w  ; $0001, $FFFFFF0A
-                rts
-Offset_0x003476:
-                btst    #Btn_C, (Control_Ports_Buffer_Data).w   ; $05, $FFFFF604
-                beq.s   Offset_0x003486
-                move.w  #Miles_Alone, (Player_Select_Flag).w  ; $0002, $FFFFFF0A
-                rts
+		move.l	d0,(a1)+
+		dbf	d1,Offset_0x003300
+		lea	(M68K_RAM_Start+$4000),a1
+		move.l	(a2)+,a0
+		move.w	#$6400,d0
+		bsr.w	EnigmaDec
+		lea	(M68K_RAM_Start+$4000),a1
+		move.l	#$40000003,d0
+		moveq	#$27,d1
+		moveq	#$3F,d2
+		jsr	(ShowVDPGraphics).l
+
+		move.b	#2,(Title_Screen_Animate_Delay).w
+		move.w	#$FFA0,(Vertical_Scroll_Value).w
+		move.w	#$400,(Vertical_Scrolling).w
+		move.l	#$FFA00000,(Camera_Y).w
+		move.b	#4,(VBlank_Index).w
+		bsr.w	Wait_For_VSync
+		move.b	#$FF,(Title_Screen_Animate_Buffer).w
+		move.b	#1,(Title_Screen_Animate_Delay).w
+		move.w	#1,(Title_Screen_Animate_Frame).w
+		moveq	#0,d0
+		bsr.w	TitleSonic_LoadFrame
+		move.b	#4,(VBlank_Index).w
+		bsr.w	Wait_For_VSync
+		moveq	#0,d0
+		bsr.w	LoadPLC2
+
+		move.w	#0,(Secret_Code_Input_Entries).w
+		move.w	#0,(Secret_Code_Input_Entries_2).w
+		move.w	#$101,(Level_Select_Flag).w		; enable level select without cheats
+		nop
+		nop
+		nop
+		moveq	#Title_Screen_Snd,d0
+		bsr.w	Play_Music
+		move.w	(VDP_Register_1_Command).w,d0
+		ori.b	#$40,d0
+		move.w	d0,(VDP_Control_Port)
+; Offset_0x0033A4:
+TitleScreen_Loop:
+		move.b	#4,(VBlank_Index).w
+		bsr.w	Wait_For_VSync
+		bsr.w	Iterate_TitleSonicFrame
+		jsr	(Load_Objects).l
+		jsr	(Build_Sprites).l
+		bsr.w	RunPLC
+		bsr.w	Secret_Codes_Test
+		tst.w	(Demo_Timer).w
+		beq.w	Offset_0x0034D2
+		move.b	(Control_Ports_Buffer_Data+1).w,d0
+		or.b	(Control_Ports_Buffer_Data+3).w,d0
+		andi.b	#$80,d0
+		beq.w	TitleScreen_Loop
+		move.b	#gm_PlayMode, (Game_Mode).w
+		move.b	#3,(Life_Count).w
+		move.b	#3,(Life_Count_P2).w
+		moveq	#0,d0
+		move.w	d0,(Ring_Count_Address).w
+		move.l	d0,(Time_Count_Address).w
+		move.l	d0,(Score_Count_Address).w
+		move.w	d0,(Ring_Count_Address_P2).w
+		move.l	d0,(Time_Count_Address_P2).w
+		move.l	d0,(Score_Count_Address_P2).w
+		move.b	d0,(Continue_Count).w
+		move.l	#$1388,(Next_Extra_Life_Score).w
+		move.l	#$1388,(Next_Extra_Life_Score_P2).w
+		moveq	#Volume_Down,d0
+		bsr.w	Play_Music
+		; leftover from Sonic 2's title menu
+		moveq	#0,d0
+		move.b	(Title_Screen_Menu_Cursor).w,d0
+		bne.s	Title_Screen_Check_2_Player_Vs
+		moveq	#0,d0
+		move.w	d0,(Two_Player_Flag_2).w
+		move.w	d0,(Two_Player_Flag).w
+		move.w	d0,(Level_Id).w
+		move.w	d0,(Level_Id_2).w
+		move.w	#AIz_Act_1,(Level_Id).w
+		move.w	#AIz_Act_1,(Level_Id_2).w
+		tst.b	(Level_Select_Flag).w
+		beq.s	TitleScreen_ClrSpecStg
+		move.b	#gm_Level_Select_Menu, (Game_Mode).w
+; TitleScreen_SonicAndTails:
+		btst	#Btn_A,(Control_Ports_Buffer_Data).w
+		beq.s	TitleScreen_SonicAlone
+		move.w	#Sonic_And_Miles, (Player_Select_Flag).w
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x003466:
+TitleScreen_SonicAlone:
+		btst	#Btn_B,(Control_Ports_Buffer_Data).w
+		beq.s	TitleScreen_TailsAlone
+		move.w	#Sonic_Alone,(Player_Select_Flag).w
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x003476:
+TitleScreen_TailsAlone:
+		btst	#Btn_C,(Control_Ports_Buffer_Data).w
+		beq.s	Offset_0x003486
+		move.w	#Miles_Alone,(Player_Select_Flag).w
+		rts
+
 Offset_0x003486:
-                rts
-Offset_0x003488:
-                move.w  D0, (Special_Stage_Id).w                     ; $FFFFFE16
-                move.w  D0, (SS_Completed_Flag).w                    ; $FFFFFFB0
-                move.l  D0, (Emerald_Collected_Flag_List).w          ; $FFFFFFB2
-                move.l  D0, (Emerald_Collected_Flag_List+$04).w      ; $FFFFFFB6
-                rts
-Title_Screen_Check_2_Player_Vs:                                ; Offset_0x00349A
-                subq.b  #$01, D0
-                bne.s   Title_Screen_Load_Options_Menu         ; Offset_0x0034C4
-                moveq   #$01, D1
-                move.w  D1, (Two_Player_Flag_2).w                    ; $FFFFFF8A
-                move.w  D1, (Two_Player_Flag).w                      ; $FFFFFFD8
-                moveq   #$00, D0
-                move.w  D0, (SS_Completed_Flag).w                    ; $FFFFFFB0
-                move.l  D0, (Emerald_Collected_Flag_List).w          ; $FFFFFFB2
-                move.l  D0, (Emerald_Collected_Flag_List+$04).w      ; $FFFFFFB6
-                move.b  #gm_S2_Versus_Mode_Menu, (Game_Mode).w  ; $1C, $FFFFF600
-                move.b  #$00, (Level_Id_2P).w                        ; $FFFFFF88
-                rts
-Title_Screen_Load_Options_Menu:                                ; Offset_0x0034C4
-                move.b  #gm_S2_Options_Menu, (Game_Mode).w      ; $24, $FFFFF600
-                move.b  #$00, (Options_Menu_Cursor).w                ; $FFFFFF8C
-                rts
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x003488:
+TitleScreen_ClrSpecStg:
+		move.w	d0,(Special_Stage_Id).w
+		move.w	d0,(SS_Completed_Flag).w
+		move.l	d0,(Emerald_Collected_Flag_List).w
+		move.l	d0,(Emerald_Collected_Flag_List+4).w
+		rts
+; ===========================================================================
+; Leftovers from Sonic 2
+; Offset_0x00349A:
+Title_Screen_Check_2_Player_Vs:
+		subq.b	#1,d0
+		bne.s	Title_Screen_Load_Options_Menu
+		moveq	#1,d1
+		move.w	d1,(Two_Player_Flag_2).w
+		move.w	d1,(Two_Player_Flag).w
+		moveq	#0,d0
+		move.w	d0,(SS_Completed_Flag).w
+		move.l	d0,(Emerald_Collected_Flag_List).w
+		move.l	d0,(Emerald_Collected_Flag_List+4).w
+		move.b	#gm_S2_Versus_Mode_Menu,(Game_Mode).w
+		move.b	#0,(Level_Id_2P).w
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x0034C4:
+Title_Screen_Load_Options_Menu:
+		move.b	#gm_S2_Options_Menu, (Game_Mode).w
+		move.b	#0,(Options_Menu_Cursor).w
+		rts
+; ===========================================================================
+
 Offset_0x0034D2:
                 moveq   #Volume_Down, D0                                  ; -$20
                 bsr     Play_Music                             ; Offset_0x001176
@@ -4038,256 +4079,282 @@ Offset_0x0035DA:
                 rts
 Offset_0x0035E4:
                 subq.b  #$01, (Title_Screen_Animate_Delay).w         ; $FFFFFFBD
-                rts   
-;-------------------------------------------------------------------------------
-Offset_0x0035EA:
-                cmpi.b  #$01, (Title_Screen_Animate_Delay).w         ; $FFFFFFBD
-                bne.s   Offset_0x003606
-                move.w  (Title_Screen_Animate_Frame).w, D0           ; $FFFFFFBE
-                move.b  Offset_0x003612(PC, D0), D0
-                ext.w   D0
-                bmi.s   Offset_0x003608
-                bsr     Offset_0x00369E
-                addq.w  #$01, (Title_Screen_Animate_Frame).w         ; $FFFFFFBE
+                rts
+; ==============================================================================
+; Offset_0x0035EA:
+Iterate_TitleSonicFrame:
+		cmpi.b	#1,(Title_Screen_Animate_Delay).w
+		bne.s	Offset_0x003606
+		move.w	(Title_Screen_Animate_Frame).w,d0
+		move.b	SonicFrameIndex(pc,d0.w),d0
+		ext.w	d0
+		bmi.s	Offset_0x003608
+		bsr.w	TitleSonic_LoadFrame
+		addq.w	#1,(Title_Screen_Animate_Frame).w
+
 Offset_0x003606:
-                rts
+		rts
+;-------------------------------------------------------------------------------
+
 Offset_0x003608:
-                move.b  #$02, (Title_Screen_Animate_Delay).w         ; $FFFFFFBD
-                bra     Offset_0x003644    
-;-------------------------------------------------------------------------------
-Offset_0x003612:
-                dc.b    $2A, $FF, $00, $01, $02, $03, $00, $01
-                dc.b    $02, $03, $04, $05, $06, $07, $08, $09
-                dc.b    $0A, $0B, $0C, $0D, $0E, $0F, $10, $11
-                dc.b    $12, $13, $14, $15, $16, $17, $18, $19
-                dc.b    $1A, $1B, $1C, $1D, $1E, $1F, $20, $21
-                dc.b    $22, $23, $24, $25, $26, $27, $28, $29
-                dc.b    $2A, $FF      
-;-------------------------------------------------------------------------------
-Offset_0x003644:
-                move.b  (Title_Screen_Animate_Buffer).w, D2          ; $FFFFFFBC
-                cmpi.b  #$01, D2
-                beq.s   Offset_0x00369C
-                move.w  (Vertical_Scrolling).w, D0                   ; $FFFFEE02
-                ext.l   D0
-                lsl.l   #$08, D0
-                add.l   D0, (Camera_Y).w                             ; $FFFFEE7C
-                move.w  (Camera_Y).w, D0                             ; $FFFFEE7C
-                move.w  D0, (Vertical_Scroll_Value).w                ; $FFFFF616
-                move.b  #$00, (Title_Screen_Animate_Buffer).w        ; $FFFFFFBC
-                move.w  #$0040, D1
-                cmpi.w  #$0000, D0
-                blt.s   Offset_0x00368E
-                bne.s   Offset_0x003684
-                cmpi.w  #$FFA5, (Vertical_Scrolling).w               ; $FFFFEE02
-                bne.s   Offset_0x003684
-                move.b  #$01, (Title_Screen_Animate_Buffer).w        ; $FFFFFFBC
-                bra.s   Offset_0x00369C
+		move.b	#2,(Title_Screen_Animate_Delay).w
+		bra.w	TitleBanner_Raise
+; ==============================================================================
+; Offset_0x003612:
+SonicFrameIndex:
+		dc.b	$2A, $FF, $00, $01, $02, $03, $00, $01
+		dc.b	$02, $03, $04, $05, $06, $07, $08, $09
+		dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11
+		dc.b	$12, $13, $14, $15, $16, $17, $18, $19
+		dc.b	$1A, $1B, $1C, $1D, $1E, $1F, $20, $21
+		dc.b	$22, $23, $24, $25, $26, $27, $28, $29
+		dc.b	$2A, $FF
+		even
+; ===========================================================================
+; Lift the banner up; this is still in the final, unused at $3AB4
+; Offset_0x003644:
+TitleBanner_Raise:
+		move.b	(Title_Screen_Animate_Buffer).w,d2
+		cmpi.b	#1,d2
+		beq.s	Offset_0x00369C
+		move.w	(Vertical_Scrolling).w,d0
+		ext.l	d0
+		lsl.l	#8,d0
+		add.l	d0,(Camera_Y).w
+		move.w	(Camera_Y).w,d0
+		move.w	d0,(Vertical_Scroll_Value).w
+		move.b	#0,(Title_Screen_Animate_Buffer).w
+		move.w	#$40,d1
+		cmpi.w	#0,d0
+		blt.s	Offset_0x00368E
+		bne.s	Offset_0x003684
+		cmpi.w	#$FFA5,(Vertical_Scrolling).w
+		bne.s	Offset_0x003684
+		move.b	#1,(Title_Screen_Animate_Buffer).w
+		bra.s	Offset_0x00369C
+; ---------------------------------------------------------------------------
+
 Offset_0x003684:
-                move.b  #$FF, (Title_Screen_Animate_Buffer).w        ; $FFFFFFBC
-                move.w  #$FFC0, D1
+		move.b	#$FF,(Title_Screen_Animate_Buffer).w
+		move.w	#$FFC0,d1
+
 Offset_0x00368E:
-                add.w   D1, (Vertical_Scrolling).w                   ; $FFFFEE02
-                cmp.b   (Title_Screen_Animate_Buffer).w, D2          ; $FFFFFFBC
-                beq.s   Offset_0x00369C
-                asr.w   (Vertical_Scrolling).w                       ; $FFFFEE02
+		add.w	d1,(Vertical_Scrolling).w
+		cmp.b	(Title_Screen_Animate_Buffer).w,d2
+		beq.s	Offset_0x00369C
+		asr.w	(Vertical_Scrolling).w
+
 Offset_0x00369C:
-                rts
-Offset_0x00369E:
-                add.w   D0, D0
-                add.w   D0, D0
-                move.w  D0, D1
-                add.w   D0, D0
-                add.w   D1, D0
-                lea     (Title_Screen_Sonic_Data), A2          ; Offset_0x00376A
-                lea     $00(A2, D0), A2
-                move.l  (A2)+, D0
-                andi.l  #$00FFFFFF, D0
-                move.l  D0, A0
-                lea     (M68K_RAM_Start), A1                         ; $FFFF0000
-                bsr     KosinskiDec                            ; Offset_0x001808
-                move.w  A1, D3
-                lsr.w   #$01, D3
-                move.l  #M68K_RAM_Start, D1                          ; $FFFF0000
-                move.w  #$0000, D2
-                tst.b   (Title_Screen_Animate_Buffer).w              ; $FFFFFFBC
-                beq.s   Offset_0x0036DE
-                move.w  #$4000, D2
+		rts
+; End of function Iterate_TitleSonicFrame
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to animate Sonic on the title screen
+; Effectively useless at this point since there's only one frame
+; ---------------------------------------------------------------------------
+
+; Offset_0x00369E:
+TitleSonic_LoadFrame:
+		add.w	d0,d0
+		add.w	d0,d0
+		move.w	d0,d1
+		add.w	d0,d0
+		add.w	d1,d0
+		lea	(TitleSonic_Frames).l,a2
+		lea	(a2,d0.w),a2
+		move.l	(a2)+,d0
+		andi.l	#$FFFFFF,d0
+		move.l	d0,a0
+		lea	(M68K_RAM_Start).l,a1
+		bsr.w	KosinskiDec
+		move.w	a1,d3
+		lsr.w	#1,d3
+		move.l	#M68K_RAM_Start,d1
+		move.w	#0,d2
+		tst.b	(Title_Screen_Animate_Buffer).w
+		beq.s	Offset_0x0036DE
+		move.w	#$4000,d2
+
 Offset_0x0036DE:
-                andi.l  #$00FFFFFF, D1
-                jsr     (DMA_68KtoVRAM)                        ; Offset_0x0012FC
-                move.l  (A2)+, A0
-                lea     (Palette_Data_Target+$40).w, A1              ; $FFFFEDC0
-                moveq   #$07, D0
+		andi.l	#$FFFFFF,d1
+		jsr	(DMA_68KtoVRAM).l
+		move.l	(a2)+,a0
+		lea	(Palette_Data_Target+$40).w,a1
+		moveq	#7,d0
+
 Offset_0x0036F2:
-                move.l  (A0)+, (A1)+
-                dbra    D0, Offset_0x0036F2
-                tst.b   (Title_Screen_Animate_Buffer).w              ; $FFFFFFBC
-                bne.s   Offset_0x00372E
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  (A2)+, A0
-                move.w  #$4000, D0
-                bsr     EnigmaDec                              ; Offset_0x00168A
-                move    #$2700, SR
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  #$60000003, D0
-                moveq   #$27, D1
-                moveq   #$1B, D2
-                jsr     (ShowVDPGraphics)                      ; Offset_0x0012BC
-                move    #$2300, SR
-                rts
+		move.l	(a0)+,(a1)+
+		dbf	d0,Offset_0x0036F2
+		tst.b	(Title_Screen_Animate_Buffer).w
+		bne.s	Offset_0x00372E
+		lea	(M68K_RAM_Start+$4000).l,a1
+		move.l	(a2)+,a0
+		move.w	#$4000,d0
+		bsr.w	EnigmaDec
+		move	#$2700,sr
+		lea	(M68K_RAM_Start+$4000).l,a1
+		move.l	#$60000003,d0
+		moveq	#$27,d1
+		moveq	#$1B,d2
+		jsr	(ShowVDPGraphics).l
+		move	#$2300,sr
+		rts
+; ---------------------------------------------------------------------------
+
 Offset_0x00372E:
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  (A2)+, A0
-                move.w  #$4200, D0
-                bsr     EnigmaDec                              ; Offset_0x00168A
-                move    #$2700, SR
-                lea     (M68K_RAM_Start+$4000), A1                   ; $FFFF4000
-                move.l  #$60000002, D0
-                moveq   #$27, D1
-                moveq   #$1B, D2
-                jsr     (ShowVDPGraphics)                      ; Offset_0x0012BC
-                move    #$2300, SR
-                rts       
-;-------------------------------------------------------------------------------
-Title_Screen_Sonic_3_Data:                                     ; Offset_0x00375E
-                dc.l    Art_Title_Screen_Sonic_3               ; Offset_0x1046CA
-                dc.l    Pal_Title_Screen_Sonic_3               ; Offset_0x1066F6
-                dc.l    Map_Title_Screen_Sonic_3               ; Offset_0x1065DA
-Title_Screen_Sonic_Data:                                       ; Offset_0x00376A                
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650
-                dc.l    Art_Title_Screen_Sonic                 ; Offset_0x1051AA
-                dc.l    Pal_Title_Screen_Sonic                 ; Offset_0x106776
-                dc.l    Map_Title_Screen_Sonic                 ; Offset_0x106650                                                                                       
-;===============================================================================
-; Tela t�tulo
-; <<<-
-;===============================================================================
+		lea	(M68K_RAM_Start+$4000).l,a1
+		move.l	(a2)+,a0
+		move.w	#$4200,d0
+		bsr.w	EnigmaDec
+		move	#$2700,sr
+		lea	(M68K_RAM_Start+$4000).l,a1
+		move.l	#$60000002,d0
+		moveq	#$27,d1
+		moveq	#$1B,d2
+		jsr	(ShowVDPGraphics).l
+		move	#$2300,sr
+		rts
+; End of function TitleSonic_LoadFrame
+
+; ===========================================================================
+; Offset_0x00375E: Title_Screen_Sonic_3_Data:
+TitleBanner_Frames:
+		dc.l	Art_Title_Screen_Sonic_3
+		dc.l	Pal_Title_Screen_Sonic_3
+		dc.l	Map_Title_Screen_Sonic_3
+; ===========================================================================
+; Offset_0x00376A: Title_Screen_Sonic_Data:
+TitleSonic_Frames:
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic
+		dc.l	Art_Title_Screen_Sonic
+		dc.l	Pal_Title_Screen_Sonic
+		dc.l	Map_Title_Screen_Sonic                                                                                       
 
 ;===============================================================================
 ; Modo de jogo ou demonstra��o das fases 
@@ -42102,7 +42169,6 @@ Angel_Island_1_Tiles_3:                                        ; Offset_0x141584
 Angel_Island_1_Chunks:                                         ; Offset_0x143D96
 Angel_Island_1_Chunks_2:                                       ; Offset_0x143D96
                 incbin  'data\aiz\ck_act1.kos'
-                dc.w     $0000, $0000
 Angel_Island_1_Flames:                                         ; Offset_0x1476A6
                 incbin  'data\aiz\flames.kmd'
                 dc.w     $0000, $0000, $0000, $0000, $0000, $0000, $0000
@@ -42125,8 +42191,7 @@ Angel_Island_2_Tiles_3:                                        ; Offset_0x14CA3C
                 dc.w     $0000, $0000, $0000, $0000, $0000, $0000
 Angel_Island_2_Chunks:                                         ; Offset_0x14EA6E
 Angel_Island_2_Chunks_2:                                       ; Offset_0x14EA6E
-                incbin  'data\aiz\ck_act2.kos'
-                dc.w     $0000, $0000, $0000, $0000, $0000, $0000                
+                incbin  'data\aiz\ck_act2.kos'       
 Hydrocity_1_Blocks:                                            ; Offset_0x152B8E
 Hydrocity_2_Blocks:                                            ; Offset_0x152B8E
                 incbin  'data\hz\blocks.kos'
