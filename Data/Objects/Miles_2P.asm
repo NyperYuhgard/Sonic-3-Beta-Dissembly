@@ -137,7 +137,7 @@ Offset_0x00CDF6:
                 move.w  (Screen_Wrap_X).w, D0                        ; $FFFFEEA8
                 and.w   D0, Obj_X(A0)                                    ; $0010
                 addi.w  #$0400, Obj_X(A0)                                ; $0010
-                bsr     CopySonicMovesForMiles                 ; Offset_0x00ACA2
+                bsr     Sonic_RecordPos                 ; Offset_0x00ACA2
                 move.b  (Primary_Angle).w, Obj_Player_Next_Tilt(A0) ; $FFFFF768, $003A
                 move.b  (Secondary_Angle).w, Obj_Player_Tilt(A0) ; $FFFFF76A, $003B
                 btst    #$01, Obj_Player_Control(A0)                     ; $002E

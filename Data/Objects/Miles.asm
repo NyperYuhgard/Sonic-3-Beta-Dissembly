@@ -107,7 +107,7 @@ Miles_ControlsLock:                                            ; Offset_0x00D2A2
                 and.w   D0, Obj_Y(A0)                                    ; $0014
 Offset_0x00D2B2:
                 bsr.s   Miles_Display                          ; Offset_0x00D304
-                bsr     CopySonicMovesForMiles                 ; Offset_0x00ACA2
+                bsr     Sonic_RecordPos                 ; Offset_0x00ACA2
                 bsr     Miles_Water                            ; Offset_0x00DA88
                 move.b  (Primary_Angle).w, Obj_Player_Next_Tilt(A0) ; $FFFFF768, $003A
                 move.b  (Secondary_Angle).w, Obj_Player_Tilt(A0) ; $FFFFF76A, $003B
@@ -1913,7 +1913,7 @@ Offset_0x00E888:
 Offset_0x00E898:
                 bsr     Miles_HurtStop                         ; Offset_0x00E8AE
                 bsr     Miles_LevelBoundaries                  ; Offset_0x00E17C
-                bsr     CopySonicMovesForMiles                 ; Offset_0x00ACA2
+                bsr     Sonic_RecordPos                 ; Offset_0x00ACA2
                 bsr     Miles_Animate                          ; Offset_0x00E952
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 ;-------------------------------------------------------------------------------                
@@ -1946,7 +1946,7 @@ Kill_Miles:                                                    ; Offset_0x00E904
 Miles_Death:                                                   ; Offset_0x00E90A
                 bsr     Player_GameOver                        ; Offset_0x00C126
                 jsr     (ObjectFall)                           ; Offset_0x0110FE
-                bsr     CopySonicMovesForMiles                 ; Offset_0x00ACA2
+                bsr     Sonic_RecordPos                 ; Offset_0x00ACA2
                 bsr     Miles_Animate                          ; Offset_0x00E952
                 jmp     (DisplaySprite)                        ; Offset_0x011148 
 ;-------------------------------------------------------------------------------  
