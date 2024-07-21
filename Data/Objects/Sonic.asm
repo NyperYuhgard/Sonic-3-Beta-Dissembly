@@ -475,56 +475,68 @@ Offset_0x00AF38:
 		rts
 ; End of subroutine Sonic_MdJump
 
-;-------------------------------------------------------------------------------  
-Sonic_Move:						    ; Offset_0x00AF42
-		move.w  (A4), D6
-		move.w  Acceleration(A4), D5		             ; $0002
-		move.w  Deceleration(A4), D4		             ; $0004
-		tst.b   Obj_Player_Status(A0)		            ; $002F
-		bmi     Offset_0x00B1FC
-		tst.w   Obj_P_Horiz_Ctrl_Lock(A0)		        ; $0032
-		bne     Offset_0x00B1B2
-		btst    #$02, (Control_Ports_Logical_Data).w         ; $FFFFF602
-		beq.s   Offset_0x00AF68
-		bsr     Offset_0x00B2A6
-Offset_0x00AF68:
-		btst    #$03, (Control_Ports_Logical_Data).w         ; $FFFFF602
-		beq.s   Offset_0x00AF74
-		bsr     Offset_0x00B32C
-Offset_0x00AF74:
-		move.b  Obj_Angle(A0), D0				; $0026
-		addi.b  #$20, D0
-		andi.b  #$C0, D0
-		bne     Offset_0x00B1B2
-		tst.w   Obj_Inertia(A0)				  ; $001C
-		bne     Offset_0x00B1B2
-		bclr    #$05, Obj_Status(A0)		             ; $002A
-		move.b  #$05, Obj_Ani_Number(A0)		         ; $0020
-		btst    #$03, Obj_Status(A0)		             ; $002A
-		beq     Offset_0x00B066
-		move.w  Obj_Player_Last(A0), A1		          ; $0042
-		tst.b   Obj_Status(A1)				   ; $002A
-		bmi     Offset_0x00B15E
-		moveq   #$00, D1
-		move.b  Obj_Width(A1), D1				; $0007
-		move.w  D1, D2
-		add.w   D2, D2
-		subq.w  #$02, D2
-		add.w   Obj_X(A0), D1				    ; $0010
-		sub.w   Obj_X(A1), D1				    ; $0010
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
-		bne     Offset_0x00AFD8
-		cmpi.w  #$0002, D1
-		blt.s   Offset_0x00B028
-		cmp.w   D2, D1
-		bge.s   Offset_0x00AFEA
-		bra     Offset_0x00B15E
-Offset_0x00AFD8:
-		cmpi.w  #$0002, D1
-		blt     Offset_0x00B150
-		cmp.w   D2, D1
-		bge     Offset_0x00B140
-		bra     Offset_0x00B15E
+; ---------------------------------------------------------------------------
+; Subroutine to make Sonic walk/run
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00AF42:
+Sonic_Move:
+		move.w	(a4),d6
+		move.w	Acceleration(a4),d5
+		move.w	Deceleration(a4),d4
+		tst.b	Obj_Player_Status(a0)
+		bmi.w	Offset_0x00B1FC
+		tst.w	Obj_P_Horiz_Ctrl_Lock(a0)
+		bne.w	Offset_0x00B1B2
+		btst	#2,(Control_Ports_Logical_Data).w	; is left being pressed?
+		beq.s	Sonic_NotLeft				; if not, branch
+		bsr.w	Offset_0x00B2A6
+; Offset_0x00AF68:
+Sonic_NotLeft:
+		btst	#3,(Control_Ports_Logical_Data).w	; is right being pressed?
+		beq.s	Sonic_NotRight				; if not, branch
+		bsr.w	Offset_0x00B32C
+; Offset_0x00AF74:
+Sonic_NotRight:
+		move.b	Obj_Angle(a0),d0
+		addi.b	#$20,d0
+		andi.b	#$C0,d0					; is Sonic on a slope?
+		bne.w	Offset_0x00B1B2				; if yes, branch
+		tst.w	Obj_Inertia(a0)				; is Sonic moving?
+		bne.w	Offset_0x00B1B2				; if yes, branch
+		bclr	#5,Obj_Status(a0)
+		move.b	#5,Obj_Ani_Number(a0)			; use "standing" animation
+		btst	#3,Obj_Status(a0)
+		beq.w	Offset_0x00B066
+		move.w	Obj_Player_Last(a0),a1
+		tst.b	Obj_Status(a1)
+		bmi.w	Offset_0x00B15E
+		moveq	#0,d1
+		move.b	Obj_Width(a1),d1
+		move.w	d1,d2
+		add.w	d2,d2
+		subq.w	#2,d2
+		add.w	Obj_X(a0),d1
+		sub.w	Obj_X(a1),d1
+		tst.b	(Super_Sonic_Flag).w
+		bne.w	SuperSonic_Balance
+		cmpi.w	#2,d1
+		blt.s	Offset_0x00B028
+		cmp.w	d2,d1
+		bge.s	Offset_0x00AFEA
+		bra.w	Offset_0x00B15E
+; ---------------------------------------------------------------------------
+; Offset_0x00AFD8:
+SuperSonic_Balance:
+		cmpi.w	#2,d1
+		blt.w	Offset_0x00B150
+		cmp.w	d2,d1
+		bge.w	Offset_0x00B140
+		bra.w	Offset_0x00B15E
+; ---------------------------------------------------------------------------
+
 Offset_0x00AFEA:
 		btst    #$00, Obj_Status(A0)		             ; $002A
 		bne.s   Offset_0x00B00A
@@ -989,190 +1001,261 @@ Offset_0x00B55A:
 		move.w  D0, Obj_Speed_X(A0)		              ; $0018
 Offset_0x00B55E:
 		rts
-;-------------------------------------------------------------------------------		
-Sonic_LevelBoundaries:				         ; Offset_0x00B560
-		move.l  Obj_X(A0), D1				    ; $0010
-		move.w  Obj_Speed_X(A0), D0		              ; $0018
-		ext.l   D0
-		asl.l   #$08, D0
-		add.l   D0, D1
-		swap.w  D1
-		move.w  (Sonic_Level_Limits_Min_X).w, D0             ; $FFFFEE14
-		addi.w  #$0010, D0
-		cmp.w   D1, D0
-		bhi.s   Offset_0x00B59E
-		move.w  (Sonic_Level_Limits_Max_X).w, D0             ; $FFFFEE16
-		addi.w  #$0128, D0
-		cmp.w   D1, D0
-		bls.s   Offset_0x00B59E
-Offset_0x00B588:
-		move.w  (Sonic_Level_Limits_Max_Y).w, D0             ; $FFFFEE1A
-		addi.w  #$00E0, D0
-		cmp.w   Obj_Y(A0), D0				    ; $0014
-		blt.s   Offset_0x00B598
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to prevent Sonic from leaving the boundaries of a level
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00B562:
+Sonic_LevelBoundaries:
+		move.l	Obj_X(a0),d1
+		move.w	Obj_Speed_X(a0),d0
+		ext.l	d0
+		asl.l	#8,d0
+		add.l	d0,d1
+		swap.w	d1
+		move.w	(Sonic_Level_Limits_Min_X).w,d0
+		addi.w	#$10,d0
+		cmp.w	d1,d0					; has Sonic touched the left boundary?
+		bhi.s	Sonic_Boundary_Sides			; if yes, branch
+		move.w	(Sonic_Level_Limits_Max_X).w,d0
+		addi.w	#$128,d0				; screen width - Sonic's width_pixels
+		cmp.w	d1,d0					; has Sonic touched the right boundary?
+		bls.s	Sonic_Boundary_Sides			; if yes, branch
+; Offset_0x00B588:
+Sonic_Boundary_CheckBottom:
+		move.w	(Sonic_Level_Limits_Max_Y).w,d0
+		addi.w	#$E0,d0
+		cmp.w	Obj_Y(a0),d0				; has Sonic touched the bottom boundary?
+		blt.s	Sonic_Boundary_Bottom			; if yes, branch
 		rts
-Offset_0x00B598:
-		jmp     (Kill_Player)		          ; Offset_0x00A4A4
-Offset_0x00B59E:
-		move.w  D0, Obj_X(A0)				    ; $0010
-		move.w  #$0000, Obj_Sub_X(A0)		            ; $0012
-		move.w  #$0000, Obj_Speed_X(A0)		          ; $0018
-		move.w  #$0000, Obj_Inertia(A0)		          ; $001C
-		bra.s   Offset_0x00B588 
-;-------------------------------------------------------------------------------		
-Sonic_Roll:						    ; Offset_0x00B5B6
-		tst.b   Obj_Player_Status(A0)		            ; $002F
-		bmi.s   Offset_0x00B5DC
-		move.w  Obj_Inertia(A0), D0		              ; $001C
-		bpl.s   Offset_0x00B5C4
-		neg.w   D0
+; ---------------------------------------------------------------------------
+; Offset_0x00B598:
+Sonic_Boundary_Bottom:
+		jmp	(Kill_Player).l
+; ===========================================================================
+; Offset_0x00B59E:
+Sonic_Boundary_Sides:
+		move.w	d0,Obj_X(a0)
+		move.w	#0,Obj_Sub_X(a0)
+		move.w	#0,Obj_Speed_X(a0)
+		move.w	#0,Obj_Inertia(a0)
+		bra.s	Sonic_Boundary_CheckBottom
+; End of function Sonic_LevelBoundaries
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine allowing Sonic to start rolling when he's moving
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00B5B6:
+Sonic_Roll:
+		tst.b	Obj_Player_Status(a0)
+		bmi.s	Sonic_NoRoll
+		move.w	Obj_Inertia(a0),d0
+		bpl.s	Offset_0x00B5C4
+		neg.w	d0
+
 Offset_0x00B5C4:
-		cmpi.w  #$0080, D0
-		bcs.s   Offset_0x00B5DC
-		move.b  (Control_Ports_Logical_Data).w, D0           ; $FFFFF602
-		andi.b  #$0C, D0
-		bne.s   Offset_0x00B5DC
-		btst    #$01, (Control_Ports_Logical_Data).w         ; $FFFFF602
-		bne.s   Offset_0x00B5DE
-Offset_0x00B5DC:
+		cmpi.w	#$80,d0					; is Sonic moving at $80 speed or faster?
+		bcs.s	Sonic_NoRoll				; if not, branch
+		move.b	(Control_Ports_Logical_Data).w,d0 
+		andi.b	#$C,d0					; is left/right being pressed?
+		bne.s	Sonic_NoRoll				; if yes, branch
+		btst	#1,(Control_Ports_Logical_Data).w	; is down being pressed?
+		bne.s	Sonic_ChkRoll				; if yes, branch
+; Offset_0x00B5DC:
+Sonic_NoRoll:
 		rts
-Offset_0x00B5DE:
-		btst    #$02, Obj_Status(A0)		             ; $002A
-		beq.s   Offset_0x00B5E8
+; ---------------------------------------------------------------------------
+; Offset_0x00B5DE:
+Sonic_ChkRoll:
+		btst	#2,Obj_Status(a0)			; is Sonic already rolling?
+		beq.s	Sonic_DoRoll				; if not, branch
 		rts
-Offset_0x00B5E8:
-		bset    #$02, Obj_Status(A0)		             ; $002A
-		move.b  #$0E, Obj_Height_2(A0)		           ; $001E
-		move.b  #$07, Obj_Width_2(A0)		            ; $001F
-		move.b  #$02, Obj_Ani_Number(A0)		         ; $0020
-		addq.w  #$05, Obj_Y(A0)				  ; $0014
-		move.w  #Rolling_Sfx, D0				 ; $003C
-		jsr     (Play_Music)		           ; Offset_0x001176
-		tst.w   Obj_Inertia(A0)				  ; $001C
-		bne.s   Offset_0x00B61A
-		move.w  #$0200, Obj_Inertia(A0)		          ; $001C
+; ---------------------------------------------------------------------------
+; Offset_0x00B5E8:
+Sonic_DoRoll:
+		bset	#2,Obj_Status(a0)
+		move.b	#$E,Obj_Height_2(a0)
+		move.b	#7,Obj_Width_2(a0)
+		move.b	#2,Obj_Ani_Number(a0)			; use "rolling" animation
+		addq.w	#5,Obj_Y(a0)
+		move.w	#Rolling_Sfx,d0
+		jsr	(Play_Music).l				; play rolling sound
+		tst.w	Obj_Inertia(a0)
+		bne.s	Offset_0x00B61A
+		move.w	#$200,Obj_Inertia(a0)
+
 Offset_0x00B61A:
 		rts 
-;-------------------------------------------------------------------------------		
-Sonic_Jump:						    ; Offset_0x00B61C
-		move.b  (Control_Ports_Logical_Data+$001).w, D0      ; $FFFFF603
-		andi.b  #$70, D0
-		beq     Offset_0x00B6F0
-		move.b  (Control_Ports_Logical_Data).w, D0           ; $FFFFF602
-		andi.b  #$0D, D0
-		cmpi.b  #$01, D0
-		bne.s   Offset_0x00B63C
-		move.w  #$FFFF, (CopySonicMovesForMilesIndex).w      ; $FFFFFE5A
+; End of function Sonic_Roll
+
+; ---------------------------------------------------------------------------
+; Subroutine allowing Sonic to jump
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00B61C:
+Sonic_Jump:
+		move.b	(Control_Ports_Logical_Data+1).w,d0
+		andi.b	#$70,d0					; is A/B/C pressed?
+		beq.w	Offset_0x00B6F0				; if not, branch
+		move.b	(Control_Ports_Logical_Data).w,d0
+		andi.b	#$D,d0
+		cmpi.b	#1,d0
+		bne.s	Offset_0x00B63C
+		move.w	#-1,(CopySonicMovesForMilesIndex).w
+
 Offset_0x00B63C:
-		moveq   #$00, D0
-		move.b  Obj_Angle(A0), D0				; $0026
-		addi.b  #$80, D0
-		movem.l A4-A6, -(A7)
-		bsr     CalcRoomOverHead		       ; Offset_0x009B94
-		movem.l (A7)+, A4-A6
-		cmpi.w  #$0006, D1
-		blt     Offset_0x00B6F0
-		move.w  #$0680, D2
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
-		beq.s   Offset_0x00B668
-		move.w  #$0800, D2
+		moveq	#0,d0
+		move.b	Obj_Angle(a0),d0
+		addi.b	#$80,d0
+		movem.l	a4-a6,-(sp)
+		bsr.w	CalcRoomOverHead
+		movem.l	(sp)+,a4-a6
+		cmpi.w	#6,d1					; does Sonic have room to jump?
+		blt.w	Offset_0x00B6F0				; if not, branch
+		move.w	#$680,d2
+		tst.b	(Super_Sonic_Flag).w
+		beq.s	Offset_0x00B668
+		move.w	#$800,d2				; set higher jump speed if super
+
 Offset_0x00B668:
-		btst    #$06, Obj_Status(A0)		             ; $002A
-		beq.s   Offset_0x00B674
-		move.w  #$0380, D2
+		btst	#6,Obj_Status(a0)
+		beq.s	Offset_0x00B674
+		move.w	#$380,d2				; set lower jump speed if under
+
 Offset_0x00B674:
-		moveq   #$00, D0
-		move.b  Obj_Angle(A0), D0				; $0026
-		subi.b  #$40, D0
-		jsr     (CalcSine)		             ; Offset_0x001B20
-		muls.w  D2, D1
-		asr.l   #$08, D1
-		add.w   D1, Obj_Speed_X(A0)		              ; $0018
-		muls.w  D2, D0
-		asr.l   #$08, D0
-		add.w   D0, Obj_Speed_Y(A0)		              ; $001A
-		bset    #$01, Obj_Status(A0)		             ; $002A
-		bclr    #$05, Obj_Status(A0)		             ; $002A
-		addq.l  #$04, A7
-		move.b  #$01, Obj_Player_Jump(A0)		        ; $0040
-		clr.b   Obj_Player_St_Convex(A0)		         ; $003C
-		move.w  #Jump_Sfx, D0				    ; $0070
-		jsr     (Play_Music)		           ; Offset_0x001176
-		move.b  Obj_Height_3(A0), Obj_Height_2(A0)        ; $001E, $0044
-		move.b  Obj_Width_3(A0), Obj_Width_2(A0)          ; $001F, $0045
-		btst    #$02, Obj_Status(A0)		             ; $002A
-		bne.s   Offset_0x00B6F2
-		move.b  #$0E, Obj_Height_2(A0)		           ; $001E
-		move.b  #$07, Obj_Width_2(A0)		            ; $001F
-		move.b  #$02, Obj_Ani_Number(A0)		         ; $0020
-		bset    #$02, Obj_Status(A0)		             ; $002A
-		move.b  Obj_Height_2(A0), D0		             ; $001E
-		sub.b   Obj_Height_3(A0), D0		             ; $0044
-		ext.w   D0
-		sub.w   D0, Obj_Y(A0)				    ; $0014
+		moveq	#0,d0
+		move.b	Obj_Angle(a0),d0
+		subi.b	#$40,d0
+		jsr	(CalcSine).l
+		muls.w	d2,d1
+		asr.l	#8,d1
+		add.w	d1,Obj_Speed_X(a0)			; make Sonic jump (in X... this adds nothing on level ground)
+		muls.w	d2,d0
+		asr.l	#8,d0
+		add.w	d0,Obj_Speed_Y(a0)			; make Sonic jump (in Y)
+		bset	#1,Obj_Status(a0)
+		bclr	#5,Obj_Status(a0)
+		addq.l	#4,sp
+		move.b	#1,Obj_Player_Jump(a0)
+		clr.b	Obj_Player_St_Convex(a0)
+		move.w	#Jump_Sfx,d0
+		jsr	(Play_Music).l				; play jumping sound
+		move.b	Obj_Height_3(a0),Obj_Height_2(a0)
+		move.b	Obj_Width_3(a0),Obj_Width_2(a0)
+		btst	#2,Obj_Status(a0)
+		bne.s	Sonic_RollJump
+		move.b	#$E,Obj_Height_2(a0)
+		move.b	#7,Obj_Width_2(a0)
+		move.b	#2,Obj_Ani_Number(a0)			; use "jumping" animation
+		bset	#2,Obj_Status(a0)
+		move.b	Obj_Height_2(a0),d0
+		sub.b	Obj_Height_3(a0),d0
+		ext.w	d0
+		sub.w	d0,Obj_Y(a0)
+
 Offset_0x00B6F0:
 		rts
-Offset_0x00B6F2:
-		bset    #$04, Obj_Status(A0)		             ; $002A
-		rts 
-;-------------------------------------------------------------------------------		
-Sonic_JumpHeight:				              ; Offset_0x00B6FA
-		tst.b   Obj_Player_Jump(A0)		              ; $0040
-		beq.s   Offset_0x00B72E
-		move.w  #$FC00, D1
-		btst    #$06, Obj_Status(A0)		             ; $002A
-		beq.s   Offset_0x00B710
-		move.w  #$FE00, D1
-Offset_0x00B710:
-		cmp.w   Obj_Speed_Y(A0), D1		              ; $001A
-		ble     Offset_0x00B7B8				; this is altered from Sonic 2 to prevent the Super Sonic transformation,
-								; change the branch to B726 to re-enable him
-		move.b  (Control_Ports_Logical_Data).w, D0           ; $FFFFF602
-		andi.b  #$70, D0
-		bne.s   Offset_0x00B726
-		move.w  D1, Obj_Speed_Y(A0)		              ; $001A
-Offset_0x00B726:
-		tst.b   Obj_Speed_Y(A0)				  ; $001A
-		beq.s   Offset_0x00B744
+; ---------------------------------------------------------------------------
+; Offset_0x00B6F2:
+Sonic_RollJump:
+		bset	#4,Obj_Status(a0)			; set the rolling+jumping flag
 		rts
-Offset_0x00B72E:
-		tst.b   Obj_Player_Spdsh_Flag(A0)		        ; $003D
-		bne.s   Offset_0x00B742
-		cmpi.w  #$F040, Obj_Speed_Y(A0)		          ; $001A
-		bge.s   Offset_0x00B742
-		move.w  #$F040, Obj_Speed_Y(A0)		          ; $001A
+; End of function Sonic_Jump
+
+; ---------------------------------------------------------------------------
+; Subroutine letting Sonic control the height of the jump
+; when the jump button is released
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00B6FA:
+Sonic_JumpHeight:
+		tst.b	Obj_Player_Jump(A0)			; is Sonic jumping?
+		beq.s	Sonic_UpVelCap				; if not, branch
+
+		move.w	#-$400,d1
+		btst	#6,Obj_Status(a0)			; is Sonic underwater?
+		beq.s	Offset_0x00B710				; if not, branch
+		move.w	#-$200,d1
+
+Offset_0x00B710:
+		cmp.w	Obj_Speed_Y(a0),d1			; if Sonic is not going up faster than d1, branch
+		ble.w	Sonic_ThrowRings			; this is altered from Sonic 2 to prevent the Super Sonic transformation,
+								; change the branch to B726 to re-enable him
+		move.b	(Control_Ports_Logical_Data).w,d0
+		andi.b	#$70,d0					; is A/B/C pressed?
+		bne.s	Offset_0x00B726				; if yes, branch
+		move.w	d1,Obj_Speed_Y(a0)			; immediately reduce Sonic's upward speed to d1
+
+Offset_0x00B726:
+		tst.b	Obj_Speed_Y(a0)				; is Sonic exactly at the height of his jump?
+		beq.s	Sonic_CheckGoSuper			; if yes, test for turning into Super Sonic
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x00B72E:
+Sonic_UpVelCap:
+		tst.b	Obj_Player_Spdsh_Flag(a0)		; is Sonic charging a spindash or in a rolling-only area?
+		bne.s	Offset_0x00B742				; if yes, branch
+		cmpi.w	#-$FC0,Obj_Speed_Y(a0)			; is Sonic moving up really fast?
+		bge.s	Offset_0x00B742				; if not, branch
+		move.w	#-$FC0,Obj_Speed_Y(a0)			; cap upward speed
+
 Offset_0x00B742:
 		rts
-;-------------------------------------------------------------------------------		
-Offset_0x00B744:
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
-		bne.s   Offset_0x00B7B6
-		cmpi.b  #$07, (Emeralds_Count).w		     ; $FFFFFFB1
-		bne.s   Offset_0x00B7B6
-		cmpi.w  #$0032, (Ring_Count_Address).w               ; $FFFFFE20
-		bcs.s   Offset_0x00B7B6
-		tst.b   (HUD_Timer_Refresh_Flag).w		   ; $FFFFFE1E
-		beq.s   Offset_0x00B7B6
-		move.b  #$01, (Super_Sonic_Palette_Status).w         ; $FFFFF65F
-		move.b  #$0F, (Super_Sonic_Palette_Timer).w          ; $FFFFF65E
-		move.b  #$01, (Super_Sonic_Flag).w		   ; $FFFFFE19
-		move.b  #$81, Obj_Player_Control(A0)		     ; $002E
-		move.b  #$1F, Obj_Ani_Number(A0)		         ; $0020
-		move.l  #Obj_Super_Sonic_Stars, (Obj_Super_Sonic_Stars_RAM).w ; Offset_0x0102AA, $FFFFCBC0
-		move.w  #$0A00, (A4)
-		move.w  #$0030, Acceleration(A4)		         ; $0002
-		move.w  #$0100, Deceleration(A4)		         ; $0004
-		move.b  #$00, Obj_P_Invcbility_Time(A0)		  ; $0035
-		bset    #$01, Obj_Player_Status(A0)		      ; $002F
-		move.w  #Super_Form_Change_Sfx, D0		       ; $FFBB
-		jsr     (Play_Music)		           ; Offset_0x001176
-		move.w  #Super_Sonic_Snd, D0		             ; $000A
-		jmp     (Play_Music)		           ; Offset_0x001176
+; End of subroutine Sonic_JumpHeight
+
+; ---------------------------------------------------------------------------
+; Subroutine that transforms Sonic into Super Sonic if he has enough rings and emeralds
+; Effectively unused due to a change in code above
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00B744:
+Sonic_CheckGoSuper:
+		tst.b	(Super_Sonic_Flag).w
+		bne.s	Offset_0x00B7B6
+		cmpi.b	#7,(Emeralds_Count).w
+		bne.s	Offset_0x00B7B6
+		cmpi.w	#50,(Ring_Count_Address).w
+		bcs.s	Offset_0x00B7B6
+		tst.b	(HUD_Timer_Refresh_Flag).w
+		beq.s	Offset_0x00B7B6
+		move.b	#1,(Super_Sonic_Palette_Status).w
+		move.b	#$F,(Super_Sonic_Palette_Timer).w
+		move.b	#1,(Super_Sonic_Flag).w
+		move.b	#$81,Obj_Player_Control(a0)
+		move.b	#$1F,Obj_Ani_Number(a0)
+		move.l	#Obj_Super_Sonic_Stars,(Obj_Super_Sonic_Stars_RAM).w
+		move.w	#$A00,(a4)
+		move.w	#$30,Acceleration(a4)
+		move.w	#$100,Deceleration(a4)
+		move.b	#$0,Obj_P_Invcbility_Time(a0)
+		bset	#1,Obj_Player_Status(a0)
+		move.w	#Super_Form_Change_Sfx,d0
+		jsr	(Play_Music).l
+		move.w	#Super_Sonic_Snd,d0
+		jmp	(Play_Music).l
+
 Offset_0x00B7B6:
 		rts
+; End of function Sonic_CheckGoSuper
 
-Offset_0x00B7B8:
-		bra.w	Offset_0x00B8B6 
+; ---------------------------------------------------------------------------
+; Offset_0x00B7B8:
+Sonic_ThrowRings:
+		bra.w	Offset_0x00B8B6
 ; ---------------------------------------------------------------------------
 ; An unused ability that lets Sonic shoot rings while jumping; the rings were
 ; likely meant to be a placeholder until proper graphics were added, which they
@@ -1180,31 +1263,29 @@ Offset_0x00B7B8:
 ;
 ; Judging from Sonic Origins' concept art of the many shield types, this might've
 ; been the "attack" ability the Flame Shield (NOT "Fire"!) was intended to have.
-; Offset_0x00B7BC:
-Sonic_ThrowRings:
 		btst	#2,Obj_Status(a0)
 		beq.w	Offset_0x00B8B6
 		move.b	(Control_Ports_Logical_Data+1).w,d0
 		andi.b	#$20,d0
-		beq.s	Offset_0x00B83A
+		beq.s	@notRolling
 		move.w	Obj_Speed_X(a0),d2
 		bsr.w	SingleObjectLoad
-		bne.w	Offset_0x00B80C
+		bne.w	@skip
 		bsr.w	Obj_ThrownRing
 		move.w	#$800,Obj_Speed_X(a1)
 		move.w	#0,Obj_Speed_Y(a1)
 		add.w	d2,Obj_Speed_X(a1)
 		bsr.w	SingleObjectLoad
-		bne.w	Offset_0x00B80C
+		bne.w	@skip
 		bsr.w	Obj_ThrownRing
 		move.w	#-$800,Obj_Speed_X(a1)
 		move.w	#0,Obj_Speed_Y(a1)
 		add.w	d2,Obj_Speed_X(a1)
-
-Offset_0x00B80C:
-		btst	#2,Obj_Status(a0)
-		beq.s	Offset_0x00B83A
-		bclr	#2,Obj_Status(a0)
+; Offset_0x00B80C:
+@skip:
+		btst	#2,Obj_Status(a0)			; is Sonic rolling?
+		beq.s	@notRolling				; if not, branch
+		bclr	#2,Obj_Status(a0)			; clear Sonic's roll status
 		move.b	Obj_Height_2(a0),d0
 		move.b	Obj_Height_3(a0),Obj_Height_2(a0)
 		move.b	Obj_Width_3(a0),Obj_Width_2(a0)
@@ -1212,8 +1293,8 @@ Offset_0x00B80C:
 		sub.b	Obj_Height_3(a0),d0
 		ext.w	d0
 		add.w	d0,Obj_Y(a0)
-
-Offset_0x00B83A:
+; Offset_0x00B83A:
+@notRolling:
 		move.b	(Control_Ports_Logical_Data+1).w,d0
 		andi.b	#$10,d0
 		beq.s	Offset_0x00B8B6
@@ -1339,7 +1420,7 @@ Obj_ThrownRing:
 		move.w	#$180,Obj_Priority(a1)
 		move.b	#8,Obj_Width(a1)
 		rts
-;-------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 ; Offset_0x00B9C8:
 ThrownRing_LoadIndex:
 		moveq	#0,d0
@@ -1359,7 +1440,7 @@ ThrownRing_Init:
 		move.b	#8,Obj_Height_2(a0)
 		move.b	#8,Obj_Width_2(a0)
 		bset	#1,Obj_Player_Status(a0)
-;-------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 ; Offset_0x00B9F6:
 ThrownRing_Main:
 		move.l	a0,a2
@@ -1861,55 +1942,73 @@ Offset_0x00BF68:
 		rts
 Offset_0x00BF6A:
 		tst.b   Obj_Player_Spdsh_Flag(A0)		        ; $003D
-		bne.s   Offset_0x00BFAE
+		bne.s   Sonic_ResetOnFloor_Part2
 		move.b  #$00, Obj_Ani_Number(A0)		         ; $0020
-;-------------------------------------------------------------------------------		
-Sonic_ResetOnFloor:				            ; Offset_0x00BF76
-		cmpi.l  #Obj_Miles, (A0)		       ; Offset_0x00D11E
-		beq     Miles_ResetOnFloor		     ; Offset_0x00E7EE
-		move.b  Obj_Height_2(A0), D0		             ; $001E
-		move.b  Obj_Height_3(A0), Obj_Height_2(A0)        ; $001E, $0044
-		move.b  Obj_Width_3(A0), Obj_Width_2(A0)          ; $001F, $0045
-		btst    #$02, Obj_Status(A0)		             ; $002A
-		beq.s   Offset_0x00BFAE
-		bclr    #$02, Obj_Status(A0)		             ; $002A
-		move.b  #$00, Obj_Ani_Number(A0)		         ; $0020
-		sub.b   Obj_Height_3(A0), D0		             ; $0044
-		ext.w   D0
-		add.w   D0, Obj_Y(A0)				    ; $0014
-Offset_0x00BFAE:
-		bclr    #$01, Obj_Status(A0)		             ; $002A
-		bclr    #$05, Obj_Status(A0)		             ; $002A
-		bclr    #$04, Obj_Status(A0)		             ; $002A
-		move.b  #$00, Obj_Player_Jump(A0)		        ; $0040
-		move.w  #$0000, (Enemy_Hit_Chain_Count).w            ; $FFFFF7D0
-		move.b  #$00, Obj_Flip_Angle(A0)		         ; $0027
-		move.b  #$00, Obj_Player_Flip_Flag(A0)		   ; $002D
-		move.b  #$00, Obj_P_Flips_Remaining(A0)		  ; $0030
-		move.b  #$00, Obj_Look_Up_Down_Time(A0)		  ; $0039
-		cmpi.b  #$14, Obj_Ani_Number(A0)		         ; $0020
-		bne.s   Offset_0x00BFF2
-		move.b  #$00, Obj_Ani_Number(A0)		         ; $0020
-Offset_0x00BFF2:
-		tst.w   (CopySonicMovesForMilesIndex).w              ; $FFFFFE5A
-		beq.s   Offset_0x00C00E
-		bmi.s   Offset_0x00C010
-		asr.w   Obj_Inertia(A0)				  ; $001C
-		asr.w   Obj_Speed_X(A0)				  ; $0018
-		move.w  #$0000, Obj_Speed_Y(A0)		          ; $001A
-		move.w  #$0000, (CopySonicMovesForMilesIndex).w      ; $FFFFFE5A
+
+; ---------------------------------------------------------------------------
+; Subroutine to reset Sonic's mode when he lands on the floor
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00BF76:
+Sonic_ResetOnFloor:
+		cmpi.l	#Obj_Miles,(a0)
+		beq.w	Miles_ResetOnFloor
+
+		move.b	Obj_Height_2(a0),d0
+		move.b	Obj_Height_3(a0),Obj_Height_2(a0)
+		move.b	Obj_Width_3(a0),Obj_Width_2(a0)
+		btst	#2,Obj_Status(a0)
+		beq.s	Sonic_ResetOnFloor_Part2
+		bclr	#2,Obj_Status(a0)
+		move.b	#0,Obj_Ani_Number(a0)
+		sub.b	Obj_Height_3(a0),d0
+		ext.w	d0
+		add.w	d0,Obj_Y(a0)
+; Offset_0x00BFAE:
+Sonic_ResetOnFloor_Part2:
+		bclr	#1,Obj_Status(a0)
+		bclr	#5,Obj_Status(a0)
+		bclr	#4,Obj_Status(a0)
+		move.b	#0,Obj_Player_Jump(a0)
+		move.w	#0,(Enemy_Hit_Chain_Count).w
+		move.b	#0,Obj_Flip_Angle(a0)
+		move.b	#0,Obj_Player_Flip_Flag(a0)
+		move.b	#0,Obj_P_Flips_Remaining(a0)
+		move.b	#0,Obj_Look_Up_Down_Time(a0)
+		cmpi.b	#$14,Obj_Ani_Number(a0)
+		bne.s	Sonic_ResetOnFloor_Part3
+		move.b	#0,Obj_Ani_Number(a0)
+; Offset_0x00BFF2:
+Sonic_ResetOnFloor_Part3:
+		tst.w	(CopySonicMovesForMilesIndex).w
+		beq.s	Offset_0x00C00E
+		bmi.s	Sonic_Dropdash
+		asr.w	Obj_Inertia(a0)
+		asr.w	Obj_Speed_X(a0)
+		move.w	#0,Obj_Speed_Y(a0)
+		move.w	#0,(CopySonicMovesForMilesIndex).w
 Offset_0x00C00E:
 		rts
-Offset_0x00C010:
-		move.w  #$0000, Obj_Speed_Y(A0)		          ; $001A
-		move.w  #$0000, (CopySonicMovesForMilesIndex).w      ; $FFFFFE5A
-		bsr     Reset_Player_Position_Array            ; Offset_0x00ACEC
-		move.b  #$09, Obj_Ani_Number(A0)		         ; $0020
-		move.w  #Rolling_Sfx, D0				 ; $003C
-		jsr     (Play_Music)		           ; Offset_0x001176
-		move.b  #$01, Obj_Player_Spdsh_Flag(A0)		  ; $003D
-		move.w  #$0000, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
-		rts  
+; End of function Sonic_ResetOnFloor
+
+; ---------------------------------------------------------------------------
+; Subroutine for Sonic to do a dropdash-like ability (removed in final)
+; ---------------------------------------------------------------------------
+; Offset_0x00C010:
+Sonic_Dropdash:
+		move.w	#0,Obj_Speed_Y(a0)
+		move.w	#0,(CopySonicMovesForMilesIndex).w
+		bsr.w	Reset_Player_Position_Array
+		move.b	#9,Obj_Ani_Number(a0)
+		move.w	#Rolling_Sfx,d0
+		jsr	(Play_Music).l
+		move.b	#1,Obj_Player_Spdsh_Flag(a0)
+		move.w	#0,Obj_Player_Spdsh_Cnt(a0)
+		rts
+; End of subroutine Sonic_DropDash
+
 ;-------------------------------------------------------------------------------   
 Sonic_Hurt:						    ; Offset_0x00C03E
 		tst.w   (Debug_Mode_Active).w		        ; $FFFFFFFA

@@ -4534,7 +4534,7 @@ Offset_0x0039C0:
 		bsr.w	LoadPLC
 
 Offset_0x003A0A:
-		bsr.w	Init_Player_Selected
+		bsr.w	Level_SetPlayerMode
 		moveq	#6,d0
 		tst.w	(Two_Player_Flag).w
 		bne.s	Offset_0x003A2E
@@ -4684,7 +4684,7 @@ Offset_0x003BAE:
 		jsr	(S2_FloorLog_Unk).l
 		bsr.w	Load_Collision_Index
 		bsr.w	Water_Effects
-		bsr.w	Load_Player_Selected
+		bsr.w	InitPlayers
 		move.w	(Control_Ports_Buffer_Data+2).w,(Tmp_FF7C).w
 		move.w	#0,(Control_Ports_Logical_Data).w
 		move.w	#0,(Control_Ports_Logical_Data_2).w
@@ -4818,7 +4818,7 @@ Level_MainLoop:
 		jsr	(Background_Scroll_Speed).l
 		jsr	(Background_Scroll_Layer).l
 		bsr.w	Water_Effects
-		bsr.w	S2_Change_Water_Surface_Pos
+		bsr.w	UpdateWaterSurface
 		jsr	(Load_Ring_Pos).l
 		cmpi.b	#S2_CNz_Id,(Level_Id).w
 		bne.s	Offset_0x003E10
@@ -4981,59 +4981,67 @@ Offset_0x004050:
                 bne.s   Offset_0x00400E
                 rts
 
-;-------------------------------------------------------------------------------
-;  Rotina para inicializar o jogador n� 1 como:
-;   - Sonic ou Miles se o jogo estiver no modo -> 1 PLAYER 
-;   - Sonic          se o jogo estiver no modo -> 2 PLAYER VS
-; ->>>  
-;------------------------------------------------------------------------------- 
-Init_Player_Selected:                                          ; Offset_0x004058
-                cmpi.b  #($80|gm_DemoMode), (Game_Mode).w       ; $88, $FFFFF600
-                beq.s   Offset_0x00406E
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                bne.s   Offset_0x00406E
-                move.w  (Player_Select_Flag).w, (Player_Selected_Flag).w ; $FFFFFF0A, $FFFFFF08
-                rts
+; ---------------------------------------------------------------------------
+; Subroutine to set the player mode, which is forced to Sonic and Tails in
+; the demo mode and in 2P mode
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x004058: Init_Player_Selected:
+Level_SetPlayerMode:
+		cmpi.b	#($80|gm_DemoMode),(Game_Mode).w
+		beq.s	Offset_0x00406E
+		tst.w	(Two_Player_Flag).w
+		bne.s	Offset_0x00406E
+		move.w	(Player_Select_Flag).w,(Player_Selected_Flag).w
+		rts
+
 Offset_0x00406E:
-                move.w  #$0000, (Player_Selected_Flag).w             ; $FFFFFF08
-                rts
-;-------------------------------------------------------------------------------
-;  Rotina para inicializar o jogador n� 1 como:
-;   - Sonic ou Miles se o jogo estiver no modo -> 1 PLAYER 
-;   - Sonic          se o jogo estiver no modo -> 2 PLAYER VS
-; <<<-  
-;-------------------------------------------------------------------------------                 
-                
-;-------------------------------------------------------------------------------
-; Rotina para carregar o jogador selecionado no modo 1 PLAYER
-; ->>> Sonic And Miles / Sonic Alone / Miles Alone
-;-------------------------------------------------------------------------------   
-Load_Player_Selected:                                          ; Offset_0x004076
-                move.l  #Obj_Clear_Collision_Response_List, (Obj_02_Mem_Address).w ; Offset_0x004184, $FFFFB094
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                bne.s   Offset_0x0040F2
-                move.w  (Player_Selected_Flag).w, D0                 ; $FFFFFF08
-                bne.s   Offset_0x0040C4
-                move.l  #Obj_Sonic, (Obj_Player_One).w  ; Offset_0x00AA36, $FFFFB000
-                move.l  #Obj_Dust_Water_Splash, (Obj_P1_Dust_Water_Splash).w ; Offset_0x00FD62, $FFFFCC54
-                move.l  #Obj_Miles, (Obj_Player_Two).w  ; Offset_0x00D11E, $FFFFB04A
-                move.w  (Obj_Player_One+Obj_X).w, (Obj_Player_Two+Obj_X).w ; $FFFFB010, $FFFFB05A
-                move.w  (Obj_Player_One+Obj_Y).w, (Obj_Player_Two+Obj_Y).w ; $FFFFB014, $FFFFB05E
-                subi.w  #$0020, (Obj_Player_Two+Obj_X).w             ; $FFFFB05A
-                addi.w  #$0004, (Obj_Player_Two+Obj_Y).w             ; $FFFFB05E
-                move.l  #Obj_Dust_Water_Splash, (Obj_P2_Dust_Water_Splash).w ; Offset_0x00FD62, $FFFFCC9E
-                rts
-Offset_0x0040C4:
-                subq.w  #$01, D0
-                bne.s   Offset_0x0040DA
-                move.l  #Obj_Sonic, (Obj_Player_One).w ; Offset_0x00AA36, $FFFFB000
-                move.l  #Obj_Dust_Water_Splash, (Obj_P1_Dust_Water_Splash).w ; Offset_0x00FD62, $FFFFCC54
-                rts
-Offset_0x0040DA:
-                move.l  #Obj_Miles, (Obj_Player_One).w ; Offset_0x00D11E, $FFFFB000
-                move.l  #Obj_Dust_Water_Splash, (Obj_P2_Dust_Water_Splash).w ; Offset_0x00FD62, $FFFFCC9E
-                addi.w  #$0004, (Obj_Player_One+Obj_Y).w             ; $FFFFB014
-                rts
+		move.w	#0,(Player_Selected_Flag).w
+		rts
+; End of function Level_SetPlayerMode
+
+; ---------------------------------------------------------------------------
+; Subroutine to load the player selected
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x004076: Load_Player_Selected:
+InitPlayers:
+		move.l	#Obj_Clear_Collision_Response_List,(Obj_02_Mem_Address).w
+		tst.w	(Two_Player_Flag).w
+		bne.s	Offset_0x0040F2
+		move.w	(Player_Selected_Flag).w,d0
+		bne.s	InitPlayers_Alone
+		move.l	#Obj_Sonic,(Obj_Player_One).w
+		move.l	#Obj_Dust_Water_Splash,(Obj_P1_Dust_Water_Splash).w
+		move.l	#Obj_Miles, (Obj_Player_Two).w 
+		move.w	(Obj_Player_One+Obj_X).w,(Obj_Player_Two+Obj_X).w
+		move.w	(Obj_Player_One+Obj_Y).w,(Obj_Player_Two+Obj_Y).w
+		subi.w	#$20,(Obj_Player_Two+Obj_X).w
+		addi.w	#4,(Obj_Player_Two+Obj_Y).w
+		move.l	#Obj_Dust_Water_Splash,(Obj_P2_Dust_Water_Splash).w
+		rts
+; ===========================================================================
+; Offset_0x0040C4:
+InitPlayers_Alone:
+		subq.w	#1,d0
+		bne.s	InitPlayers_TailsAlone
+		move.l	#Obj_Sonic,(Obj_Player_One).w
+		move.l	#Obj_Dust_Water_Splash,(Obj_P1_Dust_Water_Splash).w
+		rts
+; ===========================================================================
+; Offset_0x0040DA:
+InitPlayers_TailsAlone:
+		move.l	#Obj_Miles,(Obj_Player_One).w
+		move.l	#Obj_Dust_Water_Splash,(Obj_P2_Dust_Water_Splash).w
+		addi.w	#4,(Obj_Player_One+Obj_Y).w
+		rts
+; End of function InitPlayers
+
+
 Offset_0x0040F2:
                 move.b  (Menu_Player_One_Cursor).w, D0               ; $FFFFFFDA
                 bsr.s   Offset_0x004130
@@ -5080,30 +5088,32 @@ Pal_Level_2P:                                                  ; Offset_0x004164
 Obj_Clear_Collision_Response_List:                             ; Offset_0x004184
                 move.w  #$0000, (Collision_Response_List).w          ; $FFFFE380
                 rts               
-;-------------------------------------------------------------------------------
-; Rotina para mudar a superf�cie da �gua.
-; ->>>   Sonic 2 left over
-;------------------------------------------------------------------------------- 
-S2_Change_Water_Surface_Pos:                                   ; Offset_0x00418C
-                rts
-; Offset_0x00418E:
-                tst.b   (Water_Level_Flag).w                         ; $FFFFF730
-                beq.s   Offset_0x0041AE
-                move.w  (Camera_X).w, D1                             ; $FFFFEE78
-                btst    #$00, (Level_Frame_Count+$01).w              ; $FFFFFE05
-                beq.s   Offset_0x0041A4
-                addi.w  #$0020, D1
+
+; ---------------------------------------------------------------------------
+; Subroutine to move the water or oil surface sprites to where the screen is at
+; Leftover from Sonic 2, and useless since the objects themselves handle this now
+; ---------------------------------------------------------------------------
+
+; Offset_0x00418A: S2_Change_Water_Surface_Pos:
+UpdateWaterSurface:
+		rts
+; ---------------------------------------------------------------------------
+		tst.b	(Water_Level_Flag).w
+		beq.s	Offset_0x0041AE
+		move.w	(Camera_X).w,d1
+		btst	#0,(Level_Frame_Count+1).w
+		beq.s	Offset_0x0041A4
+		addi.w	#$20,d1
+
 Offset_0x0041A4:
-                move.w  D1, D0
-                addi.w  #$0060, D0
-                addi.w  #$0120, D1
+		move.w	d1,d0
+		addi.w	#$60,d0
+		addi.w	#$120,d1
+
 Offset_0x0041AE:
-                rts                
-;-------------------------------------------------------------------------------
-; Rotina para mudar a superf�cie da �gua.
-; <<<-   Sonic 2 left over
-;-------------------------------------------------------------------------------
-                 
+		rts
+; End of function UpdateWaterSurface
+
 ;------------------------------------------------------------------------------- 
 ; Rotina para controlar os efeitos da �gua. Ex: Mudan�a de n�vel
 ; ->>>   
