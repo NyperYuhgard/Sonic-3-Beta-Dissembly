@@ -15,7 +15,7 @@ Offset_0x025C3E:
 Offset_0x025C4E:
                 lea     (Art_Hz_Geyser_Horizontal), A1         ; Offset_0x12FCF0
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 move.l  #Offset_0x025C64, (A0)
 Offset_0x025C64:                
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
@@ -270,7 +270,7 @@ Offset_0x025FF2:
 Offset_0x025FF8:
                 lea     (Art_Hz_Geyser_Vertical), A1           ; Offset_0x130482
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 move.b  #$01, Obj_Map_Id(A0)                             ; $0022
                 move.b  #$81, (Obj_Player_One+Obj_Timer).w           ; $FFFFB02E
                 move.b  #$81, (Obj_Player_Two+Obj_Player_Control).w  ; $FFFFB078

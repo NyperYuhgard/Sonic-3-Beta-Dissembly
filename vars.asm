@@ -187,6 +187,8 @@ LBz_Act_1             equ $0600
 LBz_Act_2             equ $0601
 LRz_Id                equ $09
 LRz_Act_1             equ $0900
+DDz_Id                equ $0C
+DDz_Act_1             equ $0C00
 ALz_Id                equ $0E
 Alz_Act_1             equ $0E00  
 BPz_Id                equ $0F

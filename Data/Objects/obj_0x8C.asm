@@ -45,7 +45,7 @@ Offset_0x03FEBE:
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 lea     (Art_Ball_Shooter), A1                 ; Offset_0x1224EC
                 move.w  #$84A0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     Ball_Shooter_Palette(PC), A1           ; Offset_0x0406E4
                 jmp     Pal_Load_Line_1(PC)                    ; Offset_0x04314C    
 ;-------------------------------------------------------------------------------

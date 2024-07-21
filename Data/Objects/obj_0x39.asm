@@ -18,7 +18,7 @@ Offset_0x026756:
 Offset_0x026762:
                 lea     (Art_Hz_Large_Fan), A1                 ; Offset_0x12F9EE
                 move.w  #$A000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 move.l  #Offset_0x026778, (A0)
 Offset_0x026778:                
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60

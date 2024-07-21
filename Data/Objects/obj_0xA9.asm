@@ -20,7 +20,7 @@ Offset_0x037206:
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 lea     (Art_Flame_Mobile), A1                 ; Offset_0x1114FC
                 move.w  #$3000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     Pal_Flame_Mobile(PC), A1               ; Offset_0x037E0C
                 jmp     (Pal_Load_Line_1)                      ; Offset_0x04314C
 ;-------------------------------------------------------------------------------

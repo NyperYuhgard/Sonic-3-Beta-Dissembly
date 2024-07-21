@@ -205,7 +205,7 @@ Offset_0x035D70:
                 move.b  #$20, Obj_Width(A0)                              ; $0007
                 lea     (Art_Tornado), A1                      ; Offset_0x12C208
                 move.w  #$A520, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     Offset_0x035F2C(PC), A2
                 jmp     (Load_Child_Object_A2)                 ; Offset_0x041D9A   
 ;-------------------------------------------------------------------------------

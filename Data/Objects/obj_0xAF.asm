@@ -212,18 +212,18 @@ Offset_0x039BD0:
                 jsr     (Level_Load_Music)                     ; Offset_0x0432CA
                 lea     (Marble_Garden_1_Tiles), A1            ; Offset_0x15D0A4
                 move.w  #$0000, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Marble_Garden_2_Tiles_2), A1          ; Offset_0x1632A8
                 move.w  #$4FC0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$14, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
                 lea     (Art_Spiker), A1                       ; Offset_0x11A308
                 move.w  #$A600, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Art_Mantis), A1                       ; Offset_0x11A51A
                 move.w  #$A9E0, D2
-                jsr     (Kosinski_Moduled_Dec)                 ; Offset_0x0018A8
+                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (PLC_MGz_After_Boss), A1               ; Offset_0x041B90
                 jsr     (LoadPLC_A1)                           ; Offset_0x001502
                 lea     (Pal_Marble_Garden_Act_1), A1          ; Offset_0x1E9D14
