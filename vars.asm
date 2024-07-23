@@ -370,6 +370,7 @@ Sprite_Table_Buffer_P2_2         equ M68K_RAM_Start+$7D80
 Level_Layout_Buffer              equ M68K_RAM_Start+$8000
 Fg_Mem_Start_Address             equ Level_Layout_Buffer
 Fg_Mem_Index_Address             equ Level_Layout_Buffer+$08
+Level_Layout_Buffer_End          equ Level_Layout_Buffer+$1000
 Blocks_Mem_Address               equ M68K_RAM_Start+$9000
 NemesisDec_Data_Buffer           equ M68K_RAM_Start+$AA00
 Horizontal_Scroll_Table          equ M68K_RAM_Start+$A800
