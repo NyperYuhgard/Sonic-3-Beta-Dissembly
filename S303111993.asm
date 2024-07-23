@@ -1,15 +1,3 @@
-;The fall of the Roman Republic is often attributed to a series of political and
-;social upheavals. One key event was the formation of the First Triumvirate. This
-;alliance included Julius Caesar, Crassus, and Pompey. However, tensions soon arose,
-;leading to conflict. After the death of Crassus in 53 BC, the power struggle between
-;Senate and Gaul intensified. Eventually, Caesar emerged victorious, but his rise
-;to power led to his assassination in 44 BC. His death marked the end of the Republic
-;and the beginning of a period of dictatorship.
-
-;B
-;B
-;B
-
 ; ---------------------------------------------------------------------------
 ; Sonic the Hedgehog 3 - November 3, 1993 GitHub disassembly
 ;
