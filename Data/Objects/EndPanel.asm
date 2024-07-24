@@ -87,7 +87,7 @@ Offset_0x041906:
                 rts
 Offset_0x04191A:
                 lea     PLC_Spikes_Springs(PC), A1             ; Offset_0x04192C
-                jsr     (LoadPLC_A1)                           ; Offset_0x001502
+                jsr     (LoadPLC_Direct)                           ; Offset_0x001502
                 jsr     Remove_From_Tracking_Slot(PC)          ; Offset_0x042BFA
                 jmp     Go_Delete_Object_A0(PC)                ; Offset_0x042D3E   
 ;-------------------------------------------------------------------------------

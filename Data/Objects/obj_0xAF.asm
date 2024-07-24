@@ -225,7 +225,7 @@ Offset_0x039BD0:
                 move.w  #$A9E0, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (PLC_MGz_After_Boss), A1               ; Offset_0x041B90
-                jsr     (LoadPLC_A1)                           ; Offset_0x001502
+                jsr     (LoadPLC_Direct)                           ; Offset_0x001502
                 lea     (Pal_Marble_Garden_Act_1), A1          ; Offset_0x1E9D14
                 jsr     (Pal_Load_Line_1)                      ; Offset_0x04314C
                 btst    #$00, Obj_Flags(A0)                              ; $0004
