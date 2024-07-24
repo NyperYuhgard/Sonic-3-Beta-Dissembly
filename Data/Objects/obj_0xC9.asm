@@ -8,7 +8,7 @@
                 move.l  #Offset_0x0354AA, (A0)
                 addq.w  #$04, Obj_Y(A0)                                  ; $0014
                 lea     Knuckles_Switch_PLC_Data(PC), A1       ; Offset_0x0354A2
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502    
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502    
 ;-------------------------------------------------------------------------------
 Knuckles_Switch_PLC_Data:                                      ; Offset_0x0354A2 
                 dc.w    $0000

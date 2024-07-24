@@ -214,7 +214,7 @@ Drill_Mobile_Defeated:                                         ; Offset_0x0374DA
                 jsr     (Load_Child_Object_Simple_A2)          ; Offset_0x041F5A
                 bset    #$01, Obj_Flags(A1)                              ; $0004
                 lea     (PLC_AIz_MGz_Boss_Defeated), A1        ; Offset_0x041BA6
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502    
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502    
 ;-------------------------------------------------------------------------------    
 Offset_0x037504:
                 tst.b   (Control_Ports_Buffer_Data+$03).w            ; $FFFFF607
@@ -245,7 +245,7 @@ Offset_0x03754C:
                 jsr     (Load_Child_Object_Simple_A2)          ; Offset_0x041F5A
                 move.b  #$04, Obj_Subtype(A1)                            ; $002C
                 lea     (PLC_Flame_Mobile_Explosion), A1       ; Offset_0x041BC2
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502   
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502   
 ;-------------------------------------------------------------------------------
 Offset_0x03757A:
                 tst.b   (Control_Locked_Flag_P1).w                   ; $FFFFF7CC

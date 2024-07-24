@@ -10,8 +10,8 @@
 ;     e.g. "@notLeft"
 ; - Object name format is Obj_NAME, or ObjXX_NAME if it has an ID
 ;     e.g. 'Obj_Sonic' and 'Obj38_ClassicShield'
-; - Object label format for internal functions is 'NAME_FUNCITON'
-;     e.g. "Sonic_CheckForSpindash" and  'ThrownRing_Main'
+; - Object label format for internal functions is 'NAME_FUNCITON'; don't include the ObjXX_ prefix!
+;     e.g. "Sonic_CheckForSpindash" and 'ThrownRing_Main'
 ; - Generally limit the '_' in labels to one maximum
 ;     e.g. "Tails_TestForFlight', NOT "Tails_Test_For_Flight'
 ; ---------------------------------------------------------------------------
@@ -1695,127 +1695,160 @@ Offset_0x0014C4:
 ; Rotina de descompress�o no formato Nemesis
 ; <<<-
 ;=============================================================================== 
-          
-;===============================================================================
-; Rotinas para carga dos gr�ficos no array ArtLoadCues de acordo com o 
-; ind�ce em D0
-; ->>>
-;=============================================================================== 
-LoadPLC:                                                       ; Offset_0x0014D0
-                movem.l A1/A2, -(A7)
-                lea     (ArtLoadCues), A1                      ; Offset_0x04ABFE
-                add.w   D0, D0
-                move.w  $00(A1, D0), D0
-                lea     $00(A1, D0), A1
-                lea     (PLC_Data_Buffer).w, A2                      ; $FFFFF680
-Offset_0x0014E8:
-                tst.l   (A2)
-                beq.s   Offset_0x0014F0
-                addq.w  #$06, A2
-                bra.s   Offset_0x0014E8
-Offset_0x0014F0:
-                move.w  (A1)+, D0
-                bmi.s   Offset_0x0014FC
-Offset_0x0014F4:
-                move.l  (A1)+, (A2)+
-                move.w  (A1)+, (A2)+
-                dbra    D0, Offset_0x0014F4
-Offset_0x0014FC:
-                movem.l (A7)+, A1/A2
-                rts 
-;-------------------------------------------------------------------------------
-LoadPLC_A1:                                                    ; Offset_0x001502
-                lea     (PLC_Data_Buffer).w, A2                      ; $FFFFF680
-Offset_0x001506:
-                tst.l   (A2)
-                beq.s   Offset_0x00150E
-                addq.w  #$06, A2
-                bra.s   Offset_0x001506
-Offset_0x00150E:
-                move.w  (A1)+, D0
-                bmi.s   Offset_0x00151A
-Offset_0x001512:
-                move.l  (A1)+, (A2)+
-                move.w  (A1)+, (A2)+
-                dbra    D0, Offset_0x001512
-Offset_0x00151A:
-                rts    
-;-------------------------------------------------------------------------------
-LoadPLC2:                                                      ; Offset_0x00151C
-                movem.l A1/A2, -(A7)
-                lea     (ArtLoadCues), A1                      ; Offset_0x04ABFE
-                add.w   D0, D0
-                move.w  $00(A1, D0), D0
-                lea     $00(A1, D0), A1
-                bsr.s   ClearPLC                               ; Offset_0x001548
-                lea     (PLC_Data_Buffer).w, A2                      ; $FFFFF680
-                move.w  (A1)+, D0
-                bmi.s   Offset_0x001542
-Offset_0x00153A:
-                move.l  (A1)+, (A2)+
-                move.w  (A1)+, (A2)+
-                dbra    D0, Offset_0x00153A
-Offset_0x001542:
-                movem.l (A7)+, A1/A2
-                rts                           
-;===============================================================================
-; Rotinas para carga dos gr�ficos no array ArtLoadCues de acordo com o 
-; ind�ce em D0
-; <<<-
-;=============================================================================== 
 
-;===============================================================================
-; Rotina para limpar os itens na lista de carga dos gr�ficos
-; ->>>
-;=============================================================================== 
-ClearPLC:                                                      ; Offset_0x001548
-                lea     (PLC_Data_Buffer).w, A2                      ; $FFFFF680
-                moveq   #$1F, D0
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to load pattern load cues in RAM
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0014D0:
+LoadPLC:
+		movem.l	a1/a2,-(sp)
+		lea	(ArtLoadCues).l,a1
+		add.w	d0,d0
+		move.w	(a1,d0.w),d0
+		lea	(a1,d0.w),a1
+		lea	(PLC_Data_Buffer).w,a2
+; Offset_0x0014E8:
+@findFreeSlot:
+		tst.l	(a2)					; is the current slot on the queue free?
+		beq.s	@getPieceCount				; if yes, branch
+		addq.w	#6,a2					; otherwise skip past and check the next slot
+		bra.s	@findFreeSlot
+; ---------------------------------------------------------------------------
+; Offset_0x0014F0:
+@getPieceCount:
+		move.w	(a1)+,d0
+		bmi.s	@done
+; Offset_0x0014F4:
+@queuePieces:
+		move.l	(a1)+,(a2)+				; store compressed data location
+		move.w	(a1)+,(a2)+				; store destination in VRAM
+		dbf	d0,@queuePieces
+; Offset_0x0014FC:
+@done:
+		movem.l	(sp)+,a1/a2
+		rts
+; End of function LoadPLC
+
+; ---------------------------------------------------------------------------
+; Subroutine to load a pattern load cue directly, rather than from an index
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x001502: LoadPLC_A1:
+LoadPLC_Direct:
+		lea	(PLC_Data_Buffer).w,a2
+; Offset_0x001506:
+@findFreeSlot:
+		tst.l	(a2)					; is the current slot on the queue free?
+		beq.s	@getPieceCount				; if yes, branch
+		addq.w	#6,a2					; otherwise skip past and check the next slot
+		bra.s	@findFreeSlot
+; ---------------------------------------------------------------------------
+; Offset_0x00150E:
+@getPieceCount:
+		move.w	(a1)+,d0
+		bmi.s	@done
+; Offset_0x001512:
+@queuePieces:
+		move.l	(a1)+,(a2)+				; store compressed data location
+		move.w	(a1)+,(a2)+				; store destination in VRAM
+		dbf	d0,@queuePieces
+; Offset_0x00151A:
+@done:
+		rts
+; End of function LoadPLC_Direct
+
+; ---------------------------------------------------------------------------
+; Subroutine to load pattern load cues after clearing it first
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00151C:
+LoadPLC2:
+		movem.l	a1/a2,-(sp)
+		lea	(ArtLoadCues).l,a1
+		add.w	d0,d0
+		move.w	(a1,d0.w),d0
+		lea	(a1,d0.w),a1
+		bsr.s	ClearPLC
+		lea	(PLC_Data_Buffer).w,a2
+		move.w	(a1)+,d0
+		bmi.s	@done
+; Offset_0x00153A:
+@queuePieces:
+		move.l	(a1)+,(a2)+				; store compressed data location
+		move.w	(a1)+,(a2)+				; store destination in VRAM
+		dbf	d0,@queuePieces
+; Offset_0x001542:
+@done:
+		movem.l	(sp)+,a1/a2
+		rts
+; End of function LoadPLC2
+
+; ---------------------------------------------------------------------------
+; Subroutine to clear the pattern load cue
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x001548:
+ClearPLC:
+		lea	(PLC_Data_Buffer).w,a2
+		moveq	#(PLC_Data_Buffer_End>>2-PLC_Data_Buffer>>2)-1,d0
+
 Offset_0x00154E:
-                clr.l   (A2)+
-                dbra    D0, Offset_0x00154E
-                rts                         
-;===============================================================================
-; Rotina para limpar os itens na lista de carga dos gr�ficos
-; <<<-
-;===============================================================================                                                                                                                
+		clr.l	(a2)+
+		dbf	d0,Offset_0x00154E
+		rts                         
+; End of function ClearPLC
 
-;===============================================================================
-; Rotina para descompactar os itens na lista de carga dos gr�ficos
-; ->>>
-;=============================================================================== 
-RunPLC:                                                        ; Offset_0x001556
-                tst.l   (PLC_Data_Buffer).w                          ; $FFFFF680
-                beq.s   Offset_0x0015AC
-                tst.w   (PLC_Data_Count).w                           ; $FFFFF6F8
-                bne.s   Offset_0x0015AC
-                move.l  (PLC_Data_Buffer).w, A0                      ; $FFFFF680
-                lea     (NemesisDec_Output), A3                ; Offset_0x001452
-                nop
-                lea     (NemesisDec_Data_Buffer).w, A1               ; $FFFFAA00
-                move.w  (A0)+, D2
-                bpl.s   Offset_0x00157A
-              ; Aponta A3 para NemesisDec_Output_XOR se A3 = NemesisDec_Output ou
-              ; Aponta A3 para NemesisDec_OutputRAM_XOR se A3 = NemesisDec_OutputRAM   
-                adda.w  #(NemesisDec_Output_XOR-NemesisDec_Output), A3   ; $000A
+; ---------------------------------------------------------------------------
+; Subroutine to use graphics listed in a pattern load cue
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x001556: RunPLC:
+RunPLC_RAM:
+		tst.l	(PLC_Data_Buffer).w
+		beq.s	Offset_0x0015AC
+		tst.w	(PLC_Data_Count).w
+		bne.s	Offset_0x0015AC
+		move.l	(PLC_Data_Buffer).w,a0
+		lea	(NemesisDec_Output).l,a3
+		nop
+		lea	(NemesisDec_Data_Buffer).w,a1
+		move.w	(A0)+, D2
+		bpl.s	Offset_0x00157A
+		adda.w	#NemesisDec_Output_XOR-NemesisDec_Output,a3
+
 Offset_0x00157A:
-                andi.w  #$7FFF, D2
-                move.w  D2, (PLC_Data_Count).w                       ; $FFFFF6F8
-                bsr     NemesisDec_4                           ; Offset_0x00147E
-                move.b  (A0)+, D5
-                asl.w   #$08, D5
-                move.b  (A0)+, D5
-                moveq   #$10, D6
-                moveq   #$00, D0
-                move.l  A0, (PLC_Data_Buffer).w                      ; $FFFFF680
-                move.l  A3, (Nemesis_Decomp_Vars).w                  ; $FFFFF6E0
-                move.l  D0, (Nemesis_Repeat_Count).w                 ; $FFFFF6E4
-                move.l  D0, (Nemesis_Palette_Index).w                ; $FFFFF6E8
-                move.l  D0, (Nemesis_Previous_Row).w                 ; $FFFFF6EC
-                move.l  D5, (Nemesis_Data_Word).w                    ; $FFFFF6F0
-                move.l  D6, (Nemesis_Shift_Value).w                  ; $FFFFF6F4
+		andi.w	#$7FFF,d2
+		move.w	d2,(PLC_Data_Count).w
+		bsr.w	NemesisDec_4
+		move.b	(a0)+,d5
+		asl.w	#8,d5
+		move.b	(a0)+,d5
+		moveq	#$10,d6
+		moveq	#0,d0
+		move.l	a0,(PLC_Data_Buffer).w
+		move.l	a3,(Nemesis_Decomp_Vars).w
+		move.l	d0,(Nemesis_Repeat_Count).w
+		move.l	d0,(Nemesis_Palette_Index).w
+		move.l	d0,(Nemesis_Previous_Row).w
+		move.l	d5,(Nemesis_Data_Word).w
+		move.l	d6,(Nemesis_Shift_Value).w
+
 Offset_0x0015AC:
-                rts 
+                rts
+; End of function RunPLC_RAM
+
 ;===============================================================================
 ; Rotina para descompactar os itens na lista de carga dos gr�ficos
 ; <<<-
@@ -1876,34 +1909,37 @@ Offset_0x00164E:
                 move.l  $0006(A0), (A0)+
                 dbra    D0, Offset_0x00164E
                 rts   
-                
-;===============================================================================
-; Carrega os dados direto do ROM sem entrar na fila       
-; ->>>
-;=============================================================================== 
-RunPLC_ROM:                                                    ; Offset_0x001658
-                lea     (ArtLoadCues), A1                      ; Offset_0x04ABFE
-                add.w   D0, D0
-                move.w  $00(A1, D0), D0
-                lea     $00(A1, D0), A1
-                move.w  (A1)+, D1
-RunPLC_ROM_Loop:                                               ; Offset_0x00166A
-                move.l  (A1)+, A0
-                moveq   #$00, D0
-                move.w  (A1)+, D0
-                lsl.l   #$02, D0
-                lsr.w   #$02, D0
-                ori.w   #$4000, D0
-                swap.w  D0
-                move.l  D0, (VDP_Control_Port)                       ; $00C00004
-                bsr     NemesisDec                             ; Offset_0x001390
-                dbra    D1, RunPLC_ROM_Loop                    ; Offset_0x00166A
-                rts 
-;===============================================================================
-; Carrega os dados direto do ROM sem entrar na fila       
-; <<<-
-;=============================================================================== 
-    
+
+; ---------------------------------------------------------------------------
+; Subroutine to execute a pattern load cue directly from the ROM
+; rather than loading them into the queue first; unused here and in S3
+; final, only ever used for Blue Spheres in S&K
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x001658:
+RunPLC_ROM:
+		lea	(ArtLoadCues).l,a1
+		add.w	d0,d0
+		move.w	(a1,d0.w),d0
+		lea	(a1,d0.w),a1
+		move.w	(a1)+,d1
+; Offset_0x00166A:
+RunPLC_ROM_Loop:
+		move.l	(a1)+,a0
+		moveq	#0,d0
+		move.w	(a1)+,d0
+		lsl.l	#2,d0
+		lsr.w	#2,d0
+		ori.w	#$4000,d0
+		swap.w	d0
+		move.l	d0,(VDP_Control_Port).l
+		bsr.w	NemesisDec
+		dbf	d1,RunPLC_ROM_Loop
+		rts 
+; End of function RunPLC_ROM
+
 ;===============================================================================
 ; Rotina de descompress�o no formato Enigma
 ; ->>>
@@ -3398,7 +3434,7 @@ Pal_FadeTo_Loop:                                               ; Offset_0x002D2E
                 move.b  #$12, (VBlank_Index).w                       ; $FFFFF62A
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 bsr.s   Pal_FadeIn                             ; Offset_0x002D44
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 dbra    D4, Pal_FadeTo_Loop                    ; Offset_0x002D2E
                 rts
 ;-------------------------------------------------------------------------------
@@ -3494,7 +3530,7 @@ Pal_FadeFrom_Loop:                                             ; Offset_0x002DF2
                 move.b  #$12, (VBlank_Index).w                       ; $FFFFF62A
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 bsr.s   Pal_FadeOut                            ; Offset_0x002E08
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 dbra    D4, Pal_FadeFrom_Loop                  ; Offset_0x002DF2
                 rts
 ;-------------------------------------------------------------------------------
@@ -3557,7 +3593,7 @@ Offset_0x002E8A:
                 move.b  #$12, (VBlank_Index).w                       ; $FFFFF62A
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 bsr.s   Pal_WhiteToBlack                       ; Offset_0x002EA0
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 dbra    D4, Offset_0x002E8A
                 rts
 ;-------------------------------------------------------------------------------                
@@ -3622,7 +3658,7 @@ Offset_0x002F1A:
                 move.b  #$12, (VBlank_Index).w                       ; $FFFFF62A
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 bsr.s   Pal_ToWhite                            ; Offset_0x002F30
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 dbra    D4, Offset_0x002F1A
                 rts
 Pal_ToWhite:                                                   ; Offset_0x002F30
@@ -3676,64 +3712,78 @@ Pal_NoAdd_2:                                                   ; Offset_0x002F9A
 ; <<<-
 ;===============================================================================
 
-;===============================================================================
-; Rotinas para carga da paleta selecionada em D0 no buffer de paletas
-; ->>>
-;===============================================================================
-PalLoad1:                                                      ; Offset_0x002F9E
-                lea     (PalPointers), A1                      ; Offset_0x1E94F4
-                lsl.w   #$03, D0
-                adda.w  D0, A1
-                move.l  (A1)+, A2               ; Localiza��o da paleta no ROM  
-                move.w  (A1)+, A3               ; Destino da paleta na RAM
-                adda.w  #$0080, A3              ; Adiciona $80 no Destino da RAM
-                move.w  (A1)+, D7               ; Quantidade de cores a ser lido
-PalLoad1_Loop:                                                 ; Offset_0x002FB2
-                move.l  (A2)+, (A3)+
-                dbra    D7, PalLoad1_Loop                      ; Offset_0x002FB2
-                rts 
-;-------------------------------------------------------------------------------    
-PalLoad2:                                                      ; Offset_0x002FBA
-                lea     (PalPointers), A1                      ; Offset_0x1E94F4
-                lsl.w   #$03, D0
-                adda.w  D0, A1
-                move.l  (A1)+, A2               ; Localiza��o da paleta no ROM
-                move.w  (A1)+, A3               ; Destino da paleta na RAM 
-                move.w  (A1)+, D7               ; Quantidade de cores a ser lido
-PalLoad2_Loop:                                                 ; Offset_0x002FCA
-                move.l  (A2)+, (A3)+
-                dbra    D7, PalLoad2_Loop                      ; Offset_0x002FCA
-                rts         
-;-------------------------------------------------------------------------------  
-PalLoad3_Water:                                                ; Offset_0x002FD2
-                lea     (PalPointers), A1                      ; Offset_0x1E94F4
-                lsl.w   #$03, D0
-                adda.w  D0, A1
-                move.l  (A1)+, A2              ; Localiza��o da paleta no ROM
-                move.w  (A1)+, A3              ; Destino da paleta na RAM 
-                adda.w  #$0380, A3             ; Subtrai $0380 no Destino da RAM    
-                move.w  (A1)+, D7              ; Quantidade de cores a ser lido
-PalLoad3_Loop:                                                 ; Offset_0x002FE6
-                move.l  (A2)+, (A3)+
-                dbra    D7, PalLoad3_Loop                      ; Offset_0x002FE6
-                rts            
-;-------------------------------------------------------------------------------
-PalLoad4_Water:                                                ; Offset_0x002FEE
-                lea     (PalPointers), A1                      ; Offset_0x1E94F4
-                lsl.w   #$03, D0
-                adda.w  D0, A1
-                move.l  (A1)+, A2              ; Localiza��o da paleta no ROM
-                move.w  (A1)+, A3              ; Destino da paleta na RAM 
-                adda.w  #$0300, A3             ; Subtrai $0300 no Destino da RAM 
-                move.w  (A1)+, D7              ; Quantidade de cores a ser lido
-PalLoad4_Loop:                                                 ; Offset_0x003002
-                move.l  (A2)+, (A3)+
-                dbra    D7, PalLoad4_Loop                      ; Offset_0x003002
-                rts                        
-;===============================================================================
-; Rotinas para carga da paleta selecionada em D0 no buffer de paletas
-; <<<-
-;===============================================================================  
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutines to load the palette for various circumstances
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x002F9E: PalLoad1:
+PalLoad_ForFade:
+		lea	(PalPointers).l,a1
+		lsl.w	#3,d0
+		adda.w	d0,a1
+		move.l	(a1)+,a2
+		move.w	(a1)+,a3
+		adda.w	#$80,a3
+		move.w	(a1)+,d7
+; Offset_0x002FB2: PalLoad1_Loop:
+@loop:
+		move.l	(a2)+,(a3)+
+		dbf	d7,@loop
+		rts
+; End of function PalLoad_ForFade
+
+; ---------------------------------------------------------------------------
+; Offset_0x002FBA: PalLoad2:
+PalLoad_Now:
+		lea	(PalPointers).l,a1
+		lsl.w	#3,d0
+		adda.w	d0,a1
+		move.l	(a1)+,a2
+		move.w	(a1)+,a3
+		move.w	(a1)+,d7
+; Offset_0x002FCA: PalLoad2_Loop:
+@loop:
+		move.l	(a2)+,(a3)+
+		dbf	d7,@loop
+		rts
+; End of function PalLoad_Now
+
+; ---------------------------------------------------------------------------
+; Offset_0x002FD2: PalLoad3_Water:
+PalLoad_Water_Now:
+		lea	(PalPointers).l,a1
+		lsl.w	#3,d0
+		adda.w	d0,a1
+		move.l	(a1)+,a2
+		move.w	(a1)+,a3
+		adda.w	#$380,a3
+		move.w	(a1)+,d7
+; Offset_0x02FE6:
+PalLoad3_Loop:
+		move.l	(a2)+,(a3)+
+		dbf	d7,PalLoad3_Loop
+		rts
+; End of function PalLoad_Water_Now
+
+; ---------------------------------------------------------------------------
+; Offset_0x002FEE: PalLoad4_Water:
+PalLoad_Water_ForFade:
+		lea	(PalPointers).l,a1
+		lsl.w	#3,d0
+		adda.w	d0,a1
+		move.l	(a1)+,a2
+		move.w	(a1)+,a3
+		adda.w	#$300,a3
+		move.w	(a1)+,d7
+; Offset_0x003002:
+PalLoad4_Loop:
+		move.l	(a2)+,(a3)+
+		dbf	d7,PalLoad4_Loop
+		rts
+; End of function PalLoad_Water_ForFade
 
 ;===============================================================================
 ; Logo da SEGA
@@ -3804,7 +3854,7 @@ Offset_0x00309A:
                 move.b  #$4E, Obj_Subtype(A1)                            ; $002C
 Offset_0x00310C:
                 moveq   #$00, D0
-                bsr     PalLoad2                               ; Offset_0x002FBA
+                bsr     PalLoad_Now                               ; Offset_0x002FBA
                 move.w  #$FFF6, (Palette_Cycle_Count_0).w            ; $FFFFF632
                 move.w  #$0000, (Palette_Cycle_Count_1).w            ; $FFFFF634
                 move.w  #$0000, (VBlank_Subroutine).w                ; $FFFFF662
@@ -3999,7 +4049,7 @@ TitleScreen_Loop:
 		bsr.w	Iterate_TitleSonicFrame
 		jsr	(RunObjects).l
 		jsr	(Build_Sprites).l
-		bsr.w	RunPLC
+		bsr.w	RunPLC_RAM
 		bsr.w	Secret_Codes_Test
 		tst.w	(Demo_Timer).w
 		beq.w	Offset_0x0034D2
@@ -4654,7 +4704,7 @@ Level_LoadPal:
 		clr.w	(DMA_Buffer_List).w
 		move.l	#DMA_Buffer_List,(DMA_Buffer_List_End).w
 		moveq	#3,d0
-		bsr.w	PalLoad2
+		bsr.w	PalLoad_Now
 		bsr.w	Init_Water_Levels
 		tst.b	(Water_Level_Flag).w
 		beq.s	Level_GetBgm
@@ -4682,7 +4732,7 @@ Level_TtlCard:
 		bsr.w	Wait_For_VSync
 		jsr	(RunObjects).l
 		jsr	(Build_Sprites).l
-		bsr.w	RunPLC
+		bsr.w	RunPLC_RAM
 		jsr	(Process_Kos_Module_Queue).l
 		tst.w	(Obj_08_Mem_Address+Obj_Respaw_Ref).w
 		beq.s	Level_TtlCard
@@ -4694,14 +4744,14 @@ Level_CreateHUD:
 
 Offset_0x003BAE:
  		moveq	#3,d0
-		bsr.w	PalLoad1
+		bsr.w	PalLoad_ForFade
 		jsr	(LevelSizeLoad).l
 		jsr	(DeformBgLayer).l
 		bsr.w	LoadZoneTiles
 		jsr	(LoadZoneBlockMaps).l
 		jsr	(Animate_Counters_Init).l
 		move	#$2700,sr
-		jsr	(Load_Tiles_From_Start_Ptr).l
+		jsr	(JmpTo_Setup_TileDrawing).l
 		move	#$2300,sr
 		jsr	(S2_FloorLog_Unk).l
 		bsr.w	Load_Collision_Index
@@ -4770,7 +4820,7 @@ Offset_0x003CCC:
 		jsr	(LRz_Load_Rock_Pos).l
 		jsr	(RunObjects).l
 		jsr	(Build_Sprites).l
-		jsr	(Dynamic_Art_Cues).l
+		jsr	(AnimateStageTiles).l
 		bsr.w	Clear_End_Level_Art_Load_Flag
 		move.w	#0,(Demo_Button_Index).w
 		move.w	#0,(Demo_Button_Index_2P).w
@@ -4834,12 +4884,12 @@ Level_MainLoop:
 		addq.w	#1,(Level_Frame_Count).w
 		bsr.w	Init_Demo_Control
 		jsr	(AnimatePalette).l
-		jsr	(Load_Tiles_As_You_Move_Loop).l
+		jsr	(Repeat_TileDrawing).l
 		jsr	(RunObjects).l
 		tst.w	(Restart_Level_Flag).w
 		bne.w	Level
 		jsr	(DeformBgLayer).l
-		jsr	(Background_Scroll_Layer).l
+		jsr	(Run_TileDrawing).l
 		bsr.w	WaterEffects
 		bsr.w	UpdateWaterSurface
 		jsr	(Load_Ring_Pos).l
@@ -4853,11 +4903,11 @@ Offset_0x003E10:
 		jsr	(LRz_Load_Rock_Pos).l
 
 Offset_0x003E1E:
-		jsr	(Dynamic_Art_Cues).l
-		bsr.w	RunPLC
+		jsr	(AnimateStageTiles).l
+		bsr.w	RunPLC_RAM
 		jsr	(Process_Kos_Module_Queue).l
 		bsr.w	Oscillate_Num_Do
-		bsr.w	Change_Object_Frame
+		bsr.w	ChangeRingFrame
 		bsr.w	CheckLoadSignpostArt
 		jsr	(Build_Sprites).l
 		jsr	(ObjectsManager).l
@@ -4894,7 +4944,7 @@ Offset_0x003E98:
                 bsr     Init_Demo_Control                      ; Offset_0x0047F6
                 jsr     (RunObjects)                         ; Offset_0x0110AE
                 jsr     (DeformBgLayer)              ; Offset_0x0120D4
-                jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
+                jsr     (Run_TileDrawing)              ; Offset_0x02F2EA
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (ObjectsManager)                      ; Offset_0x011BF8
                 jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
@@ -4956,11 +5006,11 @@ Offset_0x003F8C:
                 addq.w  #$02, A7
                 tst.w   (Restart_Level_Flag).w                       ; $FFFFFE02
                 bne     Level                                  ; Offset_0x00399E
-                jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
-                jsr     (Dynamic_Art_Cues)                     ; Offset_0x01E85A
+                jsr     (Run_TileDrawing)              ; Offset_0x02F2EA
+                jsr     (AnimateStageTiles)                     ; Offset_0x01E85A
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (AnimatePalette)                      ; Offset_0x002DD4
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
                 cmpi.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
                 beq.s   Offset_0x003FD0
@@ -4991,7 +5041,7 @@ Offset_0x00400E:
                 bsr     Init_Demo_Control                      ; Offset_0x0047F6
                 jsr     (RunObjects)                         ; Offset_0x0110AE
                 jsr     (DeformBgLayer)              ; Offset_0x0120D4
-                jsr     (Background_Scroll_Layer)              ; Offset_0x02F2EA
+                jsr     (Run_TileDrawing)              ; Offset_0x02F2EA
                 jsr     (Build_Sprites)                        ; Offset_0x011296
                 jsr     (ObjectsManager)                      ; Offset_0x011BF8
                 jsr     (Process_Kos_Module_Queue)               ; Offset_0x0018FE
@@ -5915,30 +5965,37 @@ Oscillate_Data2:                                               ; Offset_0x004A8A
 ; <<<-
 ;===============================================================================
 
-;===============================================================================
-; Rotina para fazer os an�is e outros objetos girarem em torno de si
-; ->>>
-;===============================================================================
-Change_Object_Frame:                                           ; Offset_0x004ACA
-                subq.b  #$01, (Object_Frame_Timer).w                 ; $FFFFFEA2
-                bpl.s   Offset_0x004AE0
-                move.b  #$07, (Object_Frame_Timer).w                 ; $FFFFFEA2
-                addq.b  #$01, (Object_Frame_Buffer).w                ; $FFFFFEA3
-                andi.b  #$03, (Object_Frame_Buffer).w                ; $FFFFFEA3
+; ---------------------------------------------------------------------------
+; Subroutine to change global object animation variables (rings)
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x004ACA: Change_Object_Frame:
+ChangeRingFrame:
+		subq.b	#1,(Object_Frame_Timer).w
+		bpl.s	Offset_0x004AE0
+		move.b	#7,(Object_Frame_Timer).w
+		addq.b	#1,(Object_Frame_Buffer).w
+		andi.b	#3,(Object_Frame_Buffer).w
+
 Offset_0x004AE0:
-                tst.b   (Object_Frame_Anim_Counter).w                ; $FFFFFEA6
-                beq.s   Offset_0x004B02
-                moveq   #$00, D0
-                move.b  (Object_Frame_Anim_Counter).w, D0            ; $FFFFFEA6
-                add.w   (Object_Frame_Anim_Accum).w, D0              ; $FFFFFEA8
-                move.w  D0, (Object_Frame_Anim_Accum).w              ; $FFFFFEA8
-                rol.w   #$07, D0
-                andi.w  #$0003, D0
-                move.b  D0, (Object_Frame_Anim_Frame).w              ; $FFFFFEA7
-                subq.b  #$01, (Object_Frame_Anim_Counter).w          ; $FFFFFEA6
+		tst.b	(Object_Frame_Anim_Counter).w
+		beq.s	Offset_0x004B02
+		moveq	#0,d0
+		move.b	(Object_Frame_Anim_Counter).w,d0
+		add.w	(Object_Frame_Anim_Accum).w,d0
+		move.w	d0,(Object_Frame_Anim_Accum).w
+		rol.w	#7,d0
+		andi.w	#3,d0
+		move.b	d0,(Object_Frame_Anim_Frame).w
+		subq.b	#1,(Object_Frame_Anim_Counter).w
+
 Offset_0x004B02:
-                addi.w  #$0180, (Object_Frame_Angle).w               ; $FFFFFEAA
-                rts
+		addi.w	#$180,(Object_Frame_Angle).w
+		rts
+; End of function ChangeRingFrame
+
 ;===============================================================================
 ; Rotina para fazer os an�is e outros objetos girarem em torno de si
 ; <<<-
@@ -6080,7 +6137,7 @@ Offset_0x005034:
 		move.b	#$C,(VBlank_Index).w
 		jsr	(Process_Kos_Queue).l
 		bsr.w	Wait_For_VSync
-		bsr.w	RunPLC
+		bsr.w	RunPLC_RAM
 		jsr	(Process_Kos_Module_Queue).l
 		tst.b	(Kosinski_Modules_Left).w
 		bne.s	Offset_0x005034
@@ -6159,9 +6216,9 @@ LevelInit_UndewaterPalette:                                    ; Offset_0x0050F0
                 nop
 Offset_0x00515C:
                 move.w  D0, D1
-                bsr     PalLoad3_Water                         ; Offset_0x002FD2
+                bsr     PalLoad_Water_Now                         ; Offset_0x002FD2
                 move.w  D1, D0
-                bsr     PalLoad4_Water                         ; Offset_0x002FEE
+                bsr     PalLoad_Water_ForFade                         ; Offset_0x002FEE
                 tst.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 beq.s   Offset_0x005174
                 move.b  (Saved_Underwater_Flag).w, (Underwater_Flag).w ; $FFFFFE53, $FFFFF64E
@@ -6351,7 +6408,7 @@ Offset_0x0053F2:
                 lea     (Menu_Animate), A2                     ; Offset_0x006614
                 jsr     (Dynamic_Normal)                       ; Offset_0x01F2DE
                 moveq   #$04, D0
-                bsr     PalLoad1                               ; Offset_0x002F9E
+                bsr     PalLoad_ForFade                               ; Offset_0x002F9E
                 lea     (Palette_Row_2_Offset).w, A1                 ; $FFFFED40
                 lea     (Palette_Data_Target+$40).w, A2              ; $FFFFEDC0
                 moveq   #$07, D1
@@ -6564,7 +6621,7 @@ Options_Menu:                                                  ; Offset_0x0056CA
                 lea     (Menu_Animate), A2                     ; Offset_0x006614
                 jsr     (Dynamic_Normal)                       ; Offset_0x01F2DE
                 moveq   #$04, D0
-                bsr     PalLoad1                               ; Offset_0x002F9E
+                bsr     PalLoad_ForFade                               ; Offset_0x002F9E
                 clr.w   (Two_Player_Flag).w                          ; $FFFFFFD8
                 clr.l   (Camera_X).w                                 ; $FFFFEE78
                 clr.l   (Camera_Y).w                                 ; $FFFFEE7C
@@ -6866,7 +6923,7 @@ Offset_0x005A64:
                 lea     (Menu_Animate), A2                     ; Offset_0x006614
                 jsr     (Dynamic_Normal)                       ; Offset_0x01F2DE
                 moveq   #$04, D0
-                bsr     PalLoad1                               ; Offset_0x002F9E
+                bsr     PalLoad_ForFade                               ; Offset_0x002F9E
                 lea     (Palette_Row_2_Offset).w, A1                 ; $FFFFED40
                 lea     (Palette_Data_Target+$40).w, A2              ; $FFFFEDC0
                 moveq   #$07, D1
@@ -7480,7 +7537,7 @@ Offset_0x00672C:
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 jsr     (RunObjects)                         ; Offset_0x0110AE
                 jsr     (Build_Sprites)                        ; Offset_0x011296
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 cmpi.b  #gm_S3_Special_Stage, (Game_Mode).w     ; $2C, $FFFFF600
                 beq.s   Offset_0x00672C
                 rts
@@ -7585,7 +7642,7 @@ Offset_0x0071B2:
                 bsr     Wait_For_VSync                         ; Offset_0x001AEE
                 jsr     (RunObjects)                         ; Offset_0x0110AE
                 jsr     (Build_Sprites)                        ; Offset_0x011296
-                bsr     RunPLC                                 ; Offset_0x001556
+                bsr     RunPLC_RAM                                 ; Offset_0x001556
                 cmpi.b  #gm_SK_Special_Stage, (Game_Mode).w     ; $30, $FFFFF600
                 beq.s   Offset_0x0071B2
                 rts
@@ -13640,8 +13697,9 @@ Offset_0x0123C6:
 ; <<<-   rolagem por software
 ;-------------------------------------------------------------------------------
 
-Load_Tiles_From_Start_Ptr:                                     ; Offset_0x0123D8
-                jmp     (Load_Tiles_From_Start)                ; Offset_0x02F25C
+; Offset_0x123D8: Load_Tiles_From_Start_Ptr:
+JmpTo_Setup_TileDrawing:
+		jmp	(Setup_TileDrawing).l
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -13682,7 +13740,7 @@ Offset_0x012428:
 		move.l	d0,d7
 		move.l	d0,a0
 		lea	(M68K_RAM_Start).l,a1
-		jsr	(KosinskiDec)
+		jsr	(KosinskiDec).l
 		move.l	(a2)+,d0
 		andi.l	#$FFFFFF,d0
 		cmp.l	d0,d7
@@ -13706,7 +13764,7 @@ Load_Level_Palette:
 		addq.w	#4,a2
 		moveq	#0,d0
 		move.b	(a2),d0
-		jsr	(PalLoad1).l
+		jsr	(PalLoad_ForFade).l
 		rts
 ; End of function LoadZoneBlockMaps
 
@@ -13866,7 +13924,7 @@ Offset_0x012588:
                 move.w  #$0419, Obj_Y(A1)                                ; $0014
 Offset_0x0125BE:
                 moveq   #$05, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 move.w  #$1300, (Sonic_Level_Limits_Min_X).w         ; $FFFFEE14
                 moveq   #$0B, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
@@ -13884,7 +13942,7 @@ Offset_0x0125DA:
                 move.w  #$1760, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$2A, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 st      (Level_Events_Buffer_5).w                    ; $FFFFEEC6
                 addq.b  #$02, (Dynamic_Resize_Routine).w             ; $FFFFEE33
 Offset_0x012612:
@@ -14023,7 +14081,7 @@ Offset_0x01276A:
                 move.w  #$A000, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$30, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 st      (Level_Events_Buffer_5).w                    ; $FFFFEEC6
                 addq.b  #$02, (Dynamic_Resize_Routine).w             ; $FFFFEE33
 Offset_0x0127B8:
@@ -15379,22 +15437,30 @@ Obj_0x1B_LBz_Pipe_Plug:                                        ; Offset_0x01E2C6
                 include 'data\objects\obj_0x1B.asm' 
 Obj_0x1C_LBz_Unknow:                                           ; Offset_0x01E6C6  
                 include 'data\objects\obj_0x1C.asm'                                                                                                                                                                                                                                   
-;===============================================================================
-; Rotina para carregar os sprites dinamicamente para a VRAM
-; ->>>     Ex: Flores na Emerald Hill, �leo na Oil Ocean, etc ....
-;===============================================================================   
-Dynamic_Art_Cues:                                              ; Offset_0x01E85A
-                moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$05, D0
-                andi.w  #$00FC, D0
-                move.w  (Dynamic_Art_Idx+$02)(PC, D0), D1      ; Offset_0x01E87C
-                lea     Dynamic_Art_Idx(PC, D1), A2            ; Offset_0x01E87A
-                move.w  Dynamic_Art_Idx(PC, D0), D0            ; Offset_0x01E87A
-                jmp     Dynamic_Art_Idx(PC, D0)                ; Offset_0x01E87A
-                rts
-;-------------------------------------------------------------------------------   
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to dynamically reload animated stage tiles in VRAM
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x01E85A: DynamicArtCues:
+AnimateStageTiles:
+		moveq	#0,d0
+		move.w	(Level_Id).w,d0
+		ror.b	#1,d0
+		lsr.w	#5,d0
+		andi.w	#$FC,d0
+		move.w	Dynamic_Art_Idx+2(pc,d0.w),d1
+		lea	Dynamic_Art_Idx(pc,d1.w),a2
+		move.w	Dynamic_Art_Idx(pc,d0.w),d0
+		jmp	Dynamic_Art_Idx(pc,d0.w)
+		rts
+; End of function AnimateStageTiles
+
+; ===========================================================================
+
 Dynamic_Art_Idx:                                               ; Offset_0x01E87A
                 dc.w    Dynamic_AIz_1-Dynamic_Art_Idx          ; Offset_0x01E93C
                 dc.w    AIz_1_Animate-Dynamic_Art_Idx          ; Offset_0x01F346
@@ -17529,93 +17595,99 @@ Obj_0x6C_Bridge:                                               ; Offset_0x02E504
                 include 'data\objects\obj_0x6C.asm'    
 ; Obj_0x69_Hz_Curved_Twisting_Pipe:                            ; Offset_0x02EEEA 
                 include 'data\objects\obj_0x69.asm'                                                    
-;===============================================================================
-; Rotina para carregar os tiles da posi��o inicial do jogador
-; ->>>                           
-;===============================================================================  
-Load_Tiles_From_Start:                                         ; Offset_0x02F25C
-                clr.b   (Background_Collision_Flag).w                ; $FFFFF664
-                clr.l   (Plane_Double_Update_Flag).w                 ; $FFFFEEA4
-                clr.w   (Level_Repeat_Routine).w                     ; $FFFFEEB2
-                clr.l   (Level_Repeat_Offset).w                      ; $FFFFEEBC
-                clr.l   (Level_Events_Routine).w                     ; $FFFFEEC0
-                clr.l   (Foreground_Events_Y_Counter).w              ; $FFFFEEC4
-                clr.w   (Earthquake_Flag).w                          ; $FFFFEECC
-                clr.l   (Earthquake_Offset).w                        ; $FFFFEECE
-                clr.l   (Background_Events).w                        ; $FFFFEED2
-                clr.l   (Background_Events+$04).w                    ; $FFFFEED6
-                clr.l   (Background_Events+$08).w                    ; $FFFFEEDA
-                clr.l   (Background_Events+$0C).w                    ; $FFFFEEDE
-                move.w  #$0FFF, (Screen_Wrap_Y).w                    ; $FFFFEEAA
-                move.w  #$0FF0, (Level_Layout_Wrap_Y).w              ; $FFFFEEAC
-                move.w  #$007C, (Level_Layout_Wrap_Row).w            ; $FFFFEEAE
-                move.w  (Camera_X).w, (Screen_Pos_Buffer_X).w ; $FFFFEE78, $FFFFEE80
-                move.w  (Camera_Y).w, (Screen_Pos_Buffer_Y).w ; $FFFFEE7C, $FFFFEE84
-                lea     (Plane_Buffer).w, A0                         ; $FFFFF100
-                lea     (Blocks_Mem_Address).w, A2                   ; $FFFF9000
-                lea     (Fg_Mem_Index_Address).w, A3                 ; $FFFF8008
-                move.w  #$C000, D7
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$02, D0
-                lsr.w   #$03, D0
-                move.l  Load_Tiles_From_Start_Pointers(PC, D0), A1  ; Offset_0x02F336
-                jsr     (A1)
-                addq.w  #$02, A3
-                move.w  #$E000, D7
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$02, D0
-                lsr.w   #$03, D0
-                move.l  Load_Tiles_From_Start_Pointers+$04(PC, D0), A1 ; Offset_0x02F33A
-                jsr     (A1)
-                move.w  (Screen_Pos_Buffer_Y).w, (Vertical_Scroll_Value).w ; $FFFFEE84, $FFFFF616
-                move.w  (Screen_Pos_Buffer_Y_2).w, (Vertical_Scroll_Value_2).w ; $FFFFEE90, $FFFFF618
-                rts      
-;===============================================================================
-; Rotina para carregar os tiles da posi��o inicial do jogador
-; <<<-                           
-;===============================================================================             
-        
-;===============================================================================
-; Rotina para rolar o tela durante o jogo tamb�m conhecido como rasteriza��o ou
-; ->>>   rolagem por software
-;===============================================================================
-Background_Scroll_Layer:                                       ; Offset_0x02F2EA
-                move.w  (Camera_X).w, (Screen_Pos_Buffer_X).w ; $FFFFEE78, $FFFFEE80
-                move.w  (Camera_Y).w, (Screen_Pos_Buffer_Y).w ; $FFFFEE7C, $FFFFEE84
-                lea     (Plane_Buffer).w, A0                         ; $FFFFF100
-                lea     (Blocks_Mem_Address).w, A2                   ; $FFFF9000
-                lea     (Fg_Mem_Index_Address).w, A3                 ; $FFFF8008
-                move.w  #$C000, D7
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$02, D0
-                lsr.w   #$03, D0
-                move.l  Load_Tiles_As_You_Move_Pointers(PC, D0), A1 ; Offset_0x02F346
-                jsr     (A1)
-                addq.w  #$02, A3
-                move.w  #$E000, D7
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
-                ror.b   #$02, D0
-                lsr.w   #$03, D0
-                move.l  Load_Tiles_As_You_Move_Pointers+$04(PC, D0), A1 ; Offset_0x02F34A
-                jsr     (A1)
-                move.w  (Screen_Pos_Buffer_Y).w, (Vertical_Scroll_Value).w ; $FFFFEE84, $FFFFF616
-                move.w  (Screen_Pos_Buffer_Y_2).w, (Vertical_Scroll_Value_2).w ; $FFFFEE90, $FFFFF618
-                rts        
-;===============================================================================
-; Rotina para rolar o tela durante o jogo tamb�m conhecido como rasteriza��o ou
-; <<<-   rolagem por software
-;===============================================================================  
-Load_Tiles_From_Start_Pointers:                                ; Offset_0x02F336  
-                dc.l    AIz_1_Events_Init                      ; Offset_0x0304DC
-                dc.l    AIz_1_Events_Init_2                    ; Offset_0x0306F2
-                dc.l    AIz_2_Events_Init                      ; Offset_0x030C6A
-                dc.l    AIz_2_Events_Init_2                    ; Offset_0x030DDE
-Load_Tiles_As_You_Move_Pointers:                               ; Offset_0x02F346
-                dc.l    AIz_1_Events_Run                       ; Offset_0x0304E4  
-                dc.l    AIz_1_Events_Run_2                     ; Offset_0x030744
-                dc.l    AIz_2_Events_Run                       ; Offset_0x030C72
-                dc.l    AIz_2_Events_Run_2                     ; Offset_0x030E16
-;--------------                
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to setup level tile drawing routines
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x02F25C: Load_Tiles_From_Start:
+Setup_TileDrawing:
+		clr.b	(Background_Collision_Flag).w
+		clr.l	(Plane_Double_Update_Flag).w
+		clr.w	(Level_Repeat_Routine).w
+		clr.l	(Level_Repeat_Offset).w
+		clr.l	(Level_Events_Routine).w
+		clr.l	(Foreground_Events_Y_Counter).w
+		clr.w	(Earthquake_Flag).w
+		clr.l	(Earthquake_Offset).w
+		clr.l	(Background_Events).w
+		clr.l	(Background_Events+4).w
+		clr.l	(Background_Events+8).w
+		clr.l	(Background_Events+$C).w
+		move.w	#$FFF,(Screen_Wrap_Y).w
+		move.w	#$FF0,(Level_Layout_Wrap_Y).w
+		move.w	#$7C,(Level_Layout_Wrap_Row).w
+		move.w	(Camera_X).w,(Screen_Pos_Buffer_X).w
+		move.w	(Camera_Y).w,(Screen_Pos_Buffer_Y).w
+		lea	(Plane_Buffer).w,a0
+		lea	(Blocks_Mem_Address).w,a2
+		lea	(Fg_Mem_Index_Address).w,a3
+		move.w	#$C000,d7
+		move.w	(Level_Id).w,d0
+		ror.b	#2,d0
+		lsr.w	#3,d0
+		move.l	Load_Tiles_From_Start_Pointers(pc,d0.w),a1
+		jsr	(a1)
+		addq.w	#2,a3
+		move.w	#$E000,d7
+		move.w	(Level_Id).w,d0
+		ror.b	#2,d0
+		lsr.w	#3,d0
+		move.l	Load_Tiles_From_Start_Pointers+4(pc,d0.w),a1
+		jsr	(a1)
+		move.w	(Screen_Pos_Buffer_Y).w,(Vertical_Scroll_Value).w
+		move.w	(Screen_Pos_Buffer_Y_2).w,(Vertical_Scroll_Value_2).w
+		rts
+; End of function Setup_TileDrawing
+
+; ---------------------------------------------------------------------------
+; Subroutine to run level tile drawing routines
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x02F2EA: Background_Scroll_Layer:
+Run_TileDrawing:
+		move.w	(Camera_X).w,(Screen_Pos_Buffer_X).w
+		move.w	(Camera_Y).w,(Screen_Pos_Buffer_Y).w
+		lea	(Plane_Buffer).w,a0
+		lea	(Blocks_Mem_Address).w,a2
+		lea	(Fg_Mem_Index_Address).w,a3
+		move.w	#$C000,d7
+		move.w	(Level_Id).w,d0
+		ror.b	#2,d0
+		lsr.w	#3,d0
+		move.l	Load_Tiles_As_You_Move_Pointers(pc,d0.w),a1
+		jsr	(a1)
+		addq.w	#2,a3
+		move.w	#$E000,d7
+		move.w	(Level_Id).w,d0
+		ror.b	#2,d0
+		lsr.w	#3,d0
+		move.l	Load_Tiles_As_You_Move_Pointers+4(pc,d0.w),a1
+		jsr	(a1)
+		move.w	(Screen_Pos_Buffer_Y).w,(Vertical_Scroll_Value).w
+		move.w	(Screen_Pos_Buffer_Y_2).w,(Vertical_Scroll_Value_2).w
+		rts
+; End of function Run_TileDrawing
+
+; ---------------------------------------------------------------------------
+; Offset_0x02F336:
+Load_Tiles_From_Start_Pointers:
+		dc.l	AIz_1_Events_Init
+		dc.l	AIz_1_Events_Init_2
+		dc.l	AIz_2_Events_Init
+		dc.l	AIz_2_Events_Init_2
+; Offset_0x02F346:
+Load_Tiles_As_You_Move_Pointers:
+		dc.l	AIz_1_Events_Run
+		dc.l	AIz_1_Events_Run_2
+		dc.l	AIz_2_Events_Run
+		dc.l	AIz_2_Events_Run_2
+;--------------
                 dc.l    Hz_1_Events_Init                       ; Offset_0x031C52
                 dc.l    Hz_1_Events_Init_2                     ; Offset_0x031C5E
                 dc.l    Hz_2_Events_Init                       ; Offset_0x031CBC
@@ -18876,21 +18948,29 @@ Update_Vertical_Scroll_Value_P2:                               ; Offset_0x02FF3A
                 subi.w  #$0070, D0
                 move.w  D0, (Vertical_Scroll_Value_P2_3).w           ; $FFFFF620
                 rts
-;===============================================================================
-; Rotina para recarregar os tiles ao se mover na tela
-; ->>>
-;=============================================================================== 
-Load_Tiles_As_You_Move_Loop:                                   ; Offset_0x02FF54
-                cmpi.b  #$06, (Obj_Player_One+Obj_Routine).w         ; $FFFFB005
-                bcc.s   Offset_0x02FF64
-                move.w  (Level_Repeat_Routine).w, D0                 ; $FFFFEEB2
-                jmp     Offset_0x02FF64(PC, D0)
-Offset_0x02FF64:
-                rts 
-                nop
-; Offset_0x02FF68:                
-                bra     AIz_Do_Ship_Loop                       ; Offset_0x031152                                               
-Adjust_Background_During_Loop:                                 ; Offset_0x02FF6C
+
+; ---------------------------------------------------------------------------
+; Subroutine to repeat level tile drawing in a level segment
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x02FF54: Load_Tiles_As_You_Move_Loop:
+Repeat_TileDrawing:
+		cmpi.b	#6,(Obj_Player_One+Obj_Routine).w
+		bcc.s	RepeatTiles_Index
+		move.w	(Level_Repeat_Routine).w,d0
+		jmp	RepeatTiles_Index(pc,d0.w)
+; ===========================================================================
+; Offset_0x02FF64:
+RepeatTiles_Index:
+		; these two instructions make a blank Act 1 entry
+		rts
+		nop
+                bra.w	AIz_Do_Ship_Loop
+; ===========================================================================
+; Offset_0x02FF6C:
+Adjust_Background_During_Loop:
                 move.w  (A1), D1
                 move.w  D0, (A1)+
                 sub.w   D1, D0
@@ -19433,7 +19513,7 @@ Offset_0x030856:
                 move.w  #$16A0, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (PLC_Spikes_Springs), A1               ; Offset_0x04192C
-                jsr     (LoadPLC_A1)                           ; Offset_0x001502
+                jsr     (LoadPLC_Direct)                           ; Offset_0x001502
                 movem.l (A7)+, D7/A0/A2/A3
                 move.w  #$00F0, (Draw_Delayed_Position).w            ; $FFFFEEC8
                 move.w  #$000F, (Draw_Delayed_Position_Rowcount).w   ; $FFFFEECA
@@ -19479,7 +19559,7 @@ Offset_0x030920:
                 jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
                 jsr     (Init_Water_Levels)                    ; Offset_0x005056
                 moveq   #$0B, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
                 lea     (Palette_Row_3_Offset+$02).w, A1             ; $FFFFED62
                 move.l  #$004E006E, (A1)+
@@ -20795,7 +20875,7 @@ MGz_1_Transition:                                              ; Offset_0x031FB8
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
                 jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
                 moveq   #$0F, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
                 move.w  #$2E00, D0
                 move.w  #$0600, D1
@@ -21998,7 +22078,7 @@ Iz_1_Transition:                                               ; Offset_0x032F3C
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
                 jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
                 moveq   #$15, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
                 move.w  #$6880, D0
                 move.w  #$FF00, D1
@@ -22752,7 +22832,7 @@ LBz_1_Transition:                                              ; Offset_0x0337F6
                 jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
                 jsr     (Init_Water_Levels)                    ; Offset_0x005056
                 moveq   #$17, D0
-                jsr     (PalLoad2)                             ; Offset_0x002FBA
+                jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
                 move.w  #$3A00, D0
                 moveq   #$00, D1
@@ -24779,14 +24859,14 @@ AIz_After_Boss:                                                ; Offset_0x041AFC
                 lea     Pal_AIz_After_Boss(PC), A1             ; Offset_0x041B2A
                 jsr     (Pal_Load_Line_1)                      ; Offset_0x04314C
                 lea     PLC_AIz_After_Boss(PC), A1             ; Offset_0x041B4A
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502  
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502  
 ;------------------------------------------------------------------------------- 
 Hz_After_Boss:                                                 ; Offset_0x041B10
                 rts    
 ;------------------------------------------------------------------------------- 
 MGz_After_Boss:                                                ; Offset_0x041B12
                 lea     PLC_MGz_After_Boss(PC), A1             ; Offset_0x041B90
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502   
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502   
 ;------------------------------------------------------------------------------- 
 CNz_After_Boss:                                                ; Offset_0x041B1C
 FBz_After_Boss:                                                ; Offset_0x041B1C 
@@ -27018,7 +27098,7 @@ Obj_Load_End_Level_Art:                                        ; Offset_0x043302
                 moveq   #Volume_Down, D0                                  ; -$20
                 jsr     (Play_Music)                           ; Offset_0x001176
                 lea     PLC_End_Level_Art(PC), A1              ; Offset_0x043332
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502                      ; Offset_0x001502
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502                      ; Offset_0x001502
 ;-------------------------------------------------------------------------------
 PLC_End_Level_Art:                                             ; Offset_0x043332
                 dc.w    (((PLC_EL_00_End-PLC_EL_00)/$06)-$01) ; Auto Detec��o do n�mero de itens na lista por Esrael Neto

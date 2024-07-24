@@ -429,7 +429,7 @@ Offset_0x035134:
                 lea     Offset_0x03558E(PC), A2
                 jsr     (Load_Child_Object_A2)                 ; Offset_0x041D9A
                 lea     (PLC_After_Knuckles_LBz_1), A1         ; Offset_0x041BBA
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502  
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502  
 ;-------------------------------------------------------------------------------
 Offset_0x03515E:
                 move.b  #$0A, Obj_Routine(A0)                            ; $0005

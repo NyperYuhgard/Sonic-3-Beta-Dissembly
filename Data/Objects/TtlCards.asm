@@ -105,7 +105,7 @@ Offset_0x02464E:
                 bra.s   Offset_0x02468E
 Offset_0x024682:
                 lea     (PLC_Spikes_Springs), A1               ; Offset_0x04192C
-                jsr     (LoadPLC_A1)                           ; Offset_0x001502
+                jsr     (LoadPLC_Direct)                           ; Offset_0x001502
 Offset_0x02468E:
                 move.w  (Level_Id_2).w, D0                           ; $FFFFEE54
                 jsr     Level_Load_Enemies_Art(PC)             ; Offset_0x024F46

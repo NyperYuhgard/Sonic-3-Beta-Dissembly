@@ -45,7 +45,7 @@ Offset_0x0452A2:
                 moveq   #Volume_Down, D0                                  ; -$20
                 jsr     (Play_Music)                           ; Offset_0x001176
                 lea     PLC_Tunnelbot(PC), A1                  ; Offset_0x045856
-                jmp     (LoadPLC_A1)                           ; Offset_0x001502   
+                jmp     (LoadPLC_Direct)                           ; Offset_0x001502   
 ;-------------------------------------------------------------------------------
 Offset_0x0452FC:
                 jsr     (Swing_Up_And_Down)                    ; Offset_0x04232E
