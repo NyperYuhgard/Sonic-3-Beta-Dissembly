@@ -579,6 +579,7 @@ Nemesis_Data_Word                equ M68K_RAM_Start+$F6F0
 Nemesis_Shift_Value              equ M68K_RAM_Start+$F6F4
 PLC_Data_Count                   equ M68K_RAM_Start+$F6F8
 Nemesis_Frame_Pattern_Left       equ M68K_RAM_Start+$F6FA
+PLC_Data_Buffer_End:             equ PLC_Data_Buffer+$80
 Miles_Control_Vars               equ M68K_RAM_Start+$F700    
 Miles_CPU_Ctrl_Auto_Timer        equ M68K_RAM_Start+$F702
 Miles_CPU_Respawn_Timer          equ M68K_RAM_Start+$F704
