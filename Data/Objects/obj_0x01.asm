@@ -180,7 +180,7 @@ Offset_0x013138:
 Offset_0x013178:
                 cmpi.w  #$0008, D0
                 bne.s   Offset_0x01318E
-                move.b  (HUD_Timer_Refresh_Flag).w, D1               ; $FFFFFE1E
+                move.b  (Update_HUD_timer).w, D1               ; $FFFFFE1E
                 add.b   (HUD_Timer_Refresh_Flag_P2).w, D1            ; $FFFFFECA
                 cmpi.b  #$02, D1
                 beq.s   Offset_0x01318E
@@ -241,15 +241,15 @@ S2_Monitor_Miles_Life: ; Referência inválida - Sonic 2 Left over
 Monitor_Sonic_Life:                                            ; Offset_0x01320A
                 addq.w  #$01, (Monitors_Broken).w                    ; $FFFFFEF4
                 addq.b  #$01, (Life_count).w                         ; $FFFFFE12
-                addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
+                addq.b  #$01, (Update_HUD_lives).w              ; $FFFFFE1C
                 moveq   #Extra_Life_Snd, D0                                ; $2A
                 jmp     (Play_Music)                           ; Offset_0x001176  
 ;-------------------------------------------------------------------------------  
 Monitor_Rings:                                                 ; Offset_0x01321E
                 addq.w  #$01, (A2)
                 lea     (Ring_Count_Address).w, A2                   ; $FFFFFE20
-                lea     (HUD_Rings_Refresh_Flag).w, A3               ; $FFFFFE1D
-                lea     (Ring_Status_Flag).w, A4                     ; $FFFFFE1B
+                lea     (Update_HUD_rings).w, A3               ; $FFFFFE1D
+                lea     (Extra_life_flags).w, A4                     ; $FFFFFE1B
                 lea     (Total_Ring_Count_Address).w, A5             ; $FFFFFEF0
                 cmpa.w  #Obj_Player_One, A1                              ; $B000
                 beq.s   Offset_0x013246
@@ -355,7 +355,7 @@ Offset_0x013376:
 ;-------------------------------------------------------------------------------
 Monitor_Invincibility:                                         ; Offset_0x013384
                 addq.w  #$01, (A2)
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 bne.s   Offset_0x0133CE
                 bset    #Invincibility_Type, Obj_Player_Status(A1)  ; $01, $002F
                 move.b  #$96, Obj_P_Invcbility_Time(A1)                  ; $0035
@@ -382,7 +382,7 @@ Monitor_Super_Sonic:                                           ; Offset_0x0133D0
                 addi.w  #$0032, (Ring_Count_Address).w               ; $FFFFFE20
                 move.b  #$01, (Super_Sonic_Palette_Status).w         ; $FFFFF65F
                 move.b  #$0F, (Super_Sonic_Palette_Timer).w          ; $FFFFF65E
-                move.b  #$01, (Super_Sonic_Flag).w                   ; $FFFFFE19
+                move.b  #$01, (Super_Sonic_flag).w                   ; $FFFFFE19
                 move.b  #$81, (Obj_Player_One+Obj_Timer).w           ; $FFFFB02E
                 move.b  #$1F, (Obj_Player_One+Obj_Ani_Number).w      ; $FFFFB020
                 move.l  #Obj_Super_Sonic_Stars, (Obj_Super_Sonic_Stars_RAM).w ; Offset_0x0102AA, $FFFFCBC0

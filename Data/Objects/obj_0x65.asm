@@ -19,7 +19,7 @@
                 move.w  D0, Obj_Control_Var_08(A0)                       ; $0038
                 move.b  #$05, (Competition_Laps_To_Win).w            ; $FFFFFEFA
                 clr.w   (Competition_Lap_Count_P1).w                 ; $FFFFFEFC
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 clr.l   (Time_Count_Address).w                       ; $FFFFFE22
                 clr.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
@@ -96,7 +96,7 @@ Offset_0x02D274:
                 move.b  #$02, Obj_Status(A1)                             ; $002A
                 move.w  #$0000, Obj_Control_Var_02(A1)                   ; $0032
                 clr.w   (Competition_Lap_Count_P1).w                 ; $FFFFFEFC
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 clr.l   (Time_Count_Address).w                       ; $FFFFFE22
                 clr.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
@@ -152,7 +152,7 @@ Offset_0x02D39C:
 Offset_0x02D39E:
                 tst.b   $0001(A2)
                 bne.s   Offset_0x02D39A
-                tst.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bne.s   Offset_0x02D39A
                 move.b  #$01, (Control_Locked_Flag_P1).w             ; $FFFFF7CC
                 move.b  #$01, (Control_Locked_Flag_P2).w             ; $FFFFF7CF
@@ -334,7 +334,7 @@ Offset_0x02D5C2:
 Offset_0x02D5DC:
                 cmpi.b  #$03, Obj_Map_Id(A0)                             ; $0022
                 bne.s   Offset_0x02D5F6
-                move.b  #$01, (HUD_Timer_Refresh_Flag).w             ; $FFFFFE1E
+                move.b  #$01, (Update_HUD_timer).w             ; $FFFFFE1E
                 move.b  #$01, (HUD_Timer_Refresh_Flag_P2).w          ; $FFFFFECA
                 move.b  #$01, Obj_Control_Var_0A(A0)                     ; $003A
 Offset_0x02D5F6:
@@ -348,7 +348,7 @@ Offset_0x02D5F8:
                 move.b  #$03, Obj_Ani_Number(A0)                         ; $0020
                 bset    #$03, Obj_Flags(A0)                              ; $0004
                 move.b  #$02, Obj_Control_Var_0A(A0)                     ; $003A
-                move.b  #$80, (HUD_Timer_Refresh_Flag).w             ; $FFFFFE1E
+                move.b  #$80, (Update_HUD_timer).w             ; $FFFFFE1E
                 cmp.b   (Competition_Lap_Count_P2).w, D0             ; $FFFFFEFD
                 bcc.s   Offset_0x02D632
                 bclr    #$03, Obj_Flags(A0)                              ; $0004
@@ -375,11 +375,11 @@ Offset_0x02D662:
                 move.b  (Competition_Laps_To_Win).w, D0              ; $FFFFFEFA
                 cmp.b   (Competition_Lap_Count_P1).w, D0             ; $FFFFFEFC
                 bcc.s   Offset_0x02D684
-                tst.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bmi.s   Offset_0x02D684
                 move.b  #$03, Obj_Ani_Number(A0)                         ; $0020
                 bset    #$03, Obj_Flags(A0)                              ; $0004
-                move.b  #$80, (HUD_Timer_Refresh_Flag).w             ; $FFFFFE1E
+                move.b  #$80, (Update_HUD_timer).w             ; $FFFFFE1E
 Offset_0x02D684:
                 cmp.b   (Competition_Lap_Count_P2).w, D0             ; $FFFFFEFD
                 bcc.s   Offset_0x02D6A2
@@ -631,7 +631,7 @@ Offset_0x02DB34:
                 lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
                 lea     ((M68K_RAM_Start+$700A)&$00FFFFFF), A2       ; $00FF700A
                 lea     (Timer_Minute_Count_Address).w, A3           ; $FFFFFE23
-                lea     (HUD_Timer_Refresh_Flag).w, A4               ; $FFFFFE1E
+                lea     (Update_HUD_timer).w, A4               ; $FFFFFE1E
                 bra.s   Show_Timer                             ; Offset_0x02DBA8         
 ;-------------------------------------------------------------------------------
 Obj_Timer_P2:                                                  ; Offset_0x02DB48

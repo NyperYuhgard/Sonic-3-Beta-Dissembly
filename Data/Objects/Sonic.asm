@@ -54,14 +54,14 @@ Sonic_Init:
 Sonic_Init_Continued:
 		move.b	#0,Obj_P_Flips_Remaining(a0)
 		move.b	#4,Obj_Player_Flip_Speed(a0)
-		move.b	#0,(Super_Sonic_Flag).w
+		move.b	#0,(Super_Sonic_flag).w
 		move.b	#$1E,Obj_Subtype(a0)
 		subi.w	#$20,Obj_X(a0)
 		addi.w	#4,Obj_Y(a0)
 		bsr.w	Reset_Player_Position_Array
 		addi.w	#$20,Obj_X(a0)
 		subi.w	#4,Obj_Y(a0)
-		move.w	#0,(CopySonicMovesForMilesIndex).w
+		move.w	#0,(Dropdash_flag).w
 
 ; ---------------------------------------------------------------------------
 ; Normal state for Sonic
@@ -179,7 +179,7 @@ Sonic_ChkShoes:
 		move.w	#$600,(a4)
 		move.w	#$C,Acceleration(a4)
 		move.w	#$80,Deceleration(a4)
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.s	Sonic_RmvSpeed
 		move.w	#$A00,(a4)
 		move.w	#$30,Acceleration(a4)
@@ -296,7 +296,7 @@ Sonic_InWater:
 		move.w	#$300,(a4)
 		move.w	#6,Acceleration(a4)
 		move.w	#$40,Deceleration(a4)
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.s	Offset_0x00AD90
 		move.w	#$500,(a4)
 		move.w	#$18,Acceleration(a4)
@@ -322,7 +322,7 @@ Sonic_OutWater:
 		move.w	#$600,(a4)
 		move.w	#$C,Acceleration(a4)
 		move.w	#$80,Deceleration(a4)
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.s	Offset_0x00ADE6				; if Super, set different values
 		move.w	#$A00,(a4)
 		move.w	#$30,Acceleration(a4)
@@ -520,7 +520,7 @@ Sonic_NotRight:
 		subq.w	#2,d2
 		add.w	Obj_X(a0),d1
 		sub.w	Obj_X(a1),d1
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		bne.w	SuperSonic_Balance
 		cmpi.w	#2,d1
 		blt.s	Sonic_BalanceOnObjLeft
@@ -584,7 +584,7 @@ Sonic_Balance:
 		jsr	(Player_HitFloor).l
 		cmpi.w	#$C,d1
 		blt.w	Sonic_Lookup
-		tst.b	(Super_Sonic_Flag).w			; is Sonic super?
+		tst.b	(Super_Sonic_flag).w			; is Sonic super?
 		bne.w	SuperSonic_Balance2			; if yes, branch
 		cmpi.b	#3,Obj_Player_Next_Tilt(a0)
 		bne.s	Sonic_BalanceLeft
@@ -706,7 +706,7 @@ Offset_0x00B1C2:
 ; ---------------------------------------------------------------------------
 ; Offset_0x00B1C4:
 Sonic_UpdateSpeedOnGround:
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.w	Offset_0x00B1D0
 		move.w	#$C,d5
 
@@ -1196,7 +1196,7 @@ Sonic_Jump:
 		andi.b	#$D,d0
 		cmpi.b	#1,d0
 		bne.s	Offset_0x00B63C
-		move.w	#-1,(CopySonicMovesForMilesIndex).w
+		move.w	#-1,(Dropdash_flag).w
 
 Offset_0x00B63C:
 		moveq	#0,d0
@@ -1208,7 +1208,7 @@ Offset_0x00B63C:
 		cmpi.w	#6,d1					; does Sonic have room to jump?
 		blt.w	Offset_0x00B6F0				; if not, branch
 		move.w	#$680,d2
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.s	Offset_0x00B668
 		move.w	#$800,d2				; set higher jump speed if super
 
@@ -1309,17 +1309,17 @@ Offset_0x00B742:
 
 ; Offset_0x00B744:
 Sonic_CheckGoSuper:
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		bne.s	Offset_0x00B7B6
 		cmpi.b	#7,(Emeralds_Count).w
 		bne.s	Offset_0x00B7B6
 		cmpi.w	#50,(Ring_Count_Address).w
 		bcs.s	Offset_0x00B7B6
-		tst.b	(HUD_Timer_Refresh_Flag).w
+		tst.b	(Update_HUD_timer).w
 		beq.s	Offset_0x00B7B6
 		move.b	#1,(Super_Sonic_Palette_Status).w
 		move.b	#$F,(Super_Sonic_Palette_Timer).w
-		move.b	#1,(Super_Sonic_Flag).w
+		move.b	#1,(Super_Sonic_flag).w
 		move.b	#$81,Obj_Player_Control(a0)
 		move.b	#$1F,Obj_Ani_Number(a0)
 		move.l	#Obj_Super_Sonic_Stars,(Obj_Super_Sonic_Stars_RAM).w
@@ -1428,7 +1428,7 @@ Offset_0x00B8B6:
 ; original double jump ability of the Lightning Shield.
 ; Offset_0x00B8B8:
 Sonic_HyperDash:
-		tst.w	(CopySonicMovesForMilesIndex).w
+		tst.w	(Dropdash_flag).w
 		bne.w	Offset_0x00B952
 		move.b	(Control_Ports_Logical_Data+1).w,d0
 		andi.b	#$40,d0
@@ -1451,7 +1451,7 @@ Sonic_HyperDash:
 @notPlayerTwo:
 		move.w	d0,(a1)
 		bsr.w	Reset_Player_Position_Array
-		move.w	#1,(CopySonicMovesForMilesIndex).w
+		move.w	#1,(Dropdash_flag).w
 		move.w	#Rolling_Sfx,d0
 		jsr	(Play_Music).l
 		rts
@@ -1476,7 +1476,7 @@ Sonic_HyperDash:
 @notPlayerTwoAgain:
 		move.w	d0,(a1)
 		bsr.w	Reset_Player_Position_Array
-		move.w	#1,(CopySonicMovesForMilesIndex).w
+		move.w	#1,(Dropdash_flag).w
 		move.w	#Rolling_Sfx,d0
 		jsr	(Play_Music).l
 
@@ -1570,16 +1570,16 @@ Offset_0x00BA36:
 
 ; Offset_0x00BA46:
 Sonic_Super:
-		tst.b	(Super_Sonic_Flag).w
+		tst.b	(Super_Sonic_flag).w
 		beq.w	Offset_0x00BAD8
-		tst.b	(HUD_Timer_Refresh_Flag).w
+		tst.b	(Update_HUD_timer).w
 		beq.s	Sonic_RevertToNormal
 		subq.w	#1,($FFFFF670).w
 		bpl.w	Offset_0x00BAD8		; this is should be a 'bhi' as it actually counts 61 frames instead of 60
 		move.w	#60,($FFFFF670).w
 		tst.w	(Ring_Count_Address).w
 		beq.s	Sonic_RevertToNormal
-		ori.b	#1,(HUD_Rings_Refresh_Flag).w
+		ori.b	#1,(Update_HUD_rings).w
 		cmpi.w	#1,(Ring_Count_Address).w
 		beq.s	@resetHUD
 		cmpi.w	#10,(Ring_Count_Address).w
@@ -1588,7 +1588,7 @@ Sonic_Super:
 		bne.s	@updateHUD
 ; Offset_0x00BA86:
 @resetHUD:
-		ori.b	#$80,(HUD_Rings_Refresh_Flag).w
+		ori.b	#$80,(Update_HUD_rings).w
 ; Offset_0x00BA8C:
 @updateHUD:
 		subq.w	#1,(Ring_Count_Address).w
@@ -1597,7 +1597,7 @@ Sonic_Super:
 Sonic_RevertToNormal:
 		move.b	#2,(Super_Sonic_Palette_Status).w
 		move.w	#$28,(Super_Sonic_Palette_Frame).w
-		move.b	#0,(Super_Sonic_Flag).w
+		move.b	#0,(Super_Sonic_flag).w
 		move.b	#1,Obj_Ani_Flag(a0)
 		move.b	#1,Obj_P_Invcbility_Time(a0)
 		move.w	#$600,(a4)
@@ -1659,7 +1659,7 @@ Offset_0x00BB2A:
 		move.b  Obj_Player_Spdsh_Cnt(A0), D0		     ; $003E
 		add.w   D0, D0
 		move.w  Sonic_Spindash_Speed(PC, D0), Obj_Inertia(A0) ; Offset_0x00BBB2, $001C
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
+		tst.b   (Super_Sonic_flag).w		         ; $FFFFFE19
 		beq.s   Offset_0x00BB6C
 		move.w  Super_Sonic_Spindash_Speed(PC, D0), Obj_Inertia(A0) ; Offset_0x00BBC4, $001C
 Offset_0x00BB6C:
@@ -2067,13 +2067,13 @@ Sonic_ResetOnFloor_Part2:
 		move.b	#0,Obj_Ani_Number(a0)
 ; Offset_0x00BFF2:
 Sonic_ResetOnFloor_Part3:
-		tst.w	(CopySonicMovesForMilesIndex).w
+		tst.w	(Dropdash_flag).w
 		beq.s	Offset_0x00C00E
 		bmi.s	Sonic_Dropdash
 		asr.w	Obj_Inertia(a0)
 		asr.w	Obj_Speed_X(a0)
 		move.w	#0,Obj_Speed_Y(a0)
-		move.w	#0,(CopySonicMovesForMilesIndex).w
+		move.w	#0,(Dropdash_flag).w
 Offset_0x00C00E:
 		rts
 ; End of function Sonic_ResetOnFloor
@@ -2084,7 +2084,7 @@ Offset_0x00C00E:
 ; Offset_0x00C010:
 Sonic_Dropdash:
 		move.w	#0,Obj_Speed_Y(a0)
-		move.w	#0,(CopySonicMovesForMilesIndex).w
+		move.w	#0,(Dropdash_flag).w
 		bsr.w	Reset_Player_Position_Array
 		move.b	#9,Obj_Ani_Number(a0)
 		move.w	#Rolling_Sfx,d0
@@ -2192,7 +2192,7 @@ Offset_0x00C156:
 Offset_0x00C180:
 		move.b  #$08, Obj_Routine(A0)		            ; $0005
 		move.w  #$003C, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
-		addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
+		addq.b  #$01, (Update_HUD_lives).w              ; $FFFFFE1C
 		subq.b  #$01, (Life_count).w		         ; $FFFFFE12
 		bne.s   Offset_0x00C1E0
 		move.w  #$0000, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
@@ -2201,9 +2201,9 @@ Offset_0x00C180:
 		move.b  #$00, (Obj_02_Mem_Address+Obj_Map_Id).w      ; $FFFFB0B6
 		move.b  #$01, (Obj_Dynamic_RAM+Obj_Map_Id).w         ; $FFFFB100
 		move.w  A0, (Obj_02_Mem_Address+Obj_Parent_Ref).w    ; $FFFFB0D2
-		clr.b   (Time_Over_Flag).w		           ; $FFFFFE1A
+		clr.b   (Time_Over_flag).w		           ; $FFFFFE1A
 Offset_0x00C1C0:
-		clr.b   (HUD_Timer_Refresh_Flag).w		   ; $FFFFFE1E
+		clr.b   (Update_HUD_timer).w		   ; $FFFFFE1E
 		clr.b   (HUD_Timer_Refresh_Flag_P2).w		; $FFFFFECA
 		move.b  #$08, Obj_Routine(A0)		            ; $0005
 		move.w  #Game_Over_Time_Over_Snd, D0		     ; $0027
@@ -2211,7 +2211,7 @@ Offset_0x00C1C0:
 		moveq   #$03, D0
 		jmp     (LoadPLC)		              ; Offset_0x0014D0
 Offset_0x00C1E0:
-		tst.b   (Time_Over_Flag).w		           ; $FFFFFE1A
+		tst.b   (Time_Over_flag).w		           ; $FFFFFE1A
 		beq.s   Offset_0x00C20E
 		move.w  #$0000, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
 		move.l  #Obj_Time_Over_Game_Over, (Obj_02_Mem_Address).w ; Offset_0x02444C, $FFFFB094
@@ -2232,7 +2232,7 @@ Offset_0x00C210:
 		move.w  (Saved_Obj_Art_VRAM_P1).w, Obj_Art_VRAM(A0) ; $FFFFFE3C, $000A
 		move.w  (Saved_Top_Solid_P1).w, Obj_Player_Top_Solid(A0) ; $FFFFFE3E, $0046
 		clr.w   (Ring_Count_Address).w		       ; $FFFFFE20
-		clr.b   (Ring_Status_Flag).w		         ; $FFFFFE1B
+		clr.b   (Extra_life_flags).w		         ; $FFFFFE1B
 		bra.s   Offset_0x00C26A
 Offset_0x00C244:
 		move.b  #$00, (Miles_Scroll_Lock_Flag).w             ; $FFFFEE0B
@@ -2282,7 +2282,7 @@ Offset_0x00C2D8:
 ;-------------------------------------------------------------------------------
 Sonic_Animate_2:				               ; Offset_0x00C2E0
 		lea     (Sonic_Animate_Data), A1               ; Offset_0x00C5A4
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
+		tst.b   (Super_Sonic_flag).w		         ; $FFFFFE19
 		beq.s   Sonic_Animate_Sprite		   ; Offset_0x00C2F2
 		lea     (Super_Sonic_Animate_Data), A1         ; Offset_0x00C768
 Sonic_Animate_Sprite:				          ; Offset_0x00C2F2
@@ -2373,7 +2373,7 @@ Offset_0x00C3D8:
 		bpl     Offset_0x00C3E2
 		add.w   D2, D2
 Offset_0x00C3E2:
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
+		tst.b   (Super_Sonic_flag).w		         ; $FFFFFE19
 		bne.s   Offset_0x00C43E
 		lea     (Offset_0x00C5F6), A1
 		cmpi.w  #$0600, D2
@@ -2514,7 +2514,7 @@ Offset_0x00C576:
 		lsr.w   #$06, D2
 		move.b  D2, Obj_Ani_Time(A0)		             ; $0024
 		lea     (Offset_0x00C614), A1
-		tst.b   (Super_Sonic_Flag).w		         ; $FFFFFE19
+		tst.b   (Super_Sonic_flag).w		         ; $FFFFFE19
 		beq.s   Offset_0x00C58E
 		lea     (Offset_0x00C7BC), A1
 Offset_0x00C58E:

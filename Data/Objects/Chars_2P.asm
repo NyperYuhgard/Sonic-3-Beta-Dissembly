@@ -97,10 +97,10 @@ Offset_0x00A69A:
 Offset_0x00A6B2:
                 move.b  #$00, Obj_P_Flips_Remaining(A0)                  ; $0030
                 move.b  #$04, Obj_Player_Flip_Speed(A0)                  ; $0031
-                move.b  #$00, (Super_Sonic_Flag).w                   ; $FFFFFE19
+                move.b  #$00, (Super_Sonic_flag).w                   ; $FFFFFE19
                 move.b  #$1E, Obj_Subtype(A0)                            ; $002C
                 bsr     Reset_Player_Position_Array            ; Offset_0x00ACEC
-                move.w  #$0000, (CopySonicMovesForMilesIndex).w      ; $FFFFFE5A
+                move.w  #$0000, (Dropdash_flag).w      ; $FFFFFE5A
 Offset_0x00A6D4:
                 tst.w   (Debug_Mode_Active).w                        ; $FFFFFFFA
                 beq.s   Offset_0x00A6F4
@@ -303,7 +303,7 @@ Offset_0x00A92C:
                 move.b  Obj_Player_Spdsh_Cnt(A0), D0                     ; $003E
                 add.w   D0, D0
                 move.w  Sonic_Spindash_Speed_2P(PC, D0), Obj_Inertia(A0) ; Offset_0x00A9B6, $001C
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 beq.s   Offset_0x00A96E
                 move.w  Super_Sonic_Spindash_Speed_2P(PC, D0), Obj_Inertia(A0) ; Offset_0x00A9C8, $001C
 Offset_0x00A96E:

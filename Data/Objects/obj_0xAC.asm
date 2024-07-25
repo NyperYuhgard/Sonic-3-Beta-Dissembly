@@ -433,7 +433,7 @@ Offset_0x037012:
 ;-------------------------------------------------------------------------------                
 Offset_0x037014:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 move.w  #$0040, Obj_Timer(A0)                            ; $002E
                 move.l  #Offset_0x036C84, Obj_Control_Var_04(A0)         ; $0034
                 clr.b   Obj_Col_Flags(A0)                                ; $0028

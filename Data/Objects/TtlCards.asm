@@ -19,7 +19,7 @@ Offset_0x02455C:
                 move.w  #$A000, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Title_Card_Number_1), A1              ; Offset_0x13AB6C
-                tst.b   (Act_Id_2).w                                 ; $FFFFEE55
+                tst.b   (Apparent_Act).w                                 ; $FFFFEE55
                 beq.s   Offset_0x02457E
                 lea     (Title_Card_Number_2), A1              ; Offset_0x13AC2E
 Offset_0x02457E:
@@ -27,7 +27,7 @@ Offset_0x02457E:
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     Title_Card_Letters_Ptr(PC), A1         ; Offset_0x024764
                 moveq   #$00, D0
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.b  (Apparent_Zone).w, D0                           ; $FFFFEE54
                 lsl.w   #$02, D0
                 move.l  $00(A1, D0), A1
                 move.w  #$A9A0, D2
@@ -60,7 +60,7 @@ Offset_0x0245CC:
                 dbne    D1, Offset_0x0245CC
                 tst.w   Obj_Control_Var_0E(A0)                           ; $003E
                 beq.s   Offset_0x02461A
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.b  (Apparent_Zone).w, D0                           ; $FFFFEE54
                 beq.s   Offset_0x02461A
                 cmpi.b  #Iz_Id, D0                                         ; $05
                 beq.s   Offset_0x02461A
@@ -94,20 +94,20 @@ Offset_0x02464E:
                 clr.l   (Time_Count_Address).w                       ; $FFFFFE22
                 clr.w   (Ring_Count_Address).w                       ; $FFFFFE20
                 clr.w   (Total_Ring_Count_Address).w                 ; $FFFFFEF0
-                clr.b   (Ring_Status_Flag).w                         ; $FFFFFE1B
+                clr.b   (Extra_life_flags).w                         ; $FFFFFE1B
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
                 clr.w   (Ring_Count_Address_P2).w                    ; $FFFFFED0
                 clr.w   (Total_Ring_Count_Address_P2).w              ; $FFFFFEF2
                 clr.b   (Ring_Status_Flag_P2).w                      ; $FFFFFEC7
-                st      (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
-                st      (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
+                st      (Update_HUD_timer).w                   ; $FFFFFE1E
+                st      (Update_HUD_rings).w                   ; $FFFFFE1D
                 st      (End_Level_Flag).w                           ; $FFFFFAAA
                 bra.s   Offset_0x02468E
 Offset_0x024682:
                 lea     (PLC_Spikes_Springs), A1               ; Offset_0x04192C
                 jsr     (LoadPLC_Direct)                           ; Offset_0x001502
 Offset_0x02468E:
-                move.w  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.w  (Apparent_ZoneAndAct).w, D0                           ; $FFFFEE54
                 jsr     Level_Load_Enemies_Art(PC)             ; Offset_0x024F46
                 moveq   #$02, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
@@ -138,7 +138,7 @@ Offset_0x0246E2:
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 ;-------------------------------------------------------------------------------  
 Title_Card_Level_Name:                                         ; Offset_0x0246EE
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.b  (Apparent_Zone).w, D0                           ; $FFFFEE54
                 add.b   D0, Obj_Map_Id(A0)                               ; $0022
                 move.l  #Title_Card_Zone, (A0)                 ; Offset_0x0246FC
 Title_Card_Zone:                                               ; Offset_0x0246FC                
@@ -166,7 +166,7 @@ Offset_0x02473A:
 ;-------------------------------------------------------------------------------
 Title_Card_Act_Number:                                         ; Offset_0x024740
                 move.l  #Title_Card_Zone, (A0)                 ; Offset_0x0246FC
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.b  (Apparent_Zone).w, D0                           ; $FFFFEE54
                 cmpi.b  #$0A, D0
                 beq.s   Offset_0x024756
                 cmpi.b  #$0C, D0

@@ -896,7 +896,7 @@ Offset_0x039676:
                 rts
 Offset_0x039678:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$07, Obj_Status(A0)                             ; $002A
                 clr.b   Obj_Col_Flags(A0)                                ; $0028
                 clr.b   Obj_Boss_Hit(A0)                                 ; $0029

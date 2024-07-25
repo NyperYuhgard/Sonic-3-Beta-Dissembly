@@ -15,7 +15,7 @@
 Offset_0x0102DE:
                 move.l  #Offset_0x0102E4, (A0)
 Offset_0x0102E4:                
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 beq.s   Offset_0x010364
                 tst.b   Obj_P_Invunerblt_Time(A0)                        ; $0034
                 beq.s   Offset_0x010334

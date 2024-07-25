@@ -20,7 +20,7 @@ Offset_0x0247E6:
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 lea     (Title_Card_Number_1), A1              ; Offset_0x13AB6C
                 move.w  #$B000, D2
-                tst.b   (Act_Id_2).w                                 ; $FFFFEE55
+                tst.b   (Apparent_Act).w                                 ; $FFFFEE55
                 beq.s   Offset_0x024810
                 lea     (Title_Card_Number_2), A1              ; Offset_0x13AC2E
                 move.w  #$B400, D2
@@ -137,13 +137,13 @@ Offset_0x02496A:
                 addq.w  #$01, Obj_Control_Var_02(A0)                     ; $0032
                 rts
 Offset_0x024976:
-                tst.b   (Act_Id_2).w                                 ; $FFFFEE55
+                tst.b   (Apparent_Act).w                                 ; $FFFFEE55
                 beq.s   Offset_0x02498A
                 clr.b   (Player_Control_Lock_Flag).w                 ; $FFFFFAA8
                 st      (End_Level_Flag).w                           ; $FFFFFAAA
                 jmp     (DeleteObject)                         ; Offset_0x011138
 Offset_0x02498A:
-                move.b  #$01, (Act_Id_2).w                           ; $FFFFEE55
+                move.b  #$01, (Apparent_Act).w                           ; $FFFFEE55
                 clr.b   (Player_Control_Lock_Flag).w                 ; $FFFFFAA8
                 move.l  #Obj_Title_Cards, (A0)                 ; Offset_0x024546
                 clr.b   Obj_Routine(A0)                                  ; $0005
@@ -183,7 +183,7 @@ Obj_LvL_Res_TOTAL:                                             ; Offset_0x0249EA
                 jmp     (DisplaySprite)                        ; Offset_0x011148 
 ;-------------------------------------------------------------------------------
 Obj_LvL_Res_ACT_X:                                             ; Offset_0x0249F4
-                tst.b   (Act_Id_2).w                                 ; $FFFFEE55
+                tst.b   (Apparent_Act).w                                 ; $FFFFEE55
                 beq.s   Offset_0x0249E4
                 addq.b  #$01, Obj_Map_Id(A0)                             ; $0022
                 bra.s   Offset_0x0249E4        

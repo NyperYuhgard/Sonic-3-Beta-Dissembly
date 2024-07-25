@@ -193,7 +193,7 @@ Offset_0x044F12:
                 subq.w  #$01, Obj_Timer(A0)                              ; $002E
                 bpl.s   Offset_0x044F5A
                 move.w  #$003B, Obj_Timer(A0)                            ; $002E
-                ori.b   #$01, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
+                ori.b   #$01, (Update_HUD_rings).w             ; $FFFFFE1D
                 bset    #$07, Obj_Control_Var_08(A0)                     ; $0038
                 move.w  (Ring_Count_Address).w, D0                   ; $FFFFFE20
                 subq.w  #$01, D0
@@ -204,7 +204,7 @@ Offset_0x044F12:
                 cmpi.w  #$0064, (Ring_Count_Address).w               ; $FFFFFE20
                 bne.s   Offset_0x044F4A
 Offset_0x044F44:
-                ori.b   #$80, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
+                ori.b   #$80, (Update_HUD_rings).w             ; $FFFFFE1D
 Offset_0x044F4A:
                 move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
                 moveq   #Ring_Left_Speaker_Sfx, D0                         ; $33
@@ -215,7 +215,7 @@ Offset_0x044F56:
 Offset_0x044F5A:
                 bclr    #$07, Obj_Control_Var_08(A0)                     ; $0038
                 beq.s   Offset_0x044F56
-                andi.b  #$FE, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
+                andi.b  #$FE, (Update_HUD_rings).w             ; $FFFFFE1D
                 moveq   #$00, D0
                 rts
 Offset_0x044F6C:

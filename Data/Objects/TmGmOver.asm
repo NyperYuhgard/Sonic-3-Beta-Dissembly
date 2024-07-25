@@ -43,12 +43,12 @@ Offset_0x0244AE:
                 subq.w  #$01, Obj_Ani_Time(A0)                           ; $0024
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x0244D6:
-                tst.b   (Time_Over_Flag).w                           ; $FFFFFE1A
+                tst.b   (Time_Over_flag).w                           ; $FFFFFE1A
                 bne.s   Offset_0x0244F6
                 tst.b   (Time_Over_Flag_P2).w                        ; $FFFFFECC
                 bne.s   Offset_0x0244F6
                 move.b  #gm_Continue, (Game_Mode).w             ; $14, $FFFFF600
-                tst.b   (Continue_Count).w                           ; $FFFFFE18
+                tst.b   (Continue_count).w                           ; $FFFFFE18
                 bne.s   Offset_0x024500
                 move.b  #gm_SEGALogo, (Game_Mode).w             ; $00, $FFFFF600
                 bra.s   Offset_0x024500
@@ -61,7 +61,7 @@ Offset_0x024500:
                 move.w  #$0000, (Restart_Level_Flag).w               ; $FFFFFE02
                 move.b  #$18, (Game_Mode).w                          ; $FFFFF600
                 move.w  #$0000, (Results_Screen_2P).w                ; $FFFFFF02
-                tst.b   (Time_Over_Flag).w                           ; $FFFFFE1A
+                tst.b   (Time_Over_flag).w                           ; $FFFFFE1A
                 bne.s   Offset_0x024540
                 tst.b   (Time_Over_Flag_P2).w                        ; $FFFFFECC
                 bne.s   Offset_0x024540

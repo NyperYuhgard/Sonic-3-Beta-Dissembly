@@ -555,7 +555,7 @@ Offset_0x03DB84:
                 rts
 Offset_0x03DB86:
                 move.l  #Offset_0x03D63C, (A0)
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 rts   
 ;-------------------------------------------------------------------------------  
 Offset_0x03DB92:

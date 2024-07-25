@@ -4067,7 +4067,7 @@ TitleScreen_Loop:
 		move.w	d0,(Ring_Count_Address_P2).w
 		move.l	d0,(Time_Count_Address_P2).w
 		move.l	d0,(Score_Count_Address_P2).w
-		move.b	d0,(Continue_Count).w
+		move.b	d0,(Continue_count).w
 		move.l	#$1388,(Next_Extra_Life_Score).w
 		move.l	#$1388,(Next_Extra_Life_Score_P2).w
 		moveq	#Volume_Down,d0
@@ -4080,9 +4080,9 @@ TitleScreen_Loop:
 		move.w	d0,(Two_Player_Flag_2).w
 		move.w	d0,(Two_Player_Flag).w
 		move.w	d0,(Current_ZoneAndAct).w
-		move.w	d0,(Level_Id_2).w
+		move.w	d0,(Apparent_ZoneAndAct).w
 		move.w	#AIz_Act_1,(Current_ZoneAndAct).w
-		move.w	#AIz_Act_1,(Level_Id_2).w
+		move.w	#AIz_Act_1,(Apparent_ZoneAndAct).w
 		tst.b	(Level_Select_Flag).w
 		beq.s	TitleScreen_ClrSpecStg
 		move.b	#gm_Level_Select_Menu, (Game_Mode).w
@@ -4111,7 +4111,7 @@ Offset_0x003486:
 ; ---------------------------------------------------------------------------
 ; Offset_0x003488:
 TitleScreen_ClrSpecStg:
-		move.w	d0,(Special_Stage_Id).w
+		move.w	d0,(Current_SpecialStage).w
 		move.w	d0,(SS_Completed_Flag).w
 		move.l	d0,(Emerald_Collected_Flag_List).w
 		move.l	d0,(Emerald_Collected_Flag_List+4).w
@@ -4148,7 +4148,7 @@ Offset_0x0034D2:
                 add.w   D0, D0
                 move.w  Demo_Mode_Level_Array(PC, D0), D0      ; Offset_0x003544
                 move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
-                move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
+                move.w  D0, (Apparent_ZoneAndAct).w                           ; $FFFFEE54
                 addq.w  #$01, (Demo_Sequence_Idx).w                  ; $FFFFFFF2
                 cmpi.w  #$0004, (Demo_Sequence_Idx).w                ; $FFFFFFF2
                 bcs.s   Offset_0x003500
@@ -4784,13 +4784,13 @@ Level_ClrHUD:
 		bne.s	Level_FromCheckpoint
 		move.w	d0,(Ring_Count_Address).w
 		move.l	d0,(Time_Count_Address).w
-		move.b	d0,(Ring_Status_Flag).w
+		move.b	d0,(Extra_life_flags).w
 		move.w	d0,(Ring_Count_Address_P2).w
 		move.l	d0,(Time_Count_Address_P2).w
 		move.b	d0,(Ring_Status_Flag_P2).w
 ; Offset_0x003C6C:
 Level_FromCheckpoint:
-		move.b	d0,(Time_Over_Flag).w
+		move.b	d0,(Time_Over_flag).w
 		move.b	d0,(Time_Over_Flag_P2).w
 		move.w	d0,(Debug_Mode_Flag_Index).w
 		move.w	d0,(Restart_Level_Flag).w
@@ -4803,9 +4803,9 @@ Level_FromCheckpoint:
 		move.w	d0,(Loser_Timer_Left).w
 		move.b	d0,(LRz_Rocks_Routine).w
 		bsr.w	Oscillate_Num_Init
-		move.b	#1,(HUD_Score_Refresh_Flag).w
-		move.b	#1,(HUD_Rings_Refresh_Flag).w
-		move.b	#1,(HUD_Timer_Refresh_Flag).w
+		move.b	#1,(Update_HUD_score).w
+		move.b	#1,(Update_HUD_rings).w
+		move.b	#1,(Update_HUD_timer).w
 		move.b	#1,(HUD_Timer_Refresh_Flag_P2).w
 		tst.w	(Auto_Control_Player_Flag).w
 		beq.s	Offset_0x003CCC
@@ -6061,7 +6061,7 @@ CheckLoadSignpostArt:
 		subi.w	#$100,d1
 		cmp.w	d1,d0
 		blt.s	SignpostUpdateTailsBounds
-		tst.b	(HUD_Timer_Refresh_Flag).w
+		tst.b	(Update_HUD_timer).w
 		beq.s	SignpostUpdateTailsBounds
 		cmp.w	(Sonic_Level_Limits_Min_X).w,d1
 		beq.s	SignpostUpdateTailsBounds
@@ -6458,7 +6458,7 @@ Load_Selected_Level_2P:                                        ; Offset_0x0054F2
                 move.w  Menu_Level_Select_Array_2P(PC, D0), D0 ; Offset_0x005554
                 bmi.s   Menu_Load_Special_Stage_2P             ; Offset_0x00553C
                 move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
-                move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
+                move.w  D0, (Apparent_ZoneAndAct).w                           ; $FFFFEE54
                 move.w  #$0001, (Two_Player_Flag).w                  ; $FFFFFFD8
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
                 move.b  #$00, (Saved_Level_Flag).w                   ; $FFFFFE30
@@ -6470,7 +6470,7 @@ Load_Selected_Level_2P:                                        ; Offset_0x0054F2
                 move.l  #$00001388, (Next_Extra_Life_Score_P2).w     ; $FFFFFFC4
                 rts
 Menu_Load_Special_Stage_2P:                                    ; Offset_0x00553C
-                move.b  #$04, (Special_Stage_Id).w                   ; $FFFFFE16
+                move.b  #$04, (Current_SpecialStage).w                   ; $FFFFFE16
                 move.b  #gm_S2_SpecialStage, (Game_Mode).w      ; $10, $FFFFF600
                 moveq   #$01, D0
                 move.w  D0, (Two_Player_Flag).w                      ; $FFFFFFD8
@@ -6655,7 +6655,7 @@ Offset_0x005794:
                 move.w  D0, (Two_Player_Flag).w                      ; $FFFFFFD8
                 move.w  D0, (Two_Player_Flag_2).w                    ; $FFFFFF8A
                 move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
-                move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
+                move.w  D0, (Apparent_ZoneAndAct).w                           ; $FFFFEE54
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
                 rts
 Offset_0x0057B4:
@@ -6985,7 +6985,7 @@ Menu_Run_SK_Special_Stage:                                     ; Offset_0x005B9E
 Menu_Run_S2_Special_Stage:                                     ; Offset_0x005BA6
                 move.b  #gm_S2_SpecialStage, (Game_Mode).w      ; $10, $FFFFF600
                 clr.w   (Current_ZoneAndAct).w                                 ; $FFFFFE10
-                clr.w   (Level_Id_2).w                               ; $FFFFEE54
+                clr.w   (Apparent_ZoneAndAct).w                               ; $FFFFEE54
                 move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
@@ -7038,13 +7038,13 @@ Menu_Game_Reset:                                               ; Offset_0x005C2C
 Menu_Load_Level:                                               ; Offset_0x005C34
                 andi.w  #$3FFF, D0
                 move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
-                move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
+                move.w  D0, (Apparent_ZoneAndAct).w                           ; $FFFFEE54
                 cmpi.w  #AIz_Act_2, D0                                   ; $0001
                 beq.s   Offset_0x005C4C
                 cmpi.w  #Iz_Act_2, D0                                    ; $0501
                 bne.s   Offset_0x005C50
 Offset_0x005C4C:
-                clr.b   (Act_Id_2).w                                 ; $FFFFEE55
+                clr.b   (Apparent_Act).w                                 ; $FFFFEE55
 Offset_0x005C50:
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
                 move.b  #$03, (Life_count).w                         ; $FFFFFE12
@@ -7056,7 +7056,7 @@ Offset_0x005C50:
                 move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
                 move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
                 move.l  D0, (Score_Count_Address_P2).w               ; $FFFFFED6
-                move.b  D0, (Continue_Count).w                       ; $FFFFFE18
+                move.b  D0, (Continue_count).w                       ; $FFFFFE18
                 move.l  #$00001388, (Next_Extra_Life_Score).w        ; $FFFFFFC0
                 move.l  #$00001388, (Next_Extra_Life_Score_P2).w     ; $FFFFFFC4
                 move.b  #Special_Stage_Entry_Sfx, D0                       ; $D0
@@ -7329,7 +7329,7 @@ Offset_0x006002:
                 bne.s   Offset_0x006042
                 tst.w   D2
                 bne.s   Offset_0x00602E
-                move.b  #$0F, (Continue_Count).w                     ; $FFFFFE18
+                move.b  #$0F, (Continue_count).w                     ; $FFFFFE18
                 moveq   #Continue_Snd, D0                                  ; $28
                 jsr     (Play_Music)                           ; Offset_0x001176
                 bra.s   Offset_0x00603C
@@ -7748,7 +7748,7 @@ HUD_Map_RING_TIME_Warning:                                     ; Offset_0x007A84
 ; ->>>
 ;===============================================================================
 Add_Points_P1:                                                 ; Offset_0x007AB0
-                move.b  #$01, (HUD_Score_Refresh_Flag).w             ; $FFFFFE1F
+                move.b  #$01, (Update_HUD_score).w             ; $FFFFFE1F
                 lea     (Score_Count_Address).w, A3                  ; $FFFFFE26
                 add.l   D0, (A3)
                 move.l  #$000F423F, D1
@@ -7761,7 +7761,7 @@ Add_Points_Max_Score_P1:                                       ; Offset_0x007AC8
                 bcs.s   Offset_0x007AEA
                 addi.l  #$00001388, (Next_Extra_Life_Score).w        ; $FFFFFFC0
                 addq.b  #$01, (Life_count).w                         ; $FFFFFE12
-                addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
+                addq.b  #$01, (Update_HUD_lives).w              ; $FFFFFE1C
                 move.w  #S2_Extra_Life_Snd, D0                           ; $0098
                 jmp     (Play_Music)                           ; Offset_0x001176
 Offset_0x007AEA:
@@ -7807,27 +7807,27 @@ HUD_Update:                                                    ; Offset_0x007B34
                 bne     Offset_0x007C9C
                 tst.w   (Debug_Mode_Active).w                        ; $FFFFFFFA
                 bne     Offset_0x007C12
-                tst.b   (HUD_Score_Refresh_Flag).w                   ; $FFFFFE1F
+                tst.b   (Update_HUD_score).w                   ; $FFFFFE1F
                 beq.s   Offset_0x007B64
-                clr.b   (HUD_Score_Refresh_Flag).w                   ; $FFFFFE1F
+                clr.b   (Update_HUD_score).w                   ; $FFFFFE1F
                 move.l  #$5C800003, D0
                 move.l  (Score_Count_Address).w, D1                  ; $FFFFFE26
                 bsr     HUD_Draw_Six_Digit_Number              ; Offset_0x007EAC
 Offset_0x007B64:
-                tst.b   (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
+                tst.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 beq.s   Offset_0x007B84
                 bpl.s   Offset_0x007B70
                 bsr     Offset_0x007DC0
 Offset_0x007B70:
-                clr.b   (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
+                clr.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 move.l  #$5F400003, D0
                 moveq   #$00, D1
                 move.w  (Ring_Count_Address).w, D1                   ; $FFFFFE20
                 bsr     HUD_Draw_Three_Digit_Number            ; Offset_0x007EA2
 Offset_0x007B84:
-                tst.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bpl.s   Offset_0x007B92
-                move.b  #$01, (HUD_Timer_Refresh_Flag).w             ; $FFFFFE1E
+                move.b  #$01, (Update_HUD_timer).w             ; $FFFFFE1E
                 bra.s   Offset_0x007BCC
 Offset_0x007B92:
                 beq.s   Offset_0x007BEC
@@ -7858,29 +7858,29 @@ Offset_0x007BCC:
                 move.b  (Timer_Second_Count_Address).w, D1           ; $FFFFFE24
                 bsr     HUD_Draw_Two_Digit_Number              ; Offset_0x007F84
 Offset_0x007BEC:
-                tst.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                tst.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 beq.s   Offset_0x007BFA
-                clr.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                clr.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 bsr     HUD_Lives                              ; Offset_0x00804E
 Offset_0x007BFA:
                 rts
 ;-------------------------------------------------------------------------------                
 Timer_Over:                                                    ; Offset_0x007BFC
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 lea     (Obj_Player_One).w, A0                       ; $FFFFB000
                 move.l  A0, A2
                 bsr     Kill_Player                            ; Offset_0x00A4A4
-                move.b  #$01, (Time_Over_Flag).w                     ; $FFFFFE1A
+                move.b  #$01, (Time_Over_flag).w                     ; $FFFFFE1A
                 rts
 ;-------------------------------------------------------------------------------                 
 Offset_0x007C12:
                 bsr     HUD_Debug                              ; Offset_0x007E4A
-                tst.b   (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
+                tst.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 beq.s   Offset_0x007C36
                 bpl.s   Offset_0x007C22
                 bsr     Offset_0x007DC0
 Offset_0x007C22:
-                clr.b   (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
+                clr.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 move.l  #$5F400003, D0
                 moveq   #$00, D1
                 move.w  (Ring_Count_Address).w, D1                   ; $FFFFFE20
@@ -7894,9 +7894,9 @@ Offset_0x007C36:
                 moveq   #$00, D1
                 move.b  (Sprites_Drawn).w, D1                        ; $FFFFF62C
                 bsr     HUD_Draw_Two_Digit_Number              ; Offset_0x007F84
-                tst.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                tst.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 beq.s   Offset_0x007C64
-                clr.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                clr.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 bsr     HUD_Lives                              ; Offset_0x00804E
 Offset_0x007C64:
                 tst.w   (Pause_Status).w                             ; $FFFFF63A
@@ -7926,7 +7926,7 @@ Offset_0x007C9C:
 S2_HUD_Update_2P:                                              ; Offset_0x007CA6
                 tst.w   (Pause_Status).w                             ; $FFFFF63A
                 bne     Offset_0x007D70
-                tst.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 beq.s   Offset_0x007CE6
                 lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
                 cmpi.l  #$00093B3B, (A1)+
@@ -7962,9 +7962,9 @@ Offset_0x007CE6:
                 bcs.s   Offset_0x007D1E
                 move.b  #$09, (A1)
 Offset_0x007D1E:
-                tst.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                tst.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 beq.s   Offset_0x007D2C
-                clr.b   (HUD_Life_Refresh_Flag).w                    ; $FFFFFE1C
+                clr.b   (Update_HUD_lives).w                    ; $FFFFFE1C
                 bsr     HUD_Lives                              ; Offset_0x00804E
 Offset_0x007D2C:
                 tst.b   (HUD_Life_Refresh_Flag_P2).w                 ; $FFFFFEC8
@@ -7972,7 +7972,7 @@ Offset_0x007D2C:
                 clr.b   (HUD_Life_Refresh_Flag_P2).w                 ; $FFFFFEC8
                 bsr     HUD_Lives_P2                           ; Offset_0x008040
 Offset_0x007D3A:
-                move.b  (HUD_Timer_Refresh_Flag).w, D0               ; $FFFFFE1E
+                move.b  (Update_HUD_timer).w, D0               ; $FFFFFE1E
                 or.b    (HUD_Timer_Refresh_Flag_P2).w, D0            ; $FFFFFECA
                 beq.s   Offset_0x007D70
                 lea     (Loser_Timer_Left).w, A1                     ; $FFFFFEF8
@@ -7997,18 +7997,18 @@ Offset_0x007D70:
                 bsr     HUD_Draw_Single_Digit_Number           ; Offset_0x007F7A
                 rts
 Offset_0x007D82:
-                tst.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bne.s   Timer_Over_2P_Sonic                    ; Offset_0x007D90
                 tst.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 bne.s   Timer_Over_2P_Miles                    ; Offset_0x007DAA
                 rts
 ;-------------------------------------------------------------------------------                
 Timer_Over_2P_Sonic:                                           ; Offset_0x007D90
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 lea     (Obj_Player_One).w, A0                       ; $FFFFB000
                 move.l  A0, A2
                 bsr     Kill_Player                            ; Offset_0x00A4A4
-                move.b  #$01, (Time_Over_Flag).w                     ; $FFFFFE1A
+                move.b  #$01, (Time_Over_flag).w                     ; $FFFFFE1A
                 tst.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 beq.s   Offset_0x007DBE
 ;-------------------------------------------------------------------------------                 
@@ -11010,7 +11010,7 @@ Resume_Music:                                                  ; Offset_0x00F89E
                 beq.s   Offset_0x00F8BC
                 move.w  #Mushroom_Valley_2_Snd, D0                       ; $0010
 Offset_0x00F8BC:
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 beq     Offset_0x00F8C8
                 move.w  #Mushroom_Valley_2_Snd, D0                       ; $0010
 Offset_0x00F8C8:
@@ -11516,18 +11516,18 @@ Offset_0x010A32:
                 cmpi.w  #$03E7, (Ring_Count_Address).w               ; $FFFFFE20
                 bcc.s   Offset_0x010A74
                 addq.w  #$01, (Ring_Count_Address).w                 ; $FFFFFE20
-                ori.b   #$01, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
+                ori.b   #$01, (Update_HUD_rings).w             ; $FFFFFE1D
                 cmpi.w  #$0064, (Ring_Count_Address).w               ; $FFFFFE20
                 bcs.s   Offset_0x010A74
-                bset    #$01, (Ring_Status_Flag).w                   ; $FFFFFE1B
+                bset    #$01, (Extra_life_flags).w                   ; $FFFFFE1B
                 beq.s   Offset_0x010A68
                 cmpi.w  #$00C8, (Ring_Count_Address).w               ; $FFFFFE20
                 bcs.s   Offset_0x010A74
-                bset    #$02, (Ring_Status_Flag).w                   ; $FFFFFE1B
+                bset    #$02, (Extra_life_flags).w                   ; $FFFFFE1B
                 bne.s   Offset_0x010A74
 Offset_0x010A68:
                 addq.b  #$01, (Life_count).w                         ; $FFFFFE12
-                addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
+                addq.b  #$01, (Update_HUD_lives).w              ; $FFFFFE1C
                 move.w  #Ring_Lost_Sfx, D0                               ; $0034
 Offset_0x010A74:
                 jmp     (Play_Music)                           ; Offset_0x001176  
@@ -16913,7 +16913,7 @@ Obj_S2_0x6F_Special_Stage_Results: ; Sonic 2 Left over         ; Offset_0x024BCC
 ;-------------------------------------------------------------------------------  
 Level_Load_Enemies_Art:                                        ; Offset_0x024F46
                 lea     ArtLoadCues_KM(PC), A6                 ; Offset_0x02540C
-                move.w  (Level_Id_2).w, D0                           ; $FFFFEE54
+                move.w  (Apparent_ZoneAndAct).w, D0                           ; $FFFFEE54
                 ror.b   #$01, D0
                 lsr.w   #$06, D0
                 adda.w  $00(A6, D0), A6

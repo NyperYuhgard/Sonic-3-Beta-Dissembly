@@ -567,7 +567,7 @@ Offset_0x040538:
                 rts
 Offset_0x04053A:
                 move.l  #Offset_0x03FFEE, (A0)
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$04, Obj_Control_Var_08(A0)                     ; $0038
                 move.w  #$A425, Obj_Art_VRAM(A0)                         ; $000A
                 move.w  #$FE00, Obj_Speed_Y(A0)                          ; $001A

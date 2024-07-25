@@ -76,8 +76,8 @@ Offset_0x010B9E:
                 tst.b   Obj_Player_One_Or_Two(A0)                        ; $003F
                 bne.s   Offset_0x010BC2
                 move.w  #$0000, (Ring_Count_Address).w               ; $FFFFFE20
-                move.b  #$80, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
-                move.b  #$00, (Ring_Status_Flag).w                   ; $FFFFFE1B
+                move.b  #$80, (Update_HUD_rings).w             ; $FFFFFE1D
+                move.b  #$00, (Extra_life_flags).w                   ; $FFFFFE1B
                 bra.s   Offset_0x010BD4
 Offset_0x010BC2:
                 move.w  #$0000, (Ring_Count_Address_P2).w            ; $FFFFFED0

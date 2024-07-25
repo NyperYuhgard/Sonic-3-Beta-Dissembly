@@ -641,7 +641,7 @@ Offset_0x03F912:
 Offset_0x03F934:
                 rts
 Offset_0x03F936:
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 move.b  #$05, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$0040, Obj_Timer(A0)                            ; $002E
                 moveq   #$64, D0
