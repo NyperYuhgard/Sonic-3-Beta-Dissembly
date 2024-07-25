@@ -2193,7 +2193,7 @@ Offset_0x00C180:
 		move.b  #$08, Obj_Routine(A0)		            ; $0005
 		move.w  #$003C, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
 		addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
-		subq.b  #$01, (Life_Count).w		         ; $FFFFFE12
+		subq.b  #$01, (Life_count).w		         ; $FFFFFE12
 		bne.s   Offset_0x00C1E0
 		move.w  #$0000, Obj_Player_Spdsh_Cnt(A0)		 ; $003E
 		move.l  #Obj_Time_Over_Game_Over, (Obj_02_Mem_Address).w ; Offset_0x02444C, $FFFFB094

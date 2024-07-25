@@ -6,7 +6,7 @@
                 move.l  #Offset_0x015B62, (A0)
                 ori.b   #$04, Obj_Flags(A0)                              ; $0004
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
-                cmpi.b  #LBz_Id, (Level_Id).w                   ; $06, $FFFFFE10
+                cmpi.b  #LBz_Id, (Current_Zone).w                   ; $06, $FFFFFE10
                 bne.s   Offset_0x0159E6
                 move.b  Obj_Subtype(A0), D0                              ; $002C
                 andi.w  #$003F, D0
@@ -33,7 +33,7 @@ Offset_0x0159C4:
                 move.b  #$30, Obj_Height(A0)                             ; $0006
                 move.l  #Offset_0x015E46, Obj_Control_Var_00(A0)         ; $0030
 Offset_0x0159E6:
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
+                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
                 bne     Offset_0x015A80
                 move.l  #Hz_Collapsing_Platform_Mappings, Obj_Map(A0) ; Offset_0x016366, $000C
                 move.w  #$C001, Obj_Art_VRAM(A0)                         ; $000A
@@ -78,7 +78,7 @@ Offset_0x015A60:
                 dc.l    Offset_0x015EC3   
 ;-------------------------------------------------------------------------------
 Offset_0x015A80:
-                cmpi.b  #MGz_Id, (Level_Id).w                   ; $02, $FFFFFE10
+                cmpi.b  #MGz_Id, (Current_Zone).w                   ; $02, $FFFFFE10
                 bne.s   Offset_0x015B02
                 move.l  #MGz_Collapsing_Platform_Mappings, Obj_Map(A0) ; Offset_0x0167B4, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
@@ -117,7 +117,7 @@ Offset_0x015AEA:
                 dc.l    Offset_0x015EFB   
 ;-------------------------------------------------------------------------------
 Offset_0x015B02:
-                cmpi.b  #Iz_Id, (Level_Id).w                    ; $05, $FFFFFE10
+                cmpi.b  #Iz_Id, (Current_Zone).w                    ; $05, $FFFFFE10
                 bne.s   Offset_0x015B62
                 move.b  Obj_Subtype(A0), D0                              ; $002C
                 bpl.s   Offset_0x015B24

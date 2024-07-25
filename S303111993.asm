@@ -1358,7 +1358,7 @@ Exit_Play_Music:                                               ; Offset_0x0011DE
 ;===============================================================================            
 Pause:                                                         ; Offset_0x0011E0
                 nop
-                tst.b   (Life_Count).w                               ; $FFFFFE12
+                tst.b   (Life_count).w                               ; $FFFFFE12
                 beq     Unpause                                ; Offset_0x00128A
                 tst.w   (Pause_Status).w                             ; $FFFFF63A
                 bne.s   Pause_AlreadyPaused                    ; Offset_0x001200
@@ -2736,7 +2736,7 @@ PalCycle_Load:
 		bsr.w	PalCycle_SuperSonic
 		moveq	#0,d2
 		moveq	#0,d0
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#6,d0
 		move.w	PalCycle_Load_List(pc,d0.w),d0
@@ -4058,7 +4058,7 @@ TitleScreen_Loop:
 		andi.b	#$80,d0
 		beq.w	TitleScreen_Loop
 		move.b	#gm_PlayMode, (Game_Mode).w
-		move.b	#3,(Life_Count).w
+		move.b	#3,(Life_count).w
 		move.b	#3,(Life_Count_P2).w
 		moveq	#0,d0
 		move.w	d0,(Ring_Count_Address).w
@@ -4079,9 +4079,9 @@ TitleScreen_Loop:
 		moveq	#0,d0
 		move.w	d0,(Two_Player_Flag_2).w
 		move.w	d0,(Two_Player_Flag).w
-		move.w	d0,(Level_Id).w
+		move.w	d0,(Current_ZoneAndAct).w
 		move.w	d0,(Level_Id_2).w
-		move.w	#AIz_Act_1,(Level_Id).w
+		move.w	#AIz_Act_1,(Current_ZoneAndAct).w
 		move.w	#AIz_Act_1,(Level_Id_2).w
 		tst.b	(Level_Select_Flag).w
 		beq.s	TitleScreen_ClrSpecStg
@@ -4147,7 +4147,7 @@ Offset_0x0034D2:
                 andi.w  #$0007, D0
                 add.w   D0, D0
                 move.w  Demo_Mode_Level_Array(PC, D0), D0      ; Offset_0x003544
-                move.w  D0, (Level_Id).w                             ; $FFFFFE10
+                move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
                 move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
                 addq.w  #$01, (Demo_Sequence_Idx).w                  ; $FFFFFFF2
                 cmpi.w  #$0004, (Demo_Sequence_Idx).w                ; $FFFFFFF2
@@ -4156,7 +4156,7 @@ Offset_0x0034D2:
 Offset_0x003500:
                 move.w  #$0001, (Auto_Control_Player_Flag).w         ; $FFFFFFF0
                 move.b  #gm_DemoMode, (Game_Mode).w             ; $08, $FFFFF600
-                move.b  #$03, (Life_Count).w                         ; $FFFFFE12
+                move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
                 move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
@@ -4592,7 +4592,7 @@ Offset_0x0039C0:
 		move	#$2300,sr
 		moveq	#0,d0
 		move.w	d0,(Level_Frame_Count).w
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#4,d0
 		andi.w	#$1F8,d0
@@ -4695,7 +4695,7 @@ Level_ChkMode:
 		move.w	#$8405,(a6)
 		move.w	#$8A6B,(Horizontal_Int_Count_Cmd).w
 		move.w	#$9003,(a6)
-		cmpi.b	#BPz_Id,(Level_Id).w
+		cmpi.b	#BPz_Id,(Current_Zone).w
 		bne.s	Level_LoadPal
                 move.w	#$9011,(a6)
 ; Offset_0x003B1A:
@@ -4714,7 +4714,7 @@ Level_GetBgm:
 		tst.w	(Auto_Control_Player_Flag).w
 		bmi.s	Offset_0x003BAE
 		moveq	#0,d0
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#7,d0
 		lea	(PlayList).l,a1
@@ -4722,7 +4722,7 @@ Level_GetBgm:
 		move.w	d0,(Level_Music_Buffer).w
 		bsr.w	Play_Music
 		move.b	#0,(Title_Card_Flag).w
-		cmpi.b	#DDz_Id,(Level_Id).w		; is this Doomsday Zone?
+		cmpi.b	#DDz_Id,(Current_Zone).w	; is this Doomsday Zone?
 		bhi.s	Level_CreateHUD			; if not (but is Zone 0D or above), branch
 		move.l	#Obj_Title_Cards,(Obj_08_Mem_Address).w
 ; Offset_0x003B76:
@@ -4768,9 +4768,9 @@ Offset_0x003BAE:
 ; Level_ChkWater:
 		tst.b	(Water_Level_Flag).w
 		beq.s	Level_ClrHUD
-		cmpi.b	#Hz_Id,(Level_Id).w
+		cmpi.b	#Hz_Id,(Current_Zone).w
 		beq.s	Offset_0x003C36
-		cmpi.b	#Hz_Id,(Level_Id).w
+		cmpi.b	#Hz_Id,(Current_Zone).w
 		bne.s	Level_ClrHUD
 
 Offset_0x003C36:
@@ -4809,7 +4809,7 @@ Level_FromCheckpoint:
 		move.b	#1,(HUD_Timer_Refresh_Flag_P2).w
 		tst.w	(Auto_Control_Player_Flag).w
 		beq.s	Offset_0x003CCC
-		tst.w	(Level_Id).w
+		tst.w	(Current_ZoneAndAct).w
 		bne.s	Offset_0x003CCC
 		move.l	#Obj_AIz_Intro_Surfboard, (Obj_05_Mem_Address).w
 
@@ -4826,7 +4826,7 @@ Offset_0x003CCC:
 		move.w	#0,(Demo_Button_Index_2P).w
 		lea	(Demo_Index),a1
 		moveq	#0,d0
-		move.b	(Level_Id).w,d0
+		move.b	(Current_Zone).w,d0
 		lsl.w	#2,d0
 		move.l	(a1,d0.w),a1
 		tst.w	(Auto_Control_Player_Flag).w
@@ -4839,7 +4839,7 @@ Offset_0x003CCC:
 
 Offset_0x003D30:
 		move.b	1(a1),(Demo_Button_Press_Counter).w
-		tst.b	(Level_Id).w
+		tst.b	(Current_Zone).w
 		bne.s	Offset_0x003D48
 		lea	(Demo_Angel_Island),a1
 		move.b	1(a1),(Demo_Button_Press_Counter_2P).w
@@ -4860,7 +4860,7 @@ Offset_0x003D68:
 		move.b	#1,(Title_Card_Flag).w
 		tst.w	(Two_Player_Flag).w
 		bne.w	Offset_0x003EE2
-		cmpi.b	#ALz_Id,(Level_Id).w
+		cmpi.b	#ALz_Id,(Current_Zone).w
 		bcc.s	Level_StartGame
 		moveq	#2,d0
 		bsr.w	LoadPLC
@@ -4893,12 +4893,12 @@ Level_MainLoop:
 		bsr.w	WaterEffects
 		bsr.w	UpdateWaterSurface
 		jsr	(Load_Ring_Pos).l
-		cmpi.b	#S2_CNz_Id,(Level_Id).w
+		cmpi.b	#S2_CNz_Id,(Current_Zone).w
 		bne.s	Offset_0x003E10
 		jsr	(S2_Load_Triangle_Pos).l
 
 Offset_0x003E10:
-		cmpi.b	#LRz_Id,(Level_Id).w
+		cmpi.b	#LRz_Id,(Current_Zone).w
 		bne.s	Offset_0x003E1E
 		jsr	(LRz_Load_Rock_Pos).l
 
@@ -5207,11 +5207,11 @@ WaterEffects:
 MoveWater:
 		clr.b	(Underwater_Flag).w
 		moveq	#0,d0
-		cmpi.b	#Aiz_Id,(Level_Id).w
+		cmpi.b	#Aiz_Id,(Current_Zone).w
 		beq.s	Offset_0x0041F2
-		cmpi.b	#Hz_Id,(Level_Id).w
+		cmpi.b	#Hz_Id,(Current_Zone).w
 		beq.s	Offset_0x0041F2
-		cmpi.b	#LBz_Id,(Level_Id).w
+		cmpi.b	#LBz_Id,(Current_Zone).w
 		beq.s	Offset_0x0041F2
 		move.b	(Oscillate_Data_Buffer+2).w,d0
 		lsr.w	#1,d0
@@ -5219,7 +5219,7 @@ MoveWater:
 Offset_0x0041F2:
 		add.w	(Current_Water_Level).w,d0
 		move.w	d0,(Water_Level_Move).w
-		cmpi.w	#Hz_Act_1,(Level_Id).w
+		cmpi.w	#Hz_Act_1,(Current_ZoneAndAct).w
 		bne.s	Offset_0x00420A
 		cmpi.w	#$900,(Camera_X).w
 		bcs.s	Offset_0x004220
@@ -5283,7 +5283,7 @@ Water_Height_Array:                                            ; Offset_0x00423C
 ;------------------------------------------------------------------------------- 
 Dynamic_Water_Height:                                          ; Offset_0x00427C
                 moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$06, D0
                 andi.w  #$FFFE, D0
@@ -5446,7 +5446,7 @@ Offset_0x0043BA:
 Hz_Wind_Tunnels:                                               ; Offset_0x0043C0
                 tst.w   (Debug_Mode_Flag_Index).w                    ; $FFFFFE08
                 bne     Offset_0x0044A6
-                cmpi.w  #Hz_Act_1, (Level_Id).w               ; $0100, $FFFFFE10
+                cmpi.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
                 bne     Offset_0x0044A6
                 lea     (Sonic_Wind_Flag).w, A3                      ; $FFFFF7C8
                 lea     (Obj_Player_One).w, A1                       ; $FFFFB000
@@ -5541,9 +5541,9 @@ Hz_Wind_Tunnels_Data:                                          ; Offset_0x0044A8
                 dc.w    $2F30, $0680, $2F70, $0700, $0000, $FC00, $0100   
 ;-------------------------------------------------------------------------------
 Level_Slides:                                                  ; Offset_0x00457C
-                cmpi.w  #Hz_Act_2, (Level_Id).w               ; $0101, $FFFFFE10
+                cmpi.w  #Hz_Act_2, (Current_ZoneAndAct).w               ; $0101, $FFFFFE10
                 beq.s   Hz2_Water_Slides                       ; Offset_0x00458E
-                cmpi.w  #Iz_Act_1, (Level_Id).w               ; $0500, $FFFFFE10
+                cmpi.w  #Iz_Act_1, (Current_ZoneAndAct).w               ; $0500, $FFFFFE10
                 beq.s   Iz1_Slides                             ; Offset_0x0045F6
                 rts     
 ;-------------------------------------------------------------------------------
@@ -5735,7 +5735,7 @@ Init_Demo_Control:                                             ; Offset_0x0047F6
 ; Offset_0x004800: ; Sonic 2 Left over
                 lea     (Demo_Index), A1                       ; Offset_0x00491E
                 moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D0                             ; $FFFFFE10
                 lsl.w   #$02, D0
                 move.l  $00(A1, D0), A1
                 move.w  (Demo_Button_Index).w, D0                    ; $FFFFF790
@@ -5756,7 +5756,7 @@ Offset_0x004842:
                 rts
 ;-------------------------------------------------------------------------------  
 ; Offset_0x004844: ; Sonic 2 Left over
-                cmpi.b  #S2_EHz_Id, (Level_Id).w                ; $00, $FFFFFE10
+                cmpi.b  #S2_EHz_Id, (Current_Zone).w                ; $00, $FFFFFE10
                 bne.s   Offset_0x004882
                 lea     ((M68K_Dev_RAM_Start+$C000)&$00FFFFFF), A1           ; $00FEC000
                 move.w  (Demo_Button_Index_2P).w, D0                 ; $FFFFF732
@@ -5787,7 +5787,7 @@ Run_Demo_Mode:                                                 ; Offset_0x004884
 Offset_0x00489E:
                 lea     (Demo_Index), A1                       ; Offset_0x00491E
                 moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D0                             ; $FFFFFE10
                 lsl.w   #$02, D0
                 move.l  $00(A1, D0), A1
                 move.w  (Demo_Button_Index).w, D0                    ; $FFFFF790
@@ -5809,7 +5809,7 @@ Offset_0x0048DC:
                 rts    
 ;-------------------------------------------------------------------------------
 ; Offset_0x0048DE: ; Sonic 2 Left Over
-                cmpi.b  #S2_EHz_Id, (Level_Id).w                ; $00, $FFFFFE10
+                cmpi.b  #S2_EHz_Id, (Current_Zone).w                ; $00, $FFFFFE10
                 bne.s   Offset_0x004916
                 lea     (Demo_Angel_Island), A1                ; Offset_0x004BEA
                 move.w  (Demo_Button_Index_2P).w, D0                 ; $FFFFF732
@@ -5873,7 +5873,7 @@ Demo_End_Index: ; Left over do Sonic 1                         ; Offset_0x004982
 ;===============================================================================
 Load_Collision_Index:                                          ; Offset_0x0049B2
                 moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$05, D0
                 lea     (Collision_Index), A1                  ; Offset_0x1CD240
@@ -6013,27 +6013,27 @@ S2_Test_End_Level_Art_Load:                                    ; Offset_0x004B12
                 move.w  #$0000, (End_Level_Art_Load_Flag).w          ; $FFFFFFC8
                 tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
                 bne.s   Set_End_Level_Flag                     ; Offset_0x004B80
-                cmpi.w  #S2_EHz_Act_2, (Level_Id).w           ; $0001, $FFFFFE10
+                cmpi.w  #S2_EHz_Act_2, (Current_ZoneAndAct).w           ; $0001, $FFFFFE10
                 beq     Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_Mz_Act_3, (Level_Id).w            ; $0500, $FFFFFE10
+                cmpi.w  #S2_Mz_Act_3, (Current_ZoneAndAct).w            ; $0500, $FFFFFE10
                 beq     Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_WFz, (Level_Id).w                 ; $0600, $FFFFFE10
+                cmpi.w  #S2_WFz, (Current_ZoneAndAct).w                 ; $0600, $FFFFFE10
                 beq     Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_HTz_Act_2, (Level_Id).w           ; $0701, $FFFFFE10
+                cmpi.w  #S2_HTz_Act_2, (Current_ZoneAndAct).w           ; $0701, $FFFFFE10
                 beq     Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_OOz_Act_2, (Level_Id).w           ; $0A01, $FFFFFE10
+                cmpi.w  #S2_OOz_Act_2, (Current_ZoneAndAct).w           ; $0A01, $FFFFFE10
                 beq     Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_MCz_Act_2, (Level_Id).w           ; $0B01, $FFFFFE10
+                cmpi.w  #S2_MCz_Act_2, (Current_ZoneAndAct).w           ; $0B01, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_CNz_Act_2, (Level_Id).w           ; $0C01, $FFFFFE10
+                cmpi.w  #S2_CNz_Act_2, (Current_ZoneAndAct).w           ; $0C01, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_CPz_Act_2, (Level_Id).w           ; $0D01, $FFFFFE10
+                cmpi.w  #S2_CPz_Act_2, (Current_ZoneAndAct).w           ; $0D01, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_DEz, (Level_Id).w                 ; $0E00, $FFFFFE10
+                cmpi.w  #S2_DEz, (Current_ZoneAndAct).w                 ; $0E00, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_ARz_Act_2, (Level_Id).w           ; $0F01, $FFFFFE10
+                cmpi.w  #S2_ARz_Act_2, (Current_ZoneAndAct).w           ; $0F01, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
-                cmpi.w  #S2_SCz, (Level_Id).w                 ; $1000, $FFFFFE10
+                cmpi.w  #S2_SCz, (Current_ZoneAndAct).w                 ; $1000, $FFFFFE10
                 beq.s   Dont_Set_End_Level_Flag                ; Offset_0x004B86
 Set_End_Level_Flag:                                            ; Offset_0x004B80
                 move.w  #$0001, (End_Level_Art_Load_Flag).w          ; $FFFFFFC8
@@ -6109,7 +6109,7 @@ Demo_Angel_Island:                                             ; Offset_0x004BEA
 
 ; Offset_0x004FEA: Main_Level_Load_8x8_Tiles:
 LoadZoneTiles:
-                move.w	(Level_Id).w,d0
+                move.w	(Current_ZoneAndAct).w,d0
                 ror.b	#1,d0
                 lsr.w	#4,d0
                 andi.w	#$1F8,d0
@@ -6149,13 +6149,13 @@ Offset_0x005034:
 ; ->>>
 ;===============================================================================
 Init_Water_Levels:                                             ; Offset_0x005056
-                cmpi.b  #Aiz_Id, (Level_Id).w                   ; $00, $FFFFFE10
+                cmpi.b  #Aiz_Id, (Current_Zone).w                   ; $00, $FFFFFE10
                 beq.s   Offset_0x005076
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
+                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
                 beq.s   Offset_0x005076
-                cmpi.w  #CNz_Act_2, (Level_Id).w              ; $0301, $FFFFFE10
+                cmpi.w  #CNz_Act_2, (Current_ZoneAndAct).w              ; $0301, $FFFFFE10
                 beq.s   Offset_0x005076
-                cmpi.w  #LBz_Act_2, (Level_Id).w              ; $0601, $FFFFFE10
+                cmpi.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
                 bne.s   Offset_0x005082
 Offset_0x005076:
                 move.b  #$01, (Water_Level_Flag).w                   ; $FFFFF730
@@ -6165,7 +6165,7 @@ Offset_0x005082:
                 beq.s   LevelInit_UndewaterPalette             ; Offset_0x0050F0
                 move.w  #$4EF9, (HBlank_Ptr).w                       ; $FFFFF608
                 move.l  #Pal_To_ColorRAM, (HBlank_Ptr+$02).w ; Offset_0x000E32, $FFFFF60A
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
+                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
                 beq.s   Offset_0x0050B6
                 move.l  #HBlank_01, (HBlank_Ptr+$02).w       ; Offset_0x000D0C, $FFFFF60A
                 cmpi.w  #$1000, (Vertical_Frequency).w               ; $FFFFFFF6
@@ -6174,7 +6174,7 @@ Offset_0x005082:
 Offset_0x0050B6:
                 move.l  #AIz_1_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x00472E, $FFFFF62E
                 moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$06, D0
                 andi.w  #$FFFE, D0
@@ -6191,27 +6191,27 @@ LevelInit_UndewaterPalette:                                    ; Offset_0x0050F0
                 tst.b   (Water_Level_Flag).w                         ; $FFFFF730
                 beq.s   Offset_0x005174
                 moveq   #$2B, D0
-                cmpi.w  #AIz_Act_1, (Level_Id).w              ; $0000, $FFFFFE10
+                cmpi.w  #AIz_Act_1, (Current_ZoneAndAct).w              ; $0000, $FFFFFE10
                 beq.s   Offset_0x00515C
                 moveq   #$2C, D0
                 move.l  #AIz_2_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004750, $FFFFF62E
-                cmpi.w  #AIz_Act_2, (Level_Id).w              ; $0001, $FFFFFE10
+                cmpi.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
                 beq.s   Offset_0x00515C
                 moveq   #$31, D0
                 move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #Hz_Act_1, (Level_Id).w               ; $0100, $FFFFFE10
+                cmpi.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
                 beq.s   Offset_0x00515C
                 moveq   #$32, D0
                 move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #Hz_Act_2, (Level_Id).w               ; $0101, $FFFFFE10
+                cmpi.w  #Hz_Act_2, (Current_ZoneAndAct).w               ; $0101, $FFFFFE10
                 beq.s   Offset_0x00515C
                 moveq   #$2D, D0
                 move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #LBz_Act_1, (Level_Id).w              ; $0600, $FFFFFE10
+                cmpi.w  #LBz_Act_1, (Current_ZoneAndAct).w              ; $0600, $FFFFFE10
                 beq.s   Offset_0x00515C
                 moveq   #$2E, D0
                 move.l  #LBz_2_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x0047A2, $FFFFF62E
-                cmpi.w  #LBz_Act_2, (Level_Id).w              ; $0601, $FFFFFE10
+                cmpi.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
                 beq.s   Offset_0x00515C
                 nop
 Offset_0x00515C:
@@ -6457,7 +6457,7 @@ Load_Selected_Level_2P:                                        ; Offset_0x0054F2
                 add.w   D0, D0
                 move.w  Menu_Level_Select_Array_2P(PC, D0), D0 ; Offset_0x005554
                 bmi.s   Menu_Load_Special_Stage_2P             ; Offset_0x00553C
-                move.w  D0, (Level_Id).w                             ; $FFFFFE10
+                move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
                 move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
                 move.w  #$0001, (Two_Player_Flag).w                  ; $FFFFFFD8
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
@@ -6654,7 +6654,7 @@ Offset_0x005794:
                 moveq   #$00, D0
                 move.w  D0, (Two_Player_Flag).w                      ; $FFFFFFD8
                 move.w  D0, (Two_Player_Flag_2).w                    ; $FFFFFF8A
-                move.w  D0, (Level_Id).w                             ; $FFFFFE10
+                move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
                 move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
                 rts
@@ -6984,9 +6984,9 @@ Menu_Run_SK_Special_Stage:                                     ; Offset_0x005B9E
 ;-------------------------------------------------------------------------------
 Menu_Run_S2_Special_Stage:                                     ; Offset_0x005BA6
                 move.b  #gm_S2_SpecialStage, (Game_Mode).w      ; $10, $FFFFF600
-                clr.w   (Level_Id).w                                 ; $FFFFFE10
+                clr.w   (Current_ZoneAndAct).w                                 ; $FFFFFE10
                 clr.w   (Level_Id_2).w                               ; $FFFFEE54
-                move.b  #$03, (Life_Count).w                         ; $FFFFFE12
+                move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
                 move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
@@ -7037,7 +7037,7 @@ Menu_Game_Reset:                                               ; Offset_0x005C2C
 ;------------------------------------------------------------------------------- 
 Menu_Load_Level:                                               ; Offset_0x005C34
                 andi.w  #$3FFF, D0
-                move.w  D0, (Level_Id).w                             ; $FFFFFE10
+                move.w  D0, (Current_ZoneAndAct).w                             ; $FFFFFE10
                 move.w  D0, (Level_Id_2).w                           ; $FFFFEE54
                 cmpi.w  #AIz_Act_2, D0                                   ; $0001
                 beq.s   Offset_0x005C4C
@@ -7047,7 +7047,7 @@ Offset_0x005C4C:
                 clr.b   (Act_Id_2).w                                 ; $FFFFEE55
 Offset_0x005C50:
                 move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
-                move.b  #$03, (Life_Count).w                         ; $FFFFFE12
+                move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
                 move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
@@ -7064,9 +7064,9 @@ Offset_0x005C50:
                 moveq   #$00, D0
                 move.w  D0, (Two_Player_Flag_2).w                    ; $FFFFFF8A
                 move.w  D0, (Two_Player_Flag).w                      ; $FFFFFFD8
-                cmpi.b  #ALz_Id, (Level_Id).w                   ; $0E, $FFFFFE10
+                cmpi.b  #ALz_Id, (Current_Zone).w                   ; $0E, $FFFFFE10
                 bcs.s   Offset_0x005CBA
-                cmpi.b  #GM_BS_Id, (Level_Id).w                 ; $13, $FFFFFE10
+                cmpi.b  #GM_BS_Id, (Current_Zone).w                 ; $13, $FFFFFE10
                 bcc.s   Offset_0x005CBA
                 move.w  #$0001, (Two_Player_Flag).w                  ; $FFFFFFD8
 Offset_0x005CBA:
@@ -7760,7 +7760,7 @@ Add_Points_Max_Score_P1:                                       ; Offset_0x007AC8
                 cmp.l   (Next_Extra_Life_Score).w, D0                ; $FFFFFFC0
                 bcs.s   Offset_0x007AEA
                 addi.l  #$00001388, (Next_Extra_Life_Score).w        ; $FFFFFFC0
-                addq.b  #$01, (Life_Count).w                         ; $FFFFFE12
+                addq.b  #$01, (Life_count).w                         ; $FFFFFE12
                 addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
                 move.w  #S2_Extra_Life_Snd, D0                           ; $0098
                 jmp     (Play_Music)                           ; Offset_0x001176
@@ -8309,7 +8309,7 @@ HUD_Lives_P2:                                                  ; Offset_0x008040
 HUD_Lives:                                                     ; Offset_0x00804E
                 move.l  #$7BA00003, D0
                 moveq   #$00, D1
-                move.b  (Life_Count).w, D1                           ; $FFFFFE12
+                move.b  (Life_count).w, D1                           ; $FFFFFE12
 Offset_0x00805A:
                 lea     (HUD_Val_000010), A2                   ; Offset_0x007F72
                 moveq   #$01, D6
@@ -8569,7 +8569,7 @@ Offset_0x008970:
 Offset_0x00897C:
                 move.l  D0, (A1)+
                 dbra    D1, Offset_0x00897C
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$05, D0
                 lea     (Rings_Layout), A1                     ; Offset_0x1F7198
@@ -8672,7 +8672,7 @@ Offset_0x008A6C:
 Offset_0x008A70:
                 addq.b  #$02, (CNz_Triangle_Pos_Routine).w           ; $FFFFF71A
                 lea     (CNz_Triangles_Act_1), A1              ; Offset_0x008EBC
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 beq.s   Offset_0x008A86
                 lea     (CNz_Triangles_Act_2), A1              ; Offset_0x009000
 Offset_0x008A86:
@@ -11526,7 +11526,7 @@ Offset_0x010A32:
                 bset    #$02, (Ring_Status_Flag).w                   ; $FFFFFE1B
                 bne.s   Offset_0x010A74
 Offset_0x010A68:
-                addq.b  #$01, (Life_Count).w                         ; $FFFFFE12
+                addq.b  #$01, (Life_count).w                         ; $FFFFFE12
                 addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
                 move.w  #Ring_Lost_Sfx, D0                               ; $0034
 Offset_0x010A74:
@@ -12080,7 +12080,7 @@ Offset_0x011356:
 Offset_0x01135C:
                 cmpa.l  #Sprite_Table_Input, A5                      ; $FFFFAC00
                 bne.s   Offset_0x011372
-                cmpi.w  #LRz_Act_1, (Level_Id).w              ; $0900, $FFFFFE10
+                cmpi.w  #LRz_Act_1, (Current_ZoneAndAct).w              ; $0900, $FFFFFE10
                 bne.s   Offset_0x011372
                 jsr     (Build_LRz_Rocks)                      ; Offset_0x012A3A
 Offset_0x011372:
@@ -12966,7 +12966,7 @@ Offset_0x011C18:
 		move.l	d0,(a0)+
 		dbf	d1,Offset_0x011C18
 
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#5,d0
 		lea	(Objects_Layout).l,a0
@@ -13256,7 +13256,7 @@ LevelSizeLoad:
 		move.b	d0,(Dynamic_Resize_Routine).w
 		move.w	d0,(PalCycle_Done_Flag).w
 		move.w	d0,(VBlank_Subroutine).w
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#4,d0
 		lea	Level_Size_Array(pc,d0.w),a0
@@ -13316,7 +13316,7 @@ Level_Size_Check_Star_Post:                                    ; Offset_0x01204A
                 move.w  (Obj_Player_One+Obj_Y).w, D0                 ; $FFFFB014
                 bra.s   Offset_0x012098
 Offset_0x012060:
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$05, D0
                 lea     (Player_Start_Position_Array), A1      ; Offset_0x1F7018
@@ -13710,7 +13710,7 @@ JmpTo_Setup_TileDrawing:
 
 ; Offset_0x0123DE: Main_Level_Load_16_128_Blocks:
 LoadZoneBlockMaps:
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#4,d0
 		andi.w	#$1F8,d0
@@ -13777,7 +13777,7 @@ Load_Level_Palette:
 ; Offset_0x01247C:
 LoadLevelLayout:
 		moveq	#0,d0
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#5,d0
 		andi.w	#$FC,d0
@@ -13802,7 +13802,7 @@ Offset_0x01249C:
 ; Offset_0x0124A4: Dyn_Screen_Boss_Loader:
 RunDynamicLevelEvents:
 		moveq	#0,d0
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#6,d0
 		; This clamps the level index to prevent levels from accessing random data, but does it
@@ -15448,7 +15448,7 @@ Obj_0x1C_LBz_Unknow:                                           ; Offset_0x01E6C6
 ; Offset_0x01E85A: DynamicArtCues:
 AnimateStageTiles:
 		moveq	#0,d0
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#1,d0
 		lsr.w	#5,d0
 		andi.w	#$FC,d0
@@ -15986,7 +15986,7 @@ Dynamic_Iz_2:                                                  ; Offset_0x01ED6E
                 jsr     (DMA_68KtoVRAM)                        ; Offset_0x0012FC
 Offset_0x01EDD4:
                 addq.w  #$02, A3
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 bne     Offset_0x01EE68
                 moveq   #$00, D1
                 move.w  (Background_Events+$12).w, D1                ; $FFFFEEE4
@@ -16695,16 +16695,16 @@ HPz_Portal_Animate:                                            ; Offset_0x01F558
 ; ->>>
 ;===============================================================================
 Animate_Counters_Init:                                         ; Offset_0x01F55A
-                cmpi.w  #Hz_Act_1, (Level_Id).w               ; $0100, $FFFFFE10
+                cmpi.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
                 bne.s   Offset_0x01F566
                 bsr     Offset_0x01EADC
 Offset_0x01F566:
-                cmpi.w  #Hz_Act_2, (Level_Id).w               ; $0101, $FFFFFE10
+                cmpi.w  #Hz_Act_2, (Current_ZoneAndAct).w               ; $0101, $FFFFFE10
                 bne.s   Offset_0x01F57A
                 move.b  #$20, (Animate_Counters+$01).w               ; $FFFFF7F1
                 move.b  #$40, (Animate_Counters+$03).w               ; $FFFFF7F3
 Offset_0x01F57A:
-                cmpi.b  #CNz_Id, (Level_Id).w                   ; $03, $FFFFFE10
+                cmpi.b  #CNz_Id, (Current_Zone).w                   ; $03, $FFFFFE10
                 bne.s   Offset_0x01F5B2
                 move.b  #$40, (Animate_Counters+$01).w               ; $FFFFF7F1
                 move.b  #$00, (Animate_Counters+$02).w               ; $FFFFF7F2
@@ -16715,21 +16715,21 @@ Offset_0x01F57A:
                 move.b  #$02, (Animate_Counters+$0C).w               ; $FFFFF7FC
                 move.b  #$01, (Animate_Counters+$0E).w               ; $FFFFF7FE
 Offset_0x01F5B2:
-                cmpi.w  #LBz_Act_1, (Level_Id).w              ; $0600, $FFFFFE10
+                cmpi.w  #LBz_Act_1, (Current_ZoneAndAct).w              ; $0600, $FFFFFE10
                 bne.s   Offset_0x01F5C0
                 move.b  #$20, (Animate_Counters+$03).w               ; $FFFFF7F3
 Offset_0x01F5C0:
-                cmpi.w  #LBz_Act_2, (Level_Id).w              ; $0601, $FFFFFE10
+                cmpi.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
                 bne.s   Offset_0x01F5D2
                 bsr     Offset_0x01F0E2
                 move.b  #$10, (Animate_Counters+$01).w               ; $FFFFF7F1
 Offset_0x01F5D2:
-                cmpi.w  #LRz_Act_1, (Level_Id).w              ; $0900, $FFFFFE10
+                cmpi.w  #LRz_Act_1, (Current_ZoneAndAct).w              ; $0900, $FFFFFE10
                 bne.s   Offset_0x01F5E6
                 move.b  #$FF, (Animate_Counters+$01).w               ; $FFFFF7F1
                 move.b  #$FF, (Animate_Counters+$03).w               ; $FFFFF7F3
 Offset_0x01F5E6:
-                cmpi.w  #DPz_Act_1, (Level_Id).w              ; $1000, $FFFFFE10
+                cmpi.w  #DPz_Act_1, (Current_ZoneAndAct).w              ; $1000, $FFFFFE10
                 bne.s   Offset_0x01F5FA
                 move.b  #$40, (Animate_Counters+$01).w               ; $FFFFF7F1
                 move.b  #$40, (Animate_Counters+$03).w               ; $FFFFF7F3
@@ -17626,14 +17626,14 @@ Setup_TileDrawing:
 		lea	(Blocks_Mem_Address).w,a2
 		lea	(Fg_Mem_Index_Address).w,a3
 		move.w	#$C000,d7
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#2,d0
 		lsr.w	#3,d0
 		move.l	Load_Tiles_From_Start_Pointers(pc,d0.w),a1
 		jsr	(a1)
 		addq.w	#2,a3
 		move.w	#$E000,d7
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#2,d0
 		lsr.w	#3,d0
 		move.l	Load_Tiles_From_Start_Pointers+4(pc,d0.w),a1
@@ -17657,14 +17657,14 @@ Run_TileDrawing:
 		lea	(Blocks_Mem_Address).w,a2
 		lea	(Fg_Mem_Index_Address).w,a3
 		move.w	#$C000,d7
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#2,d0
 		lsr.w	#3,d0
 		move.l	Load_Tiles_As_You_Move_Pointers(pc,d0.w),a1
 		jsr	(a1)
 		addq.w	#2,a3
 		move.w	#$E000,d7
-		move.w	(Level_Id).w,d0
+		move.w	(Current_ZoneAndAct).w,d0
 		ror.b	#2,d0
 		lsr.w	#3,d0
 		move.l	Load_Tiles_As_You_Move_Pointers+4(pc,d0.w),a1
@@ -19545,7 +19545,7 @@ AIz_1_Finish:                                                  ; Offset_0x03091C
 Offset_0x030920:                
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
                 bne     Offset_0x0309F0
-                move.w  #AIz_Act_2, (Level_Id).w              ; $0001, $FFFFFE10
+                move.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 clr.b   (Saved_Level_Flag_P2).w                      ; $FFFFFEE0
                 clr.b   (Dynamic_Resize_Routine).w                   ; $FFFFEE33
@@ -19993,7 +19993,7 @@ Offset_0x030EBA:
                 movem.l D7/A0/A2/A3, -(A7)
                 moveq   #$0C, D0
                 jsr     (LoadPLC)                              ; Offset_0x0014D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 jsr     (Level_Load_Enemies_Art)               ; Offset_0x024F46
                 movem.l (A7)+, D7/A0/A2/A3
                 lea     (Palette_Row_3_Offset+$02).w, A1             ; $FFFFED62
@@ -20862,7 +20862,7 @@ Offset_0x031FA4:
 MGz_1_Transition:                                              ; Offset_0x031FB8
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
                 bne     Offset_0x032054
-                move.w  #MGz_Act_2, (Level_Id).w              ; $0201, $FFFFFE10
+                move.w  #MGz_Act_2, (Current_ZoneAndAct).w              ; $0201, $FFFFFE10
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 clr.b   (Saved_Level_Flag_P2).w                      ; $FFFFFEE0
                 clr.b   (Dynamic_Resize_Routine).w                   ; $FFFFEE33
@@ -22065,7 +22065,7 @@ Offset_0x032F34:
 Iz_1_Transition:                                               ; Offset_0x032F3C
                 tst.w   (Kosinski_Mod_Queue_Count).w                 ; $FFFFFF0E
                 bne     Offset_0x032FE8
-                move.w  #Iz_Act_2, (Level_Id).w               ; $0501, $FFFFFE10
+                move.w  #Iz_Act_2, (Current_ZoneAndAct).w               ; $0501, $FFFFFE10
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 clr.b   (Saved_Level_Flag_P2).w                      ; $FFFFFEE0
                 clr.b   (Dynamic_Resize_Routine).w                   ; $FFFFEE33
@@ -22818,7 +22818,7 @@ Offset_0x0337C6:
 LBz_1_Transition:                                              ; Offset_0x0337F6
                 tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
                 bne     Offset_0x033878
-                move.w  #LBz_Act_2, (Level_Id).w              ; $0601, $FFFFFE10
+                move.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 clr.b   (Saved_Level_Flag_P2).w                      ; $FFFFFEE0
                 clr.b   (Dynamic_Resize_Routine).w                   ; $FFFFEE33
@@ -23374,7 +23374,7 @@ EMz_Events_Init:                                               ; Offset_0x033D60
                 move.w  D0, (Level_Events_Buffer_0_P2).w             ; $FFFFEEB8
                 move.w  D0, (Level_Events_Buffer_1_P2).w             ; $FFFFEEBA
                 moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D0                             ; $FFFFFE10
                 lsl.w   #$04, D0
                 lea     (Competition_Screen_Init_Array-$E0)(PC), A1 ; Offset_0x034050
                 adda.w  D0, A1
@@ -23454,7 +23454,7 @@ EMz_Events_Init_2:                                             ; Offset_0x033E3E
 Competition_Event_Init:                                        ; Offset_0x033E42
                 move.l  (Vertical_Scroll_Value_P2).w, (Vertical_Scroll_Value_P2_2).w ; $FFFFF61E, $FFFFEE3A
                 moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D0                             ; $FFFFFE10
                 lsl.w   #$04, D0
                 lea     (Competition_Screen_Init_Array-$D4)(PC), A1 ; Offset_0x03405C
                 adda.w  D0, A1
@@ -24831,7 +24831,7 @@ Obj_End_Panel:                                                 ; Offset_0x041812
 ;===============================================================================
 After_Boss_Clean_Up:                                           ; Offset_0x041ACA
                 moveq   #$00, D0
-                lea     (Level_Id).w, A1                             ; $FFFFFE10
+                lea     (Current_ZoneAndAct).w, A1                             ; $FFFFFE10
                 move.b  (A1)+, D0
                 add.b   D0, D0
                 add.b   (A1)+, D0
@@ -27058,7 +27058,7 @@ Null_Mappings:                                                 ; Offset_0x0432C8
 ;===============================================================================
 Level_Load_Music:                                              ; Offset_0x0432CA    
                 moveq   #$00, D0
-                lea     (Level_Id).w, A1                             ; $FFFFFE10
+                lea     (Current_ZoneAndAct).w, A1                             ; $FFFFFE10
                 move.b  (A1)+, D0
                 add.b   D0, D0
                 add.b   (A1), D0
@@ -27209,7 +27209,7 @@ Offset_0x043436:
 ;===============================================================================       
 Level_Transition_Size_Load:                                    ; Offset_0x043458
                 moveq   #$00, D0
-                move.b  (Level_Id).w, D0                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D0                             ; $FFFFFE10
                 lsl.w   #$04, D0
                 lea     (Level_Size_Array), A1                 ; Offset_0x011ECA
                 lea     $08(A1, D0), A1
@@ -28637,7 +28637,7 @@ Offset_0x04B20A:
                 move.b  #$00, Obj_Map_Id(A0)                             ; $0022
                 move.b  #$00, Obj_Ani_Number(A0)                         ; $0020
                 moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$06, D0
                 andi.w  #$007E, D0
@@ -28654,7 +28654,7 @@ Offset_0x04B23C:
 ;-------------------------------------------------------------------------------                
 Offset_0x04B24C:                
                 moveq   #$00, D0
-                move.w  (Level_Id).w, D0                             ; $FFFFFE10
+                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
                 ror.b   #$01, D0
                 lsr.w   #$06, D0
                 andi.w  #$007E, D0

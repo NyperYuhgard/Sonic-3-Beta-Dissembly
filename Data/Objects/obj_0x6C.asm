@@ -7,7 +7,7 @@
                 move.l  #Bridge_Mappings, Obj_Map(A0)   ; Offset_0x02EE60, $000C
                 move.w  #$4038, Obj_Art_VRAM(A0)                         ; $000A
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
-                cmpi.b  #Iz_Id, (Level_Id).w                    ; $05, $FFFFFE10
+                cmpi.b  #Iz_Id, (Current_Zone).w                    ; $05, $FFFFFE10
                 bne.s   Offset_0x02E54C
                 move.l  #Offset_0x02E6F0, (A0)
                 move.l  #Iz_Bridge_Mappings, Obj_Map(A0) ; Offset_0x02EE28, $000C

@@ -240,7 +240,7 @@ S2_Monitor_Miles_Life: ; Referência inválida - Sonic 2 Left over
 ;-------------------------------------------------------------------------------
 Monitor_Sonic_Life:                                            ; Offset_0x01320A
                 addq.w  #$01, (Monitors_Broken).w                    ; $FFFFFEF4
-                addq.b  #$01, (Life_Count).w                         ; $FFFFFE12
+                addq.b  #$01, (Life_count).w                         ; $FFFFFE12
                 addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
                 moveq   #Extra_Life_Snd, D0                                ; $2A
                 jmp     (Play_Music)                           ; Offset_0x001176  

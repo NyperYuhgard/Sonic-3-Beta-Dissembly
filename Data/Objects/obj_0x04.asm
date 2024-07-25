@@ -5,7 +5,7 @@
 ; Offset_0x01582E:
                 move.l  #Collapsing_Platform_Mappings, Obj_Map(A0) ; Offset_0x016014, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.w  #AIz_Act_2, (Level_Id).w              ; $0001, $FFFFFE10
+                cmpi.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
                 bne.s   Offset_0x015852
                 move.l  #AIz_2_Collapsing_Platform_Mappings, Obj_Map(A0) ; Offset_0x0160F8, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
@@ -14,7 +14,7 @@ Offset_0x015852:
                 move.l  #Offset_0x015FA4, Obj_Control_Var_0C(A0)         ; $003C
                 move.b  #$3C, Obj_Width(A0)                              ; $0007
                 move.b  #$20, Obj_Height(A0)                             ; $0006
-                cmpi.b  #Iz_Id, (Level_Id).w                    ; $05, $FFFFFE10
+                cmpi.b  #Iz_Id, (Current_Zone).w                    ; $05, $FFFFFE10
                 bne.s   Offset_0x0158A0
                 move.l  #Iz_Collapsing_Platform_Mappings, Obj_Map(A0) ; Offset_0x016D00, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A

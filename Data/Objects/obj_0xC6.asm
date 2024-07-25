@@ -102,7 +102,7 @@ Offset_0x0435A6:
                 btst    #$01, Obj_Control_Var_08(A0)                     ; $0038
                 beq.s   Offset_0x0435CE
                 move.b  #$0A, Obj_Routine(A0)                            ; $0005
-                cmpi.b  #$02, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$02, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x0435C6
                 move.b  #$0E, Obj_Routine(A0)                            ; $0005
 Offset_0x0435C6:
@@ -197,7 +197,7 @@ Offset_0x0436A8:
 Offset_0x0436B6:
                 lea     Egg_Prison_Setup_Data_3(PC), A1        ; Offset_0x04397C
                 jsr     Object_Settings(PC)                    ; Offset_0x041D72
-                cmpi.w  #$0400, (Level_Id).w                         ; $FFFFFE10
+                cmpi.w  #$0400, (Current_ZoneAndAct).w                         ; $FFFFFE10
                 bne.s   Offset_0x0436CC
                 move.w  #$044E, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x0436CC:
@@ -403,7 +403,7 @@ Offset_0x0438C8:
 Offset_0x0438FC:
                 andi.w  #$0002, D0
                 move.w  D0, D2
-                cmpi.w  #$0400, (Level_Id).w                         ; $FFFFFE10
+                cmpi.w  #$0400, (Current_ZoneAndAct).w                         ; $FFFFFE10
                 bne.s   Offset_0x04390C
                 addq.w  #$04, D2
 Offset_0x04390C:

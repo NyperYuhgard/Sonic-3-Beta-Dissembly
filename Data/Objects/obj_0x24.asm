@@ -256,7 +256,7 @@ Offset_0x02049A:
                 bmi.s   Offset_0x0204AC
                 move.w  #$0012, Obj_Angle(A0)                            ; $0026
 Offset_0x0204AC:
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 bne.s   Offset_0x0204BC
                 move.l  #Obj_Tunnel_Exhaust_Smoke, (A0)        ; Offset_0x0206B0
                 bra     Obj_Tunnel_Exhaust_Smoke               ; Offset_0x0206B0

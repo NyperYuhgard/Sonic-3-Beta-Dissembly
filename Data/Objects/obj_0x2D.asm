@@ -44,7 +44,7 @@ Offset_0x0227FA:
                 move.w  Obj_Y(A0), Obj_Y(A1)                      ; $0014, $0014
                 move.l  #AIz_2_Falling_Log_Mappings, Obj_Map(A1) ; Offset_0x02297E, $000C
                 move.w  #$42F0, Obj_Art_VRAM(A1)                         ; $000A
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 bne.s   Offset_0x022848
                 move.l  #AIz_Falling_Log_Mappings, Obj_Map(A1) ; Offset_0x02298E, $000C
                 move.w  #$43CF, Obj_Art_VRAM(A1)                         ; $000A
@@ -61,7 +61,7 @@ Offset_0x022848:
                 move.w  Obj_Y(A0), Obj_Y(A1)                      ; $0014, $0014
                 move.l  #AIz_2_Falling_Log_Mappings_2, Obj_Map(A1) ; Offset_0x02299E, $000C
                 move.w  #$62F0, Obj_Art_VRAM(A1)                         ; $000A
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 bne.s   Offset_0x0228A0
                 move.l  #AIz_Falling_Log_Mappings_2, Obj_Map(A1) ; Offset_0x022A0E, $000C
                 move.w  #$43CF, Obj_Art_VRAM(A1)                         ; $000A

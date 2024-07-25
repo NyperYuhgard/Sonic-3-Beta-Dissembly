@@ -259,7 +259,7 @@ Offset_0x037588:
                 rts    
 ;-------------------------------------------------------------------------------
 Offset_0x03759E:
-                move.w  #Hz_Act_1, (Level_Id).w               ; $0100, $FFFFFE10
+                move.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
                 move.w  #Hz_Act_1, (Level_Id_2).w             ; $0100, $FFFFEE54
                 move.w  #$0001, (Restart_Level_Flag).w               ; $FFFFFE02
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30

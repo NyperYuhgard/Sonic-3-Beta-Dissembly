@@ -215,7 +215,7 @@ Miles_CPU_States:                                              ; Offset_0x00D3DE
                 dc.w    Miles_CPU_0E-Miles_CPU_States          ; Offset_0x00D8A8
 ;-------------------------------------------------------------------------------                
 Miles_CPU_Init:                                                ; Offset_0x00D3EE
-                cmpi.w  #$0000, (Level_Id).w                         ; $FFFFFE10
+                cmpi.w  #$0000, (Current_ZoneAndAct).w                         ; $FFFFFE10
                 bne.s   Offset_0x00D410
                 cmpi.w  #$1D00, (Camera_X).w                         ; $FFFFEE78
                 bcc.s   Offset_0x00D410
@@ -813,7 +813,7 @@ Offset_0x00DBB8:
                 bsr     Miles_Floor                            ; Offset_0x00E5F0
                 rts
 Offset_0x00DBC2:
-                bsr     Offset_0x00DBFE
+		bsr.w	Tails_StartFlying
                 bsr     Miles_ChgJumpDir                       ; Offset_0x00E0EC
                 bsr     Miles_LevelBoundaries                  ; Offset_0x00E17C
                 jsr     (SpeedToPos)                           ; Offset_0x01111E
@@ -829,44 +829,64 @@ Offset_0x00DBC2:
                 bsr     Offset_0x00D8C6
 Offset_0x00DBFC:
                 rts
-Offset_0x00DBFE:
-                cmpi.b  #$01, (Level_Boundaries_Flag).w              ; $FFFFF668
-                bne.s   Offset_0x00DC3E
-                move.b  (Control_Ports_Logical_Data_2+$01).w, D0     ; $FFFFF66B
-                andi.b  #$30, D0
-                beq.s   Offset_0x00DC18
-                subi.w  #$0040, Obj_Speed_Y(A0)                          ; $001A
-                bra.s   Offset_0x00DC28
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to have Tails fly by pressing jump in mid-air repeatedly
+; Very rough in this build, having no timer and being more like as infinte jump
+; you can perform when descending than actual flying
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00DBFE:
+Tails_StartFlying:
+		cmpi.b	#1,(Level_Boundaries_Flag).w
+		bne.s	Offset_0x00DC3E
+		move.b	(Control_Ports_Logical_Data_2+1).w,d0
+		andi.b	#$30,d0
+		beq.s	Offset_0x00DC18
+		subi.w	#$40,Obj_Speed_Y(a0)
+		bra.s	Offset_0x00DC28
+
 Offset_0x00DC18:
-                move.b  (Control_Ports_Logical_Data_2).w, D0         ; $FFFFF66A
-                andi.b  #$40, D0
-                beq.s   Offset_0x00DC28
-                subi.w  #$0010, Obj_Speed_Y(A0)                          ; $001A
+		move.b	(Control_Ports_Logical_Data_2).w,d0
+		andi.b	#$40,d0
+		beq.s	Offset_0x00DC28
+		subi.w	#$10,Obj_Speed_Y(a0)
+
 Offset_0x00DC28:
-                addi.w  #$0008, Obj_Speed_Y(A0)                          ; $001A
-                cmpi.w  #$FF00, Obj_Speed_Y(A0)                          ; $001A
-                bge.s   Offset_0x00DC3C
-                move.w  #$FF00, Obj_Speed_Y(A0)                          ; $001A
+		addi.w	#8,Obj_Speed_Y(a0)
+		cmpi.w	#-$100,Obj_Speed_Y(a0)
+		bge.s	Offset_0x00DC3C
+		move.w	#-$100,Obj_Speed_Y(a0)
+
 Offset_0x00DC3C:
                 rts
+; ---------------------------------------------------------------------------
+
 Offset_0x00DC3E:
-                move.b  (Control_Ports_Logical_Data_2+$01).w, D0     ; $FFFFF66B
-                andi.b  #$30, D0
-                beq.s   Offset_0x00DC56
-                tst.w   Obj_Speed_Y(A0)                                  ; $001A
-                bmi.s   Offset_0x00DC6C
-                subi.w  #$0300, Obj_Speed_Y(A0)                          ; $001A
-                bra.s   Offset_0x00DC6C
+		move.b	(Control_Ports_Logical_Data_2+1).w,d0
+		andi.b	#$30,d0
+		beq.s	Offset_0x00DC56
+		tst.w	Obj_Speed_Y(a0)
+		bmi.s	Offset_0x00DC6C
+		subi.w	#$300,Obj_Speed_Y(a0)
+		bra.s	Offset_0x00DC6C
+
 Offset_0x00DC56:
-                move.b  (Control_Ports_Logical_Data_2).w, D0         ; $FFFFF66A
-                andi.b  #$40, D0
-                beq.s   Offset_0x00DC6C
-                tst.w   Obj_Speed_Y(A0)                                  ; $001A
-                bmi.s   Offset_0x00DC6C
-                subi.w  #$0200, Obj_Speed_Y(A0)                          ; $001A
+		move.b	(Control_Ports_Logical_Data_2).w,d0
+		andi.b	#$40,d0
+		beq.s	Offset_0x00DC6C
+		tst.w	Obj_Speed_Y(a0)
+		bmi.s	Offset_0x00DC6C
+		subi.w	#$200,Obj_Speed_Y(a0)
+
 Offset_0x00DC6C:
-                addi.w  #$0008, Obj_Speed_Y(A0)                          ; $001A
-                rts    
+		addi.w	#8,Obj_Speed_Y(a0)
+		rts
+; End of function Tails_StartFlying
+
 ;-------------------------------------------------------------------------------
 Miles_MdRoll:                                                  ; Offset_0x00DC74
                 tst.b   Obj_Player_Spdsh_Flag(A0)                        ; $003D
@@ -1446,7 +1466,7 @@ Miles_JumpHeight:                                              ; Offset_0x00E2F8
                 move.w  #$FE00, D1
 Offset_0x00E30E:
                 cmp.w   Obj_Speed_Y(A0), D1                              ; $001A
-                ble.s   Offset_0x00E33A
+                ble.s   Tails_TestForFlight
                 move.b  (Control_Ports_Logical_Data_2).w, D0         ; $FFFFF66A
                 andi.b  #$70, D0
                 bne.s   Offset_0x00E322
@@ -1461,33 +1481,47 @@ Offset_0x00E324:
                 move.w  #$F040, Obj_Speed_Y(A0)                          ; $001A
 Offset_0x00E338:
                 rts
-Offset_0x00E33A:
-                btst    #$02, Obj_Status(A0)                             ; $002A
-                beq     Offset_0x00E39A
-                move.b  (Control_Ports_Logical_Data_2+$01).w, D0     ; $FFFFF66B
-                andi.b  #$70, D0
-                beq.s   Offset_0x00E39A
-                tst.w   (Miles_CPU_Ctrl_Auto_Timer).w                ; $FFFFF702
-                beq.s   Offset_0x00E39A
-                btst    #$02, Obj_Status(A0)                             ; $002A
-                beq.s   Offset_0x00E382
-                bclr    #$02, Obj_Status(A0)                             ; $002A
-                move.b  Obj_Height_2(A0), D1                             ; $001E
-                move.b  Obj_Height_3(A0), Obj_Height_2(A0)        ; $001E, $0044
-                move.b  Obj_Width_3(A0), Obj_Width_2(A0)          ; $001F, $0045
-                sub.b   Obj_Height_3(A0), D1                             ; $0044
-                ext.w   D1
-                add.w   D1, Obj_Y(A0)                                    ; $0014
-                move.b  #$00, Obj_Ani_Number(A0)                         ; $0020
+
+; ---------------------------------------------------------------------------
+; Subroutine to test if Tails can fly
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x00E33A:
+Tails_TestForFlight:
+		btst	#2,Obj_Status(a0)
+		beq.w	Offset_0x00E39A
+		move.b	(Control_Ports_Logical_Data_2+1).w,d0
+		andi.b	#$70,d0
+		beq.s	Offset_0x00E39A
+		tst.w	(Miles_CPU_Ctrl_Auto_Timer).w
+		beq.s	Offset_0x00E39A
+		; we already checked this earlier...
+		btst	#2,Obj_Status(a0)
+		beq.s	Offset_0x00E382
+		bclr	#2,Obj_Status(a0)
+		move.b	Obj_Height_2(a0),d1
+		move.b	Obj_Height_3(a0),Obj_Height_2(a0)
+		move.b	Obj_Width_3(a0),Obj_Width_2(a0)
+		sub.b	Obj_Height_3(a0),d1
+		ext.w	d1
+		add.w	d1,Obj_Y(a0)
+		move.b	#0,Obj_Ani_Number(a0)
+
 Offset_0x00E382:
-                move.b  #$01, (Level_Boundaries_Flag).w              ; $FFFFF668
-                andi.b  #$30, D0
-                beq.s   Offset_0x00E394
-                move.b  #$02, (Level_Boundaries_Flag).w              ; $FFFFF668
+		move.b	#1,(Level_Boundaries_Flag).w
+		andi.b	#$30,d0
+		beq.s	Offset_0x00E394
+		move.b	#2,(Level_Boundaries_Flag).w
+
 Offset_0x00E394:
-                move.b  #$20, Obj_Ani_Number(A0)                         ; $0020
+		move.b	#$20,Obj_Ani_Number(a0)
+
 Offset_0x00E39A:
-                rts   
+		rts
+; End of function Tails_TestForFlight
+
 ;-------------------------------------------------------------------------------                
 Miles_Spindash:                                                ; Offset_0x00E39C
                 tst.b   Obj_Player_Spdsh_Flag(A0)                        ; $003D

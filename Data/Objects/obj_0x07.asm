@@ -79,7 +79,7 @@ Offset_0x019334:
                 move.b  #$04, Obj_Ani_Number(A0)                         ; $0020
                 move.b  #$07, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$043A, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #$02, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$02, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x019354
                 move.w  #$0478, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x019354:
@@ -90,7 +90,7 @@ Offset_0x01935C:
                 move.b  #$04, Obj_Ani_Number(A0)                         ; $0020
                 move.b  #$0A, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$043A, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #$02, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$02, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x01937C
                 move.w  #$0478, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x01937C:
@@ -105,7 +105,7 @@ Offset_0x01938A:
                 move.l  #Offset_0x01943A, (A0)
                 move.l  #Springs_Mappings_2P, Obj_Map(A0) ; Offset_0x019DC2, $000C
                 move.w  #$0391, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #$12, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$12, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x0193B8
                 ori.w   #$8000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x0193B8:

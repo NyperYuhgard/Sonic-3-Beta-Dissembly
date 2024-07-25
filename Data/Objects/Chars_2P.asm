@@ -69,7 +69,7 @@ Offset_0x00A5B6:
                 move.l  #Knuckles_Mappings_2P, Obj_Map(A0)   ; Offset_0x1032E0, $000C
                 addi.w  #$2000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00A642:
-                cmpi.b  #EMz_Id, (Level_Id).w                   ; $12, $FFFFFE10
+                cmpi.b  #EMz_Id, (Current_Zone).w                   ; $12, $FFFFFE10
                 bne.s   Offset_0x00A650
                 ori.w   #$8000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00A650:
@@ -86,7 +86,7 @@ Offset_0x00A66A:
                 move.l  #Knuckles_Mappings_2P, Obj_Map(A0)   ; Offset_0x1032E0, $000C
                 addi.w  #$2000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00A68C:
-                cmpi.b  #EMz_Id, (Level_Id).w                   ; $12, $FFFFFE10
+                cmpi.b  #EMz_Id, (Current_Zone).w                   ; $12, $FFFFFE10
                 bne.s   Offset_0x00A69A
                 ori.w   #$8000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00A69A:

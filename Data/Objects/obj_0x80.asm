@@ -112,7 +112,7 @@ Offset_0x0366FE:
                 move.w  #$0400, Obj_Speed_X(A0)                          ; $0018
                 clr.w   Obj_Speed_Y(A0)                                  ; $001A
                 move.w  #$0040, Obj_Timer(A0)                            ; $002E
-                cmpi.w  #$0000, (Level_Id).w                         ; $FFFFFE10
+                cmpi.w  #$0000, (Current_ZoneAndAct).w                         ; $FFFFFE10
                 bne.s   Offset_0x03672A
                 move.w  #$0120, Obj_Timer(A0)                            ; $002E
 Offset_0x03672A:

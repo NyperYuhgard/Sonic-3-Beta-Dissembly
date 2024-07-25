@@ -142,7 +142,7 @@ Offset_0x023A86:
                 move.w  #$0592, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x023AA2:
                 moveq   #$00, D1
-                move.b  (Level_Id).w, D1                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D1                             ; $FFFFFE10
                 add.w   D1, D1
                 add.w   D0, D1
                 lea     Flickies_Type_Select(PC), A1           ; Offset_0x02391C

@@ -20,7 +20,7 @@ Offset_0x0170EE:
                 move.b  #$28, Obj_Height(A0)                             ; $0006
                 move.l  #Offset_0x0175C2, Obj_Control_Var_04(A0)         ; $0034
                 move.l  #Offset_0x0175EA, Obj_Control_Var_08(A0)         ; $0038
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
+                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
                 bne.s   Offset_0x017184
                 move.l  #Hz_Breakable_Wall_Mappings, Obj_Map(A0) ; Offset_0x0179B8, $000C
                 move.w  #$6001, Obj_Art_VRAM(A0)                         ; $000A
@@ -38,7 +38,7 @@ Offset_0x0170EE:
                 move.l  #Offset_0x0174CC, (A0)
                 rts
 Offset_0x017184:
-                cmpi.b  #MGz_Id, (Level_Id).w                   ; $02, $FFFFFE10
+                cmpi.b  #MGz_Id, (Current_Zone).w                   ; $02, $FFFFFE10
                 bne.s   Offset_0x0171C6
                 move.l  #MGz_Breakable_Wall_Mappings, Obj_Map(A0) ; Offset_0x0178F8, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
@@ -51,7 +51,7 @@ Offset_0x017184:
                 move.l  #Offset_0x0173E2, (A0)
                 rts
 Offset_0x0171C6:
-                cmpi.b  #CNz_Id, (Level_Id).w                   ; $03, $FFFFFE10
+                cmpi.b  #CNz_Id, (Current_Zone).w                   ; $03, $FFFFFE10
                 bne.s   Offset_0x017208
                 move.l  #CNz_Breakable_Wall_Mappings, Obj_Map(A0) ; Offset_0x017858, $000C
                 move.w  #$4420, Obj_Art_VRAM(A0)                         ; $000A
@@ -64,7 +64,7 @@ Offset_0x0171C6:
                 move.l  #Offset_0x0174CC, (A0)
                 rts
 Offset_0x017208:
-                cmpi.b  #LBz_Id, (Level_Id).w                   ; $06, $FFFFFE10
+                cmpi.b  #LBz_Id, (Current_Zone).w                   ; $06, $FFFFFE10
                 bne.s   Offset_0x017242
                 move.l  #LBz_Breakable_Wall_Mappings, Obj_Map(A0) ; Offset_0x017A3E, $000C
                 move.w  #$22EA, Obj_Art_VRAM(A0)                         ; $000A

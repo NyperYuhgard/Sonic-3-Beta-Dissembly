@@ -20,12 +20,12 @@ Obj_0x05_Rock:                                                 ; Offset_0x0150FC
                 ori.b   #$04, Obj_Flags(A0)                              ; $0004
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
                 move.w  #$0040, Obj_Control_Var_12(A0)                   ; $0042
-                cmpi.w  #AIz_Act_2, (Level_Id).w              ; $0001, $FFFFFE10
+                cmpi.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
                 bne.s   Offset_0x015152
                 move.l  #AIz_2_Rock_Mappings, Obj_Map(A0) ; Offset_0x015776, $000C
                 move.w  #$42F0, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x015152:
-                cmpi.w  #EMz_Act_1, (Level_Id).w              ; $1200, $FFFFFE10
+                cmpi.w  #EMz_Act_1, (Current_ZoneAndAct).w              ; $1200, $FFFFFE10
                 bne.s   Offset_0x01516E
                 move.l  #EMz_Rock_Mappings, Obj_Map(A0) ; Offset_0x0157FE, $000C
                 move.w  #$E300, Obj_Art_VRAM(A0)                         ; $000A

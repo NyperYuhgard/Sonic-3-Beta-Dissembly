@@ -682,9 +682,20 @@ Debug_Mode_Flag_Index            equ M68K_RAM_Start+$FE08
 Debug_Mode_Camera_Delay          equ M68K_RAM_Start+$FE0A
 Debug_Mode_Camera_Speed          equ M68K_RAM_Start+$FE0B 
 Vertical_Interrupt_Count         equ M68K_RAM_Start+$FE0C
-Level_Id                         equ M68K_RAM_Start+$FE10
-Act_Id                           equ M68K_RAM_Start+$FE11
-Life_Count                       equ M68K_RAM_Start+$FE12
+
+; Gonna eventually do the whole thing like this, but for now only a few variables
+		pusho						; save options
+		opt	ae+					; enable auto evens
+
+		rsset M68K_RAM_Start+$FE10
+Current_ZoneAndAct:		rs.w	1					; 2 bytes; not to be confused with Apparent_ZoneAndAct,
+										; this actually holds the real zone the player is in
+Current_Zone:			equ	Current_ZoneAndAct
+Current_Act:			equ	Current_ZoneAndAct+1
+Life_count:			rs.b	1					; current lives; not the lives displayed on the screen
+				rs.b	3					; unused
+		popo						; restore options
+
 Special_Stage_Id                 equ M68K_RAM_Start+$FE16 
 Continue_Count                   equ M68K_RAM_Start+$FE18
 Super_Sonic_Flag                 equ M68K_RAM_Start+$FE19 
