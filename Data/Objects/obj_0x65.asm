@@ -20,10 +20,10 @@
                 move.b  #$05, (Competition_Laps_To_Win).w            ; $FFFFFEFA
                 clr.w   (Competition_Lap_Count_P1).w                 ; $FFFFFEFC
                 clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
-                clr.l   (Time_Count_Address).w                       ; $FFFFFE22
+                clr.l   (Timer).w                       ; $FFFFFE22
                 clr.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
-                clr.w   (Ring_Count_Address).w                       ; $FFFFFE20
+                clr.w   (Ring_count).w                       ; $FFFFFE20
                 clr.w   (Ring_Count_Address_P2).w                    ; $FFFFFED0
                 jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
@@ -97,7 +97,7 @@ Offset_0x02D274:
                 move.w  #$0000, Obj_Control_Var_02(A1)                   ; $0032
                 clr.w   (Competition_Lap_Count_P1).w                 ; $FFFFFEFC
                 clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
-                clr.l   (Time_Count_Address).w                       ; $FFFFFE22
+                clr.l   (Timer).w                       ; $FFFFFE22
                 clr.b   (HUD_Timer_Refresh_Flag_P2).w                ; $FFFFFECA
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
                 clr.b   (Control_Locked_Flag_P1).w                   ; $FFFFF7CC
@@ -628,9 +628,9 @@ Offset_0x02DB28:
                 dbra    D0, Offset_0x02DB28
                 move.l  #Offset_0x02DB34, (A0)
 Offset_0x02DB34:                
-                lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
+                lea     (Timer).w, A1                   ; $FFFFFE22
                 lea     ((M68K_RAM_Start+$700A)&$00FFFFFF), A2       ; $00FF700A
-                lea     (Timer_Minute_Count_Address).w, A3           ; $FFFFFE23
+                lea     (Timer_minute).w, A3           ; $FFFFFE23
                 lea     (Update_HUD_timer).w, A4               ; $FFFFFE1E
                 bra.s   Show_Timer                             ; Offset_0x02DBA8         
 ;-------------------------------------------------------------------------------
@@ -769,7 +769,7 @@ Offset_0x02DD16:
                 move.l  #Offset_0x02DD22, (A0)
 Offset_0x02DD22:                
                 moveq   #$00, D0
-                tst.w   (Ring_Count_Address).w                       ; $FFFFFE20
+                tst.w   (Ring_count).w                       ; $FFFFFE20
                 beq.s   Offset_0x02DD2C
                 moveq   #$03, D0
 Offset_0x02DD2C:

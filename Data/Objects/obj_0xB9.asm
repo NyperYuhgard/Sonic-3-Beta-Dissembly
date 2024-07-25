@@ -60,7 +60,7 @@ Offset_0x0466C4:
 ;-------------------------------------------------------------------------------
 Offset_0x0466DA:
                 moveq   #$01, D0
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x0466E6
                 neg.w   D0
 Offset_0x0466E6:

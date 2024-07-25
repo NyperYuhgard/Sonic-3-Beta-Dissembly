@@ -23,7 +23,7 @@ Offset_0x010C76:
                 bpl.s   Offset_0x010CC0
                 cmpi.b  #$06, (SS_Completed_Flag).w                  ; $FFFFFFB0
                 beq     Offset_0x010D22
-                cmpi.w  #$0032, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$0032, (Ring_count).w               ; $FFFFFE20
                 bcc.s   Offset_0x010CAA
                 rts
 Offset_0x010CAA:

@@ -131,7 +131,7 @@ Offset_0x038CBC:
 Offset_0x038CE6:
                 jsr     (ObjectFall)                           ; Offset_0x0110FE
                 jsr     (Run_Object_Wait_Timer_A0)             ; Offset_0x0423D2
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq     Offset_0x038B84
                 jmp     (DisplaySprite)                        ; Offset_0x011148   
 ;-------------------------------------------------------------------------------    

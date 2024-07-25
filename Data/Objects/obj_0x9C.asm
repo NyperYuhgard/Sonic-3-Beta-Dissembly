@@ -184,7 +184,7 @@ Offset_0x044B3A:
 Offset_0x044B5E:
                 jmp     Go_Delete_Object_A0(PC)                ; Offset_0x042D3E
 Offset_0x044B62:
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x044B92
                 lea     Offset_0x044C68(PC), A2

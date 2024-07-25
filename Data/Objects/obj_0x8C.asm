@@ -187,7 +187,7 @@ Offset_0x0400C6:
                 addi.w  #$0200, D0
                 cmpi.w  #$0400, D0
                 bcs     Offset_0x03FF60
-                move.w  (Vertical_Interrupt_Count+$02).w, D0         ; $FFFFFE0E
+                move.w  (Vint_runcount+$02).w, D0         ; $FFFFFE0E
                 andi.w  #$0003, D0
                 bne     Offset_0x03FF60
                 lea     Offset_0x04067E(PC), A2

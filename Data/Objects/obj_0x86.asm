@@ -452,7 +452,7 @@ Offset_0x03F6AA:
                 rts               
 ;-------------------------------------------------------------------------------
 Offset_0x03F6B4:
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne.s   Offset_0x03F6D4
                 lea     Offset_0x03FB6A(PC), A2
                 jsr     Load_Child_Object_A2(PC)               ; Offset_0x041D9A

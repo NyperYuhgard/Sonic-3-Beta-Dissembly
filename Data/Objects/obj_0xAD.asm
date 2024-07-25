@@ -401,7 +401,7 @@ Offset_0x038364:
                 bne.s   Offset_0x03838A
                 btst    #$06, Obj_Control_Var_08(A1)                     ; $0038
                 bne     Offset_0x037EFA
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x037EFA
                 jmp     (Add_To_Response_List_And_Display)     ; Offset_0x042450
 Offset_0x03838A:

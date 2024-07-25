@@ -378,7 +378,7 @@ Offset_0x000486:
                 move.w  VBlank_List(PC, D0), D0                ; Offset_0x0004AC
                 jsr     VBlank_List(PC, D0)                    ; Offset_0x0004AC
 VBlank_Finalize:                                               ; Offset_0x0004A2               
-                addq.l  #$01, (Vertical_Interrupt_Count).w           ; $FFFFFE0C
+                addq.l  #$01, (Vint_runcount).w           ; $FFFFFE0C
                 movem.l (A7)+, D0-D7/A0-A6
                 rte    
 ;-------------------------------------------------------------------------------
@@ -504,7 +504,7 @@ Offset_0x000690:
                 rts     
 ;-------------------------------------------------------------------------------
 VBlank_14:                                                     ; Offset_0x000692
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.w  #$000F, D0
                 bne.s   Offset_0x0006BA
 		stopZ80
@@ -4061,8 +4061,8 @@ TitleScreen_Loop:
 		move.b	#3,(Life_count).w
 		move.b	#3,(Life_Count_P2).w
 		moveq	#0,d0
-		move.w	d0,(Ring_Count_Address).w
-		move.l	d0,(Time_Count_Address).w
+		move.w	d0,(Ring_count).w
+		move.l	d0,(Timer).w
 		move.l	d0,(Score_Count_Address).w
 		move.w	d0,(Ring_Count_Address_P2).w
 		move.l	d0,(Time_Count_Address_P2).w
@@ -4159,8 +4159,8 @@ Offset_0x003500:
                 move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
-                move.l  D0, (Time_Count_Address).w                   ; $FFFFFE22
+                move.w  D0, (Ring_count).w                   ; $FFFFFE20
+                move.l  D0, (Timer).w                   ; $FFFFFE22
                 move.l  D0, (Score_Count_Address).w                  ; $FFFFFE26
                 move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
                 move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
@@ -4782,8 +4782,8 @@ Level_ClrHUD:
 		moveq	#0,d0
 		tst.b	(Saved_Level_Flag).w
 		bne.s	Level_FromCheckpoint
-		move.w	d0,(Ring_Count_Address).w
-		move.l	d0,(Time_Count_Address).w
+		move.w	d0,(Ring_count).w
+		move.l	d0,(Timer).w
 		move.b	d0,(Extra_life_flags).w
 		move.w	d0,(Ring_Count_Address_P2).w
 		move.l	d0,(Time_Count_Address_P2).w
@@ -6989,8 +6989,8 @@ Menu_Run_S2_Special_Stage:                                     ; Offset_0x005BA6
                 move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
-                move.l  D0, (Time_Count_Address).w                   ; $FFFFFE22
+                move.w  D0, (Ring_count).w                   ; $FFFFFE20
+                move.l  D0, (Timer).w                   ; $FFFFFE22
                 move.l  D0, (Score_Count_Address).w                  ; $FFFFFE26
                 move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
                 move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
@@ -7050,8 +7050,8 @@ Offset_0x005C50:
                 move.b  #$03, (Life_count).w                         ; $FFFFFE12
                 move.b  #$03, (Life_Count_P2).w                      ; $FFFFFEC6
                 moveq   #$00, D0
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
-                move.l  D0, (Time_Count_Address).w                   ; $FFFFFE22
+                move.w  D0, (Ring_count).w                   ; $FFFFFE20
+                move.l  D0, (Timer).w                   ; $FFFFFE22
                 move.l  D0, (Score_Count_Address).w                  ; $FFFFFE26
                 move.w  D0, (Ring_Count_Address_P2).w                ; $FFFFFED0
                 move.l  D0, (Time_Count_Address_P2).w                ; $FFFFFED2
@@ -7669,11 +7669,11 @@ Build_HUD:                                                     ; Offset_0x007994
                 moveq   #$00, D4
                 btst    #$03, (Level_Frame_Count+$01).w              ; $FFFFFE05
                 bne.s   Offset_0x0079B0
-                tst.w   (Ring_Count_Address).w                       ; $FFFFFE20
+                tst.w   (Ring_count).w                       ; $FFFFFE20
                 bne.s   Offset_0x0079A6
                 addq.w  #$02, D4
 Offset_0x0079A6:
-                cmpi.b  #$09, (Timer_Minute_Count_Address).w         ; $FFFFFE23
+                cmpi.b  #$09, (Timer_minute).w         ; $FFFFFE23
                 bne.s   Offset_0x0079B0
                 addq.w  #$04, D4
 Offset_0x0079B0:
@@ -7822,7 +7822,7 @@ Offset_0x007B70:
                 clr.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 move.l  #$5F400003, D0
                 moveq   #$00, D1
-                move.w  (Ring_Count_Address).w, D1                   ; $FFFFFE20
+                move.w  (Ring_count).w, D1                   ; $FFFFFE20
                 bsr     HUD_Draw_Three_Digit_Number            ; Offset_0x007EA2
 Offset_0x007B84:
                 tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
@@ -7833,7 +7833,7 @@ Offset_0x007B92:
                 beq.s   Offset_0x007BEC
                 tst.w   (Pause_Status).w                             ; $FFFFF63A
                 bne.s   Offset_0x007BEC
-                lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
+                lea     (Timer).w, A1                   ; $FFFFFE22
                 cmpi.l  #$00093B3B, (A1)+
                 beq     Timer_Over                             ; Offset_0x007BFC
                 addq.b  #$01, -(A1)
@@ -7851,11 +7851,11 @@ Offset_0x007B92:
 Offset_0x007BCC:
                 move.l  #$5E400003, D0
                 moveq   #$00, D1
-                move.b  (Timer_Minute_Count_Address).w, D1           ; $FFFFFE23
+                move.b  (Timer_minute).w, D1           ; $FFFFFE23
                 bsr     HUD_Draw_Single_Digit_Number           ; Offset_0x007F7A
                 move.l  #$5EC00003, D0
                 moveq   #$00, D1
-                move.b  (Timer_Second_Count_Address).w, D1           ; $FFFFFE24
+                move.b  (Timer_second).w, D1           ; $FFFFFE24
                 bsr     HUD_Draw_Two_Digit_Number              ; Offset_0x007F84
 Offset_0x007BEC:
                 tst.b   (Update_HUD_lives).w                    ; $FFFFFE1C
@@ -7883,7 +7883,7 @@ Offset_0x007C22:
                 clr.b   (Update_HUD_rings).w                   ; $FFFFFE1D
                 move.l  #$5F400003, D0
                 moveq   #$00, D1
-                move.w  (Ring_Count_Address).w, D1                   ; $FFFFFE20
+                move.w  (Ring_count).w, D1                   ; $FFFFFE20
                 bsr     HUD_Draw_Three_Digit_Number            ; Offset_0x007EA2
 Offset_0x007C36:
                 move.l  #$5E400003, D0
@@ -7901,7 +7901,7 @@ Offset_0x007C36:
 Offset_0x007C64:
                 tst.w   (Pause_Status).w                             ; $FFFFF63A
                 bne.s   Offset_0x007C9A
-                lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
+                lea     (Timer).w, A1                   ; $FFFFFE22
                 cmpi.l  #$00093B3B, (A1)+
                 nop
                 addq.b  #$01, -(A1)
@@ -7928,7 +7928,7 @@ S2_HUD_Update_2P:                                              ; Offset_0x007CA6
                 bne     Offset_0x007D70
                 tst.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 beq.s   Offset_0x007CE6
-                lea     (Time_Count_Address).w, A1                   ; $FFFFFE22
+                lea     (Timer).w, A1                   ; $FFFFFE22
                 cmpi.l  #$00093B3B, (A1)+
                 beq     Timer_Over_2P_Sonic                    ; Offset_0x007D90
                 addq.b  #$01, -(A1)
@@ -10862,7 +10862,7 @@ Touch_Hurt:                                                    ; Offset_0x00A3F0
                 bne.s   Offset_0x00A3EC
                 move.l  A1, A2              
 Hurt_Player:                                                   ; Offset_0x00A3FA                
-                move.w  (Ring_Count_Address).w, D0                   ; $FFFFFE20
+                move.w  (Ring_count).w, D0                   ; $FFFFFE20
                 cmpa.w  #Obj_Player_One, A0                              ; $B000
                 beq.s   Hurt_Player_D0                         ; Offset_0x00A40E
                 tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
@@ -11513,15 +11513,15 @@ Add_Rings:                                                     ; Offset_0x010A26
                 addq.w  #$01, (Total_Ring_Count_Address).w           ; $FFFFFEF0
 Offset_0x010A32:
                 move.w  #Ring_Sfx, D0                                    ; $0032
-                cmpi.w  #$03E7, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$03E7, (Ring_count).w               ; $FFFFFE20
                 bcc.s   Offset_0x010A74
-                addq.w  #$01, (Ring_Count_Address).w                 ; $FFFFFE20
+                addq.w  #$01, (Ring_count).w                 ; $FFFFFE20
                 ori.b   #$01, (Update_HUD_rings).w             ; $FFFFFE1D
-                cmpi.w  #$0064, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$0064, (Ring_count).w               ; $FFFFFE20
                 bcs.s   Offset_0x010A74
                 bset    #$01, (Extra_life_flags).w                   ; $FFFFFE1B
                 beq.s   Offset_0x010A68
-                cmpi.w  #$00C8, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$00C8, (Ring_count).w               ; $FFFFFE20
                 bcs.s   Offset_0x010A74
                 bset    #$02, (Extra_life_flags).w                   ; $FFFFFE1B
                 bne.s   Offset_0x010A74
@@ -24704,7 +24704,7 @@ Offset_0x036504:
                 btst    #$04, Obj_Control_Var_08(A1)                     ; $0038
                 bne.s   Offset_0x036526
                 jsr     (Refresh_Child_Position_Adjusted)      ; Offset_0x04203C
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x036098
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x036526:
@@ -26307,7 +26307,7 @@ Obj_Flicker_Move:                                              ; Offset_0x042AFE
                 addi.w  #$0080, D0
                 cmpi.w  #$0200, D0
                 bhi     Go_Delete_Object_A0                    ; Offset_0x042D3E
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq     Exit_Object_Settings                   ; Offset_0x041D98
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 ;===============================================================================

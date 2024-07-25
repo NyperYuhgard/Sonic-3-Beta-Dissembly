@@ -119,7 +119,7 @@ Offset_0x03CFEA:
 Offset_0x03D006:
                 btst    #$01, Obj_Control_Var_08(A0)                     ; $0038
                 bne.s   Offset_0x03D04E
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$1F, D0
                 bne.s   Offset_0x03D01A
                 bsr.s   Offset_0x03CFD0
@@ -292,7 +292,7 @@ Offset_0x03D234:
                 move.w  #$0060, D3
                 move.w  (A7)+, D4
                 jsr     (Solid_Object)                         ; Offset_0x013556
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x03CF3E
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x03D26E:

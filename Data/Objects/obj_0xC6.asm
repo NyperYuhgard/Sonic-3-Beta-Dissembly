@@ -252,7 +252,7 @@ Offset_0x043760:
                 bsr     Offset_0x043956
 Offset_0x043768:
                 moveq   #$00, D0
-                btst    #$02, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$02, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne.s   Offset_0x043774
                 moveq   #$01, D0
 Offset_0x043774:

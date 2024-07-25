@@ -684,13 +684,14 @@ Debug_Mode_Object_Index          equ M68K_RAM_Start+$FE06
 Debug_Mode_Flag_Index            equ M68K_RAM_Start+$FE08 
 Debug_Mode_Camera_Delay          equ M68K_RAM_Start+$FE0A
 Debug_Mode_Camera_Speed          equ M68K_RAM_Start+$FE0B 
-Vertical_Interrupt_Count         equ M68K_RAM_Start+$FE0C
 
 ; Gonna eventually do the whole thing like this, but for now only a few variables
 		pusho						; save options
 		opt	ae+					; enable auto evens
 
-		rsset M68K_RAM_Start+$FE10
+		rsset M68K_RAM_Start+$FE0C
+Vint_runcount:			rs.l	1					; 4 bytes
+
 Current_ZoneAndAct:		rs.w	1					; 2 bytes; not to be confused with Apparent_ZoneAndAct,
 										; this actually holds the real zone the player is in
 Current_Zone:			equ	Current_ZoneAndAct
@@ -708,13 +709,14 @@ Update_HUD_lives:		rs.b	1
 Update_HUD_rings:		rs.b	1
 Update_HUD_timer:		rs.b	1
 Update_HUD_score:		rs.b	1
+
+Ring_count:			rs.w	1					; 2 bytes
+Timer:				rs.l	1					; 4 bytes
+Timer_minute:			equ	Timer+1
+Timer_second:			equ	Timer+2
+Timer_frame:			equ	Timer+3
 		popo						; restore options
 
-Ring_Count_Address               equ M68K_RAM_Start+$FE20
-Time_Count_Address               equ M68K_RAM_Start+$FE22
-Timer_Minute_Count_Address       equ M68K_RAM_Start+$FE23
-Timer_Second_Count_Address       equ M68K_RAM_Start+$FE24
-Timer_Centiseconds_Count_Address equ M68K_RAM_Start+$FE25
 Score_Count_Address              equ M68K_RAM_Start+$FE26
 Saved_Level_Flag                 equ M68K_RAM_Start+$FE30
 Saved_Last_Start_Post_Hit        equ M68K_RAM_Start+$FE31

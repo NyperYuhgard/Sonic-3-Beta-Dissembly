@@ -59,7 +59,7 @@ Offset_0x048378:
                 dc.b    $00, $40, $80, $C0        
 ;-------------------------------------------------------------------------------
 Offset_0x04837C:
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne.s   Offset_0x0483DC
                 move.w  Obj_Child_Ref(A0), A1                            ; $0046
                 btst    #$00, Obj_Flags(A1)                              ; $0004

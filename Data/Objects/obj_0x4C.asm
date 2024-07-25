@@ -76,7 +76,7 @@ Offset_0x0294CE:
                 add.w   Obj_X(A0), D0                                    ; $0010
                 move.w  D0, Obj_X(A1)                                    ; $0010
                 moveq   #$00, D0
-                btst    #$00, (Ring_Count_Address+$01).w             ; $FFFFFE21
+                btst    #$00, (Ring_count+$01).w             ; $FFFFFE21
                 beq.s   Offset_0x0294FA
                 move.w  #$0080, D0
 Offset_0x0294FA:

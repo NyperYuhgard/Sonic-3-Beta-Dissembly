@@ -247,7 +247,7 @@ Monitor_Sonic_Life:                                            ; Offset_0x01320A
 ;-------------------------------------------------------------------------------  
 Monitor_Rings:                                                 ; Offset_0x01321E
                 addq.w  #$01, (A2)
-                lea     (Ring_Count_Address).w, A2                   ; $FFFFFE20
+                lea     (Ring_count).w, A2                   ; $FFFFFE20
                 lea     (Update_HUD_rings).w, A3               ; $FFFFFE1D
                 lea     (Extra_life_flags).w, A4                     ; $FFFFFE1B
                 lea     (Total_Ring_Count_Address).w, A5             ; $FFFFFEF0
@@ -379,7 +379,7 @@ Offset_0x0133CE:
 ;-------------------------------------------------------------------------------   
 Monitor_Super_Sonic:                                           ; Offset_0x0133D0
                 addq.w  #$01, (A2)
-                addi.w  #$0032, (Ring_Count_Address).w               ; $FFFFFE20
+                addi.w  #$0032, (Ring_count).w               ; $FFFFFE20
                 move.b  #$01, (Super_Sonic_Palette_Status).w         ; $FFFFF65F
                 move.b  #$0F, (Super_Sonic_Palette_Timer).w          ; $FFFFF65E
                 move.b  #$01, (Super_Sonic_flag).w                   ; $FFFFFE19

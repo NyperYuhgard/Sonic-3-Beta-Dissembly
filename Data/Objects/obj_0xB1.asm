@@ -565,7 +565,7 @@ Offset_0x03A6FC:
                 move.w  Obj_Height_3(A0), A1                             ; $0044
                 btst    #$07, Obj_Status(A1)                             ; $002A
                 bne.s   Offset_0x03A730
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x039966
                 jmp     Add_To_Response_List_And_Display(PC)   ; Offset_0x042450
 Offset_0x03A730:
@@ -691,7 +691,7 @@ Offset_0x03A898:
                 sub.w   D4, D3
                 move.w  D2, Obj_X(A0)                                    ; $0010
                 move.w  D3, Obj_Y(A0)                                    ; $0014
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x03A914
                 move.b  Obj_Control_Var_10(A0), D0                       ; $0040

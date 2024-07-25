@@ -1313,7 +1313,7 @@ Sonic_CheckGoSuper:
 		bne.s	Offset_0x00B7B6
 		cmpi.b	#7,(Emeralds_Count).w
 		bne.s	Offset_0x00B7B6
-		cmpi.w	#50,(Ring_Count_Address).w
+		cmpi.w	#50,(Ring_count).w
 		bcs.s	Offset_0x00B7B6
 		tst.b	(Update_HUD_timer).w
 		beq.s	Offset_0x00B7B6
@@ -1548,7 +1548,7 @@ Offset_0x00BA10:
 		nop
 
 Offset_0x00BA22:
-		move.b	(Vertical_Interrupt_Count+3).w,d0
+		move.b	(Vint_runcount+3).w,d0
 		andi.w	#3,d0
 		bne.s	Offset_0x00BA36
 		addq.b	#1,Obj_Map_Id(a0)
@@ -1577,21 +1577,21 @@ Sonic_Super:
 		subq.w	#1,($FFFFF670).w
 		bpl.w	Offset_0x00BAD8		; this is should be a 'bhi' as it actually counts 61 frames instead of 60
 		move.w	#60,($FFFFF670).w
-		tst.w	(Ring_Count_Address).w
+		tst.w	(Ring_count).w
 		beq.s	Sonic_RevertToNormal
 		ori.b	#1,(Update_HUD_rings).w
-		cmpi.w	#1,(Ring_Count_Address).w
+		cmpi.w	#1,(Ring_count).w
 		beq.s	@resetHUD
-		cmpi.w	#10,(Ring_Count_Address).w
+		cmpi.w	#10,(Ring_count).w
 		beq.s	@resetHUD
-		cmpi.w	#100,(Ring_Count_Address).w
+		cmpi.w	#100,(Ring_count).w
 		bne.s	@updateHUD
 ; Offset_0x00BA86:
 @resetHUD:
 		ori.b	#$80,(Update_HUD_rings).w
 ; Offset_0x00BA8C:
 @updateHUD:
-		subq.w	#1,(Ring_Count_Address).w
+		subq.w	#1,(Ring_count).w
 		bne.s	Offset_0x00BAD8
 ; Offset_0x00BA92:
 Sonic_RevertToNormal:
@@ -2231,7 +2231,7 @@ Offset_0x00C210:
 		move.w  (Saved_Obj_Y_P1).w, Obj_Y(A0)         ; $FFFFFE34, $0014
 		move.w  (Saved_Obj_Art_VRAM_P1).w, Obj_Art_VRAM(A0) ; $FFFFFE3C, $000A
 		move.w  (Saved_Top_Solid_P1).w, Obj_Player_Top_Solid(A0) ; $FFFFFE3E, $0046
-		clr.w   (Ring_Count_Address).w		       ; $FFFFFE20
+		clr.w   (Ring_count).w		       ; $FFFFFE20
 		clr.b   (Extra_life_flags).w		         ; $FFFFFE1B
 		bra.s   Offset_0x00C26A
 Offset_0x00C244:

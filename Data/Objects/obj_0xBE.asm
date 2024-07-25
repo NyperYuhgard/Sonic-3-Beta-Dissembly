@@ -23,7 +23,7 @@ Offset_0x047802:
 ;-------------------------------------------------------------------------------
 Offset_0x047806:
                 moveq   #$02, D0
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x047812
                 neg.w   D0
 Offset_0x047812:

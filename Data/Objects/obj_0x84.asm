@@ -33,7 +33,7 @@ Offset_0x04073A:
                 rts     
 ;-------------------------------------------------------------------------------
 Offset_0x04074A:
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x040734
                 bsr     Offset_0x040760
                 jsr     Refresh_Child_Position_Adjusted(PC)    ; Offset_0x04203C

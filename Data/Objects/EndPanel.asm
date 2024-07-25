@@ -36,7 +36,7 @@ Offset_0x041866:
                 jmp     Load_Child_Object_A2(PC)               ; Offset_0x041D9A   
 ;-------------------------------------------------------------------------------
 Offset_0x04187A:
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x04188C
                 lea     Offset_0x041A9E(PC), A2

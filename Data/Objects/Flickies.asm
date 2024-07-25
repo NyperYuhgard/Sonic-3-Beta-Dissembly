@@ -201,7 +201,7 @@ Offset_0x023B42:
                 move.b  D0, Obj_Routine(A0)                              ; $0005
                 tst.b   Obj_Control_Var_08(A0)                           ; $0038
                 beq.s   Offset_0x023B98
-                btst    #$04, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$04, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x023B98
                 neg.w   Obj_Speed_X(A0)                                  ; $0018
                 bchg    #00, Obj_Flags(A0)                               ; $0004

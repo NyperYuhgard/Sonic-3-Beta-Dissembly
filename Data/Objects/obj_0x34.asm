@@ -87,7 +87,7 @@ Offset_0x02400C:
                 bne.s   Offset_0x0240C2
                 cmpi.b  #$07, (Emeralds_Count).w                     ; $FFFFFFB1
                 beq.s   Offset_0x0240C2
-                cmpi.w  #$0032, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$0032, (Ring_count).w               ; $FFFFFE20
                 bcs.s   Offset_0x0240C2
                 bsr     Load_Star_Post_Stars                   ; Offset_0x024302
 Offset_0x0240C2:
@@ -146,9 +146,9 @@ Star_Post_Save_Info:                                           ; Offset_0x024150
                 move.w  Obj_Y(A0), (Saved_Obj_Y_P1).w         ; $0014, $FFFFFE34
                 move.w  (Obj_Player_One+Obj_Art_VRAM).w, (Saved_Obj_Art_VRAM_P1).w ; $FFFFB00A, $FFFFFE3C
                 move.w  (Obj_Player_One+Obj_Player_Top_Solid).w, (Saved_Top_Solid_P1).w ; $FFFFB046, $FFFFFE3E
-                move.w  (Ring_Count_Address).w, (Saved_Ring_Count_Address).w ; $FFFFFE20, $FFFFFE36
+                move.w  (Ring_count).w, (Saved_Ring_Count_Address).w ; $FFFFFE20, $FFFFFE36
                 move.b  (Extra_life_flags).w, (Saved_Ring_Status_Flag).w ; $FFFFFE1B, $FFFFFE54
-                move.l  (Time_Count_Address).w, (Saved_Time).w ; $FFFFFE22, $FFFFFE38
+                move.l  (Timer).w, (Saved_Time).w ; $FFFFFE22, $FFFFFE38
                 move.b  (Dynamic_Resize_Routine).w, (Saved_Dynamic_Resize_Routine).w ; $FFFFEE33, $FFFFFE58
                 move.w  (Sonic_Level_Limits_Max_Y).w, (Saved_Sonic_Level_Limits_Max_Y).w ; $FFFFEE1A, $FFFFFE56
                 move.w  (Camera_X).w, (Saved_Camera_X).w  ; $FFFFEE78, $FFFFFE40
@@ -181,13 +181,13 @@ Star_Post_Load_Info:                                           ; Offset_0x0241EC
                 move.b  (Saved_Last_Start_Post_Hit).w, (Saved_Level_Flag).w ; $FFFFFE31, $FFFFFE30
                 move.w  (Saved_Obj_X_P1).w, (Obj_Player_One+Obj_X).w ; $FFFFFE32, $FFFFB010
                 move.w  (Saved_Obj_Y_P1).w, (Obj_Player_One+Obj_Y).w ; $FFFFFE34, $FFFFB014
-                move.w  (Saved_Ring_Count_Address).w, (Ring_Count_Address).w ; $FFFFFE36, $FFFFFE20
+                move.w  (Saved_Ring_Count_Address).w, (Ring_count).w ; $FFFFFE36, $FFFFFE20
                 move.b  (Saved_Ring_Status_Flag).w, (Extra_life_flags).w ; $FFFFFE54, $FFFFFE1B
-                clr.w   (Ring_Count_Address).w                       ; $FFFFFE20
+                clr.w   (Ring_count).w                       ; $FFFFFE20
                 clr.b   (Extra_life_flags).w                         ; $FFFFFE1B
-                move.l  (Saved_Time).w, (Time_Count_Address).w ; $FFFFFE38, $FFFFFE22
-                move.b  #$3B, (Timer_Centiseconds_Count_Address).w   ; $FFFFFE25
-                subq.b  #$01, (Timer_Second_Count_Address).w         ; $FFFFFE24
+                move.l  (Saved_Time).w, (Timer).w ; $FFFFFE38, $FFFFFE22
+                move.b  #$3B, (Timer_frame).w   ; $FFFFFE25
+                subq.b  #$01, (Timer_second).w         ; $FFFFFE24
                 move.w  (Saved_Obj_Art_VRAM_P1).w, (Obj_Player_One+Obj_Art_VRAM).w ; $FFFFFE3C, $FFFFB00A
                 move.w  (Saved_Top_Solid_P1).w, (Obj_Player_One+Obj_Player_Top_Solid).w ; $FFFFFE3E, $FFFFB046
                 move.b  (Saved_Dynamic_Resize_Routine).w, (Dynamic_Resize_Routine).w ; $FFFFFE58, $FFFFEE33

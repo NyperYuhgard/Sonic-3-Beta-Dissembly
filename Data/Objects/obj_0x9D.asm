@@ -29,7 +29,7 @@ Offset_0x044D04:
                 bsr     Offset_0x044E68
                 jsr     Animate_Raw(PC)                        ; Offset_0x04208E
                 jsr     Find_Player(PC)                        ; Offset_0x042634
-                move.b  (Vertical_Interrupt_Count+$03).w, D4         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D4         ; $FFFFFE0F
                 andi.b  #$07, D4
                 bne.s   Offset_0x044D26
                 moveq   #$01, D4
@@ -88,7 +88,7 @@ Offset_0x044DAE:
 ;-------------------------------------------------------------------------------
 Offset_0x044DBA:
                 move.b  #$00, Obj_Map_Id(A0)                             ; $0022
-                btst    #$02, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$02, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x044DCE
                 move.b  #$02, Obj_Map_Id(A0)                             ; $0022
 Offset_0x044DCE:
@@ -195,18 +195,18 @@ Offset_0x044F12:
                 move.w  #$003B, Obj_Timer(A0)                            ; $002E
                 ori.b   #$01, (Update_HUD_rings).w             ; $FFFFFE1D
                 bset    #$07, Obj_Control_Var_08(A0)                     ; $0038
-                move.w  (Ring_Count_Address).w, D0                   ; $FFFFFE20
+                move.w  (Ring_count).w, D0                   ; $FFFFFE20
                 subq.w  #$01, D0
                 bmi.s   Offset_0x044F6C
                 beq.s   Offset_0x044F44
-                cmpi.w  #$000A, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$000A, (Ring_count).w               ; $FFFFFE20
                 beq.s   Offset_0x044F44
-                cmpi.w  #$0064, (Ring_Count_Address).w               ; $FFFFFE20
+                cmpi.w  #$0064, (Ring_count).w               ; $FFFFFE20
                 bne.s   Offset_0x044F4A
 Offset_0x044F44:
                 ori.b   #$80, (Update_HUD_rings).w             ; $FFFFFE1D
 Offset_0x044F4A:
-                move.w  D0, (Ring_Count_Address).w                   ; $FFFFFE20
+                move.w  D0, (Ring_count).w                   ; $FFFFFE20
                 moveq   #Ring_Left_Speaker_Sfx, D0                         ; $33
                 jsr     (Play_Music)                           ; Offset_0x001176
 Offset_0x044F56:

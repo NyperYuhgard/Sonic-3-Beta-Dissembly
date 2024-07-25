@@ -268,7 +268,7 @@ Offset_0x03DFBC:
 ;-------------------------------------------------------------------------------
 Offset_0x03DFD8:
                 moveq   #$01, D0
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x03DFE4
                 neg.w   D0
 Offset_0x03DFE4:

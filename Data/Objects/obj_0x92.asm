@@ -187,7 +187,7 @@ Offset_0x04A61E:
                 jmp     (Delete_Sprite_Check_X_Y)              ; Offset_0x042AD0  
 ;-------------------------------------------------------------------------------
 Offset_0x04A636:
-                btst    #$02, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$02, (Vint_runcount+$03).w       ; $FFFFFE0F
                 jsr     (Find_Player)                          ; Offset_0x042634
                 bclr    #$00, Obj_Flags(A0)                              ; $0004
                 tst.w   D0
@@ -235,7 +235,7 @@ Offset_0x04A6AA:
                 rts       
 ;-------------------------------------------------------------------------------  
 Offset_0x04A6B8:
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x04A6C8
                 move.b  #$1F, Obj_Col_Flags(A0)                          ; $0028
                 rts

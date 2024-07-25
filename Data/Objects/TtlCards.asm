@@ -91,8 +91,8 @@ Offset_0x024642:
 Offset_0x02464E:
                 tst.w   Obj_Control_Var_0E(A0)                           ; $003E
                 beq.s   Offset_0x024682
-                clr.l   (Time_Count_Address).w                       ; $FFFFFE22
-                clr.w   (Ring_Count_Address).w                       ; $FFFFFE20
+                clr.l   (Timer).w                       ; $FFFFFE22
+                clr.w   (Ring_count).w                       ; $FFFFFE20
                 clr.w   (Total_Ring_Count_Address).w                 ; $FFFFFEF0
                 clr.b   (Extra_life_flags).w                         ; $FFFFFE1B
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2

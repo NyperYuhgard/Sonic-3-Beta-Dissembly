@@ -40,10 +40,10 @@ Offset_0x024844:
                 move.w  #$AC20, D2
                 jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
                 moveq   #$00, D0
-                move.b  (Timer_Minute_Count_Address).w, D0           ; $FFFFFE23
+                move.b  (Timer_minute).w, D0           ; $FFFFFE23
                 mulu.w  #$003C, D0
                 moveq   #$00, D1
-                move.b  (Timer_Second_Count_Address).w, D1           ; $FFFFFE24
+                move.b  (Timer_second).w, D1           ; $FFFFFE24
                 add.w   D1, D0
                 cmpi.w  #$0257, D0
                 bne.s   Offset_0x02486E
@@ -60,7 +60,7 @@ Offset_0x02487A:
                 lea     LR_Decimal_Values(PC), A1              ; Offset_0x024B08
                 move.w  $00(A1, D0), (Level_Results_Time_Bonus).w    ; $FFFFF7D2
 Offset_0x024886:
-                move.w  (Ring_Count_Address).w, D0                   ; $FFFFFE20
+                move.w  (Ring_count).w, D0                   ; $FFFFFE20
                 mulu.w  #$000A, D0
                 move.w  D0, (Level_Results_Ring_Bonus).w             ; $FFFFF7D4
                 clr.w   (Level_Results_Total_Bonus).w                ; $FFFFFF8E

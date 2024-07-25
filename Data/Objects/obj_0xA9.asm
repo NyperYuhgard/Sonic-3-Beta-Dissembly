@@ -495,7 +495,7 @@ Offset_0x037886:
                 jsr     (SpeedToPos)                           ; Offset_0x01111E
                 subq.w  #$01, Obj_Timer(A0)                              ; $002E
                 bmi.s   Offset_0x0378B2
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x0378AC
                 lea     Offset_0x037CEA(PC), A2

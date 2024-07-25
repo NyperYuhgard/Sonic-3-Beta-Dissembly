@@ -71,7 +71,7 @@ Offset_0x045216:
 Offset_0x045230:
                 jsr     Animate_Raw(PC)                        ; Offset_0x04208E
                 moveq   #-$02, D0
-                move.b  (Vertical_Interrupt_Count+$03).w, D1         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D1         ; $FFFFFE0F
                 btst    #$00, D1
                 beq.s   Offset_0x045242
                 moveq   #$01, D0
