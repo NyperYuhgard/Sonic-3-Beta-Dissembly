@@ -4724,7 +4724,7 @@ Level_GetBgm:
 		move.b	#0,(Title_Card_Flag).w
 		cmpi.b	#DDz_Id,(Current_Zone).w	; is this Doomsday Zone?
 		bhi.s	Level_CreateHUD			; if not (but is Zone 0D or above), branch
-		move.l	#Obj_Title_Cards,(Obj_08_Mem_Address).w
+		move.l	#Obj_TitleCard,(Obj_08_Mem_Address).w
 ; Offset_0x003B76:
 Level_TtlCard:
 		move.b	#$C,(VBlank_Index).w
@@ -16893,10 +16893,10 @@ Obj_0x34_Star_Post:                                            ; Offset_0x023F76
                 include 'data\objects\obj_0x34.asm'
 Obj_Time_Over_Game_Over:                                       ; Offset_0x02444C
                 include 'data\objects\tmgmover.asm'
-Obj_Title_Cards:                                               ; Offset_0x024546
-                include 'data\objects\ttlcards.asm'     
-Obj_Level_Results:                                             ; Offset_0x0247D0
-                include 'data\objects\lvresult.asm'      
+; Offset_0x024546: Obj_Title_Cards: Obj_TitleCard:
+		include	"data\objects\ttlcards.asm"
+; Offset_0x0247D0: Obj_LevelResults:
+		include	"data\objects\lvresult.asm"
 ;-------------------------------------------------------------------------------                                   
 Offset_0x024BC4:
                 jmp     (DeleteObject)                         ; Offset_0x011138
