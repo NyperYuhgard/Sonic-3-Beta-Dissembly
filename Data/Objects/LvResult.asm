@@ -375,7 +375,8 @@ Offset_0x024ACE:
 ; End of function LevelResults_GetDecimalScore
 
 ; ===========================================================================
-; Unknown data; powers of two
+; Apparently, according to Jorge, this is used by LevelResults_GetDecimalScore
+; as it reads backwards into these values when reading TimeBonuses
 ; Offset_0x024AD8:
 		dc.b    $03, $27, $68, $01, $63, $84, $00, $81
 		dc.b    $92, $00, $40, $96, $00, $20, $48, $00
