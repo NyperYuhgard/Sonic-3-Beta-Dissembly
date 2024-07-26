@@ -28,7 +28,7 @@ Offset_0x0417B2:
                 cmp.w   D0, D1
                 bcc.s   Offset_0x0417FC
                 bclr    #$00, Obj_Control_Var_08(A1)                     ; $0038
-                move.l  #Obj_0x01_Monitors, (A0)               ; Offset_0x012F44
+                move.l  #Obj01_Monitors, (A0)               ; Offset_0x012F44
                 move.b  #$02, Obj_Routine(A0)                            ; $0005
                 move.b  #$04, Obj_Control_Var_0C(A0)                     ; $003C
                 move.w  #$FC00, Obj_Speed_Y(A0)                          ; $001A
