@@ -14470,8 +14470,8 @@ LRz_Rocks_Mappings:                                            ; Offset_0x012A90
 ;-------------------------------------------------------------------------------
 Obj_0x02_Layer_Switch:                                         ; Offset_0x012AE8
                 include 'data\objects\obj_0x02.asm'
-Obj_0x01_Monitors:                                             ; Offset_0x012F44
-                include 'data\objects\obj_0x01.asm'
+; Offset_0x012F44: Obj_0x01_Monitors: Obj01_Monitors:
+		include	"data\objects\obj_0x01.asm"
                 
 ;------------------------------------------------------------------------------- 
 ; Rotina para tratar os espinhos e outros objetos como objeto s�lido
@@ -14523,7 +14523,7 @@ Solid_Object_2:                                                ; Offset_0x0135B6
                 addq.b  #$01, D6
 Solid_Object_2_A1:                                             ; Offset_0x0135CC
                 btst    D6, Obj_Status(A0)                               ; $002A
-                beq     Solid_Object_Monitors                  ; Offset_0x013890
+                beq     SolidObject_cont                  ; Offset_0x013890
                 move.w  D1, D2
                 add.w   D2, D2
                 btst    #$01, Obj_Status(A1)                             ; $002A
@@ -14793,7 +14793,7 @@ Offset_0x013888:
 ; Rotina para tratar os monitores como objeto s�lido
 ; ->>>
 ;-------------------------------------------------------------------------------                  
-Solid_Object_Monitors:                                         ; Offset_0x013890
+SolidObject_cont:                                         ; Offset_0x013890
                 move.w  Obj_X(A1), D0                                    ; $0010
                 sub.w   Obj_X(A0), D0                                    ; $0010
                 add.w   D1, D0
@@ -28856,7 +28856,7 @@ DOL_00: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -28954,7 +28954,7 @@ DOL_01: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29070,7 +29070,7 @@ DOL_02: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($09<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29237,7 +29237,7 @@ DOL_03: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29347,7 +29347,7 @@ DOL_04: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29460,7 +29460,7 @@ DOL_05: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29501,7 +29501,7 @@ DOL_06: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($05<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29608,7 +29608,7 @@ DOL_07: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($05<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29715,7 +29715,7 @@ DOL_08: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29828,7 +29828,7 @@ DOL_09: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -29953,7 +29953,7 @@ DOL_0A: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30021,7 +30021,7 @@ DOL_0B: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30050,7 +30050,7 @@ DOL_0C: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30090,7 +30090,7 @@ DOL_0D: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30119,7 +30119,7 @@ DOL_0E: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30148,7 +30148,7 @@ DOL_0F: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30177,7 +30177,7 @@ DOL_10: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30537,7 +30537,7 @@ DOL_16: ; DOL - Debug Object List
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
                 dc.l    Rings_Mappings                         ; Offset_0x010DE2
                 dc.w    $A6BC
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    ($08<<$18)|Monitors_Mappings           ; Offset_0x0134A2
                 dc.w    $04C4
                 dc.l    ($01<<$18)|Obj_0x02_Layer_Switch       ; Offset_0x012AE8
@@ -30570,7 +30570,7 @@ DOL_16_End:
 ;=============================================================================== 
 Object_List:                                                   ; Offset_0x04C964
                 dc.l    Obj_0x00_Rings                         ; Offset_0x0109A4
-                dc.l    Obj_0x01_Monitors                      ; Offset_0x012F44
+                dc.l    Obj01_Monitors                      ; Offset_0x012F44
                 dc.l    Obj_0x02_Layer_Switch                  ; Offset_0x012AE8
                 dc.l    Obj_0x03_AIz_Hollow_Tree               ; Offset_0x014E88
                 dc.l    Obj_0x04_Collapsing_Platform           ; Offset_0x01582E
