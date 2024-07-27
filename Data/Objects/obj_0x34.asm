@@ -270,7 +270,7 @@ Load_Star_Post_Stars:                                          ; Offset_0x024302
                 moveq   #$03, D1
                 moveq   #$00, D2
 Offset_0x024306:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x024370
                 move.l  (A0), (A1)
                 move.l  #Star_Post_Stars_Mappings, Obj_Map(A1) ; Offset_0x0242E4, $000C

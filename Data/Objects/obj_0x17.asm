@@ -29,7 +29,7 @@ Obj_0x17_LBz_Hooked_Ride:                                      ; Offset_0x01D4FC
                 move.l  LBz_Hooked_Ride_Range(PC, D0), Obj_Control_Var_04(A0) ; Offset_0x01D4C8, $0034
                 move.l  #Hooked_Ride_Mappings, Obj_Map(A0) ; Offset_0x01D8F8, $000C
                 move.w  #$2433, Obj_Art_VRAM(A0)                         ; $000A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x01D5A2
                 move.l  #Offset_0x01D6CA, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

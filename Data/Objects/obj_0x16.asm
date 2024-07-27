@@ -20,7 +20,7 @@ Offset_0x01D31C:
                 add.b   Obj_Subtype(A0), D0                              ; $002C
                 andi.b  #$7F, D0
                 bne.s   Offset_0x01D376
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01D376
                 move.l  #Offset_0x01D39A, (A1)
                 bsr.s   Offset_0x01D2EA

@@ -17,7 +17,7 @@
                 move.l  #Offset_0x020916, (A0)
                 bra.s   Offset_0x020916
 Offset_0x02089E:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0208EA
                 move.l  #Offset_0x020998, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

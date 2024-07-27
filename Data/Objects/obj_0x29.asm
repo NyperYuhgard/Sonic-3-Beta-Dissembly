@@ -56,7 +56,7 @@ Offset_0x020F80:
                 tst.b   Obj_Control_Var_06(A0)                           ; $0036
                 bne.s   Offset_0x020FE6
                 move.b  #$01, Obj_Control_Var_06(A0)                     ; $0036
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x020FE6
                 move.l  #Offset_0x020FEC, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

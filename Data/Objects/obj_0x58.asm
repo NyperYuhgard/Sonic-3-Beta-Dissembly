@@ -13,7 +13,7 @@
                 move.w  Obj_Y(A0), Obj_Control_Var_02(A0)         ; $0014, $0032
                 move.b  #$03, Obj_Map_Id(A0)                             ; $0022
                 move.b  #$8F, Obj_Col_Flags(A0)                          ; $0028
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02A444
                 move.l  #Offset_0x02A4C4, (A1)
                 move.l  #Swinging_Spiked_Ball_Mappings, Obj_Map(A1) ; Offset_0x02A582, $000C

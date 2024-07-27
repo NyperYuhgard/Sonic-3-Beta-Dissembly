@@ -333,7 +333,7 @@ Offset_0x014814:
                 bra.s   Offset_0x01482C      
 ;-------------------------------------------------------------------------------  
 Offset_0x014824:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x014886
 Offset_0x01482C:
                 move.l  (A0), (A1)

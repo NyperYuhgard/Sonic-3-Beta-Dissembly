@@ -11,7 +11,7 @@
                 move.b  #$08, Obj_Height(A0)                             ; $0006
                 move.w  Obj_Y(A0), Obj_Control_Var_02(A0)         ; $0014, $0032
                 bset    #$07, Obj_Status(A0)                             ; $002A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02C054
                 move.l  #Offset_0x02C0D4, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -20,7 +20,7 @@
                 addi.w  #$000C, Obj_Y(A1)                                ; $0014
                 move.b  #$A6, Obj_Col_Flags(A1)                          ; $0028
                 move.w  A0, Obj_Control_Var_0E(A1)                       ; $003E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02C054
                 move.l  #Offset_0x02C0EA, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

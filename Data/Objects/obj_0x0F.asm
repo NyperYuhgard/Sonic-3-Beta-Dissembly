@@ -338,7 +338,7 @@ Offset_0x015D78:
                 bra.s   Offset_0x015DA4              
 ;-------------------------------------------------------------------------------
 Offset_0x015D9C:
-                bsr     SingleObjectLoad_A0                    ; Offset_0x011DE0
+                bsr     AllocateObjectAfterCurrent                    ; Offset_0x011DE0
                 bne.s   Offset_0x015DDA
                 addq.w  #$06, A3
 ;-------------------------------------------------------------------------------                

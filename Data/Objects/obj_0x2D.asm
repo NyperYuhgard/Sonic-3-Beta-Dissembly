@@ -37,7 +37,7 @@ Offset_0x0227FA:
                 add.w   Obj_Control_Var_04(A0), D0                       ; $0034
                 and.w   Obj_Control_Var_02(A0), D0                       ; $0032
                 bne     Offset_0x0228C0
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0228C0
                 move.l  #Offset_0x0228C6, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -54,7 +54,7 @@ Offset_0x022848:
                 move.b  #$04, Obj_Flags(A1)                              ; $0004
                 move.w  #$0280, Obj_Priority(A1)                         ; $0008
                 move.l  A1, A2
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0228C0
                 move.l  #Offset_0x022952, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

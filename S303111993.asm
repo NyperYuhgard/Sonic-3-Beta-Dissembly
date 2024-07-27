@@ -7545,7 +7545,8 @@ Offset_0x00672C:
 Pal_Special_Stage_1_Test:                                      ; Offset_0x006750
                 incbin  'data\ss_test\ss_test.pal'  
 ;------------------------------------------------------------------------------- 
-SS_SingleObjectLoad:                                           ; Offset_0x0067D0
+; Offset_0x0067D0: SS_SingleObjectLoad:
+SS_AllocateObject:
                 move.l  A0, A1
                 move.w  #Obj_Fixed_RAM_End, D0                           ; $CF82
                 sub.w   A0, D0
@@ -13188,8 +13189,8 @@ Offset_0x011D98:
 		move.l	(a4,d2.w),(a1)
 		move.b	(a0)+,Obj_Subtype(a1)
 		move.w	a3,Obj_Respaw_Ref(a1)
-; Offset_0x11DC8:
-SingleObjectLoad_A1_D0:
+; Offset_0x11DC8: SingleObjectLoad_A1_D0:
+AllocateObject_Immediate:
 		subq.w	#1,d0
 		bmi.s	Offset_0x011DD6
 
@@ -13225,8 +13226,7 @@ AllocateObject:
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
-; Offset_0x011DE0:
-SingleObjectLoad_A0:			; eventually get rid of references to this label
+; Offset_0x011DE0: SingleObjectLoad_A0:
 AllocateObjectAfterCurrent:
 		move.l	a0,a1
 		move.w	#Obj_Dynamic_RAM_End,d0
@@ -21057,7 +21057,7 @@ Offset_0x0321DA:
                 move.w  D2, Obj_Timer(A1)                                ; $002E
                 move.l  D3, Obj_Control_Var_00(A1)                       ; $0030
                 swap.w  D2
-                jsr     (SingleObjectLoad_A1_D0)               ; Offset_0x011DC8
+                jsr     (AllocateObject_Immediate)               ; Offset_0x011DC8
                 bne.s   Offset_0x03221A
                 move.l  #Obj_Earthquake_Tiles_Attributes, (A1) ; Offset_0x0325CE
                 move.w  D1, Obj_X(A1)                                    ; $0010
@@ -21066,7 +21066,7 @@ Offset_0x0321DA:
                 addi.w  #$0020, D1
                 swap.w  D2
                 addq.l  #$04, D3
-                jsr     (SingleObjectLoad_A1_D0)               ; Offset_0x011DC8
+                jsr     (AllocateObject_Immediate)               ; Offset_0x011DC8
                 dbne    D4, Offset_0x0321DA
 Offset_0x03221A:
                 st      (Earthquake_Flag).w                          ; $FFFFEECC

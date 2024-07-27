@@ -63,7 +63,7 @@ Offset_0x01D112:
                 tst.w   (A2)
                 bne.s   Offset_0x01D140
                 move.l  A1, -(A7)
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01D13E
                 move.l  #Offset_0x01D1BC, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

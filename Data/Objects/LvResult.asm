@@ -85,7 +85,7 @@ LevelResults_Main:
 		subq.w	#1,Obj_Timer(a0)
 		tst.b	(Kosinski_Modules_Left).w		; has the KosinskiM art finished decompressing?
 		bne.s	Offset_0x02490C				; if not, branch
-		jsr	(SingleObjectLoad_A0).l
+		jsr	(AllocateObjectAfterCurrent).l
 		bne.s	Offset_0x02490C
 		lea	LevelResults_ObjArray(pc),a2
 		moveq	#(LevelResults_ObjArray_End-LevelResults_ObjArray)/14-1,d1	; create objects
@@ -103,7 +103,7 @@ LevelResults_MakeObject:
 		move.b	#$40,Obj_Flags(a1)
 		move.l	#Level_Results_Mappings,Obj_Map(a1)
 		move.w	a0,Obj_Respaw_Ref(a1)
-		jsr	(SingleObjectLoad_A1_D0).l
+		jsr	(AllocateObject_Immediate).l
 		dbne	d1,LevelResults_MakeObject
 		addq.b	#2,Obj_Routine(a0)
 

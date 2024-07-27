@@ -177,7 +177,7 @@ Offset_0x017372:
                 bra.s   Offset_0x0173A0     
 ;-------------------------------------------------------------------------------
 Offset_0x017396:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0173DA
                 addq.w  #$06, A3
 Offset_0x0173A0:

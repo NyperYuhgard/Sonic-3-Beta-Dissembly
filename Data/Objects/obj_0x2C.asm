@@ -15,7 +15,7 @@
                 move.b  #$08, Obj_Height(A0)                             ; $0006
                 move.b  #$04, Obj_Flags(A0)                              ; $0004
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x021FCE
                 move.l  #Offset_0x0220E4, (A1)
                 move.l  #Collapsing_Bridge_Mappings, Obj_Map(A1) ; Offset_0x0222A2, $000C
@@ -58,7 +58,7 @@ Offset_0x021FD8:
                 move.b  #$08, Obj_Height(A0)                             ; $0006
                 move.b  #$04, Obj_Flags(A0)                              ; $0004
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x022096
                 move.l  #Offset_0x0220E4, (A1)
                 move.l  #Collapsing_Bridge_Mappings_2, Obj_Map(A1) ; Offset_0x0222C4, $000C
@@ -225,7 +225,7 @@ Offset_0x02222E:
                 bra.s   Offset_0x02224E   
 ;-------------------------------------------------------------------------------
 Offset_0x022246:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02228C
 Offset_0x02224E:
                 move.l  D4, (A1)

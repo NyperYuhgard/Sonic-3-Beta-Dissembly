@@ -22,7 +22,7 @@ Offset_0x020092:
                 clr.b   Obj_Col_Prop(A0)                                 ; $0029
                 move.w  #$0081, Obj_Control_Var_00(A0)                   ; $0030
                 move.w  #$0001, (Animate_Counters+$04).w             ; $FFFFF7F4
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0200DC
                 move.l  #Obj_0x8B_LBz_Flybot_767, (A1)         ; Offset_0x048DF8
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

@@ -8,7 +8,7 @@
                 move.l  A0, A1
                 tst.b   Obj_Subtype(A0)                                  ; $002C
                 bpl.s   Offset_0x02648A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0264D4
                 move.l  #Offset_0x02669C, (A0)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

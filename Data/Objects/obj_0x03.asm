@@ -73,7 +73,7 @@ Offset_0x014F10:
                 move.l  #$00000000, (A2)
                 bset    #$06, Obj_Player_Control(A1)                     ; $002E
                 bset    #$01, Obj_Player_Control(A1)                     ; $002E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x014F7E
                 move.l  #Obj_AIz_Tree_Reveal_Control, (A1)     ; Offset_0x03064C
 Offset_0x014F7E:

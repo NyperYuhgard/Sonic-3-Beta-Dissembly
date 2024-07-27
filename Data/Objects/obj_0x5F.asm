@@ -9,7 +9,7 @@ Offset_0x019FD6:
                 dc.b    $0C, $08, $02, $01, $0C, $08, $03, $01                  
 ;-------------------------------------------------------------------------------
 Obj_0x5F_Retracting_Spring:                                    ; Offset_0x019FF6
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01A0CC
                 move.l  #Offset_0x01A38E, (A1)
                 move.l  #Retracting_Spring_Mappings, Obj_Map(A1) ; Offset_0x01A408, $000C

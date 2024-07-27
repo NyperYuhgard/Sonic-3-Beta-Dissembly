@@ -46,7 +46,7 @@ Offset_0x02457E:
 TitleCard_Main:
 		tst.b	(Kosinski_Modules_Left).w		; has the KosinskiM art finished decompressing?
 		bne.s	Offset_0x02461E				; if not, branch
-		jsr	(SingleObjectLoad_A0).l
+		jsr	(AllocateObjectAfterCurrent).l
 		bne.s	Offset_0x02461E
 		lea	TitleCard_ObjArray(pc),a2
 		moveq	#(TitleCard_ObjArray_End-TitleCard_ObjArray)/14-1,d1	; create objects
@@ -63,7 +63,7 @@ TitleCard_MakeObject:
 		move.b	#$40,Obj_Flags(a1)
 		move.l	#Title_Cards_Mappings,Obj_Map(a1)
 		move.w	a0,Obj_Respaw_Ref(a1)
-		jsr	(SingleObjectLoad_A1_D0).l
+		jsr	(AllocateObject_Immediate).l
 		dbne	d1,TitleCard_MakeObject
 		tst.w	Obj_Control_Var_0E(a0)
 		beq.s	Offset_0x02461A

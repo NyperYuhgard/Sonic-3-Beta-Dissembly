@@ -23,7 +23,7 @@
                 move.b  #$00, Obj_Map_Id(A1)                             ; $0022
                 move.b  #$03, Obj_Player_Control(A1)                     ; $002E
 Offset_0x018640:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Intro_Surfboard_Main                   ; Offset_0x018654
                 move.l  #Intro_Surfboard_Splash, (A1)          ; Offset_0x018AC4
                 move.w  A0, Obj_P_Flips_Remaining(A1)                    ; $0030
@@ -36,7 +36,7 @@ Intro_Surfboard_Main:                                          ; Offset_0x018654
                 addi.w  #$0008, Obj_X(A0)                                ; $0010
                 cmpi.w  #$0900, Obj_X(A1)                                ; $0010
                 bcs.s   Offset_0x0186C4
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x018698
                 move.l  #Surfboard, (A1)                       ; Offset_0x018D7A
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -177,7 +177,7 @@ Offset_0x018860:
                 subq.w  #$01, Obj_Player_Control(A0)                     ; $002E
                 bpl.s   Offset_0x018892
                 move.w  #$0005, Obj_Player_Control(A0)                   ; $002E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x018892
                 move.l  #Surfboard_Waves, (A1)                 ; Offset_0x018A3C
                 move.w  A0, Obj_P_Flips_Remaining(A1)                    ; $0030
@@ -360,7 +360,7 @@ Offset_0x018AB6:
 Intro_Surfboard_Splash:                                        ; Offset_0x018AC4
                 move.l  A0, A1
                 bsr.s   Offset_0x018AF4
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x018AF2
                 bsr.s   Offset_0x018B0C
                 move.l  #Offset_0x018BA8, (A1)

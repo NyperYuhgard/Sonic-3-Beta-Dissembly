@@ -64,7 +64,7 @@ Offset_0x027A22:
                 move.b  (Level_Frame_Count+$01).w, D0                ; $FFFFFE05
                 andi.b  #$03, D0
                 bne.s   Offset_0x027A6A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x027A6A
                 move.l  #Obj_Fire_Shield_Dissipate, (A1)       ; Offset_0x013E28
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

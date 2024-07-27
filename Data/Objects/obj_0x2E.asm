@@ -11,7 +11,7 @@
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
                 move.w  Obj_Y(A0), Obj_Control_Var_00(A0)         ; $0014, $0030
                 move.b  (Water_Entered_Counter).w, Obj_Control_Var_06(A0) ; $FFFFF64D, $0036
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x022AD4
                 move.l  #Offset_0x022C14, (A1)
                 move.b  #$04, Obj_Flags(A1)                              ; $0004

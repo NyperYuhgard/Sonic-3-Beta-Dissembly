@@ -151,7 +151,7 @@ Offset_0x0152F6:
                 bpl     Offset_0x0152DE
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x015310:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x015338
                 moveq   #$48, D0
 Offset_0x01531C:
@@ -350,7 +350,7 @@ Offset_0x015576:
                 bra.s   Offset_0x01559C
 ;-------------------------------------------------------------------------------
 Offset_0x015596:
-                bsr     SingleObjectLoad_A0                    ; Offset_0x011DE0
+                bsr     AllocateObjectAfterCurrent                    ; Offset_0x011DE0
                 bne.s   Offset_0x0155F4
 Offset_0x01559C:
                 move.l  D4, (A1)

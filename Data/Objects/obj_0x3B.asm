@@ -49,7 +49,7 @@ Offset_0x025CB6:
                 move.w  Obj_Y(A0), D3                                    ; $0014
                 moveq   #$07, D1
 Offset_0x025CE8:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x025D40
                 move.l  #Offset_0x025E54, (A1)
                 move.l  #Water_Wall_Debris_Mappings, Obj_Map(A1) ; Offset_0x0263B8, $000C
@@ -97,7 +97,7 @@ Offset_0x025D76:
                 subq.w  #$01, Obj_Control_Var_00(A0)                     ; $0030
                 addq.w  #$08, Obj_X(A0)                                  ; $0010
 Offset_0x025D84:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x025E02
                 move.l  #Offset_0x025F18, (A1)
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -165,7 +165,7 @@ Offset_0x025E6A:
                 asr.w   Obj_Speed_X(A0)                                  ; $0018
                 asr.w   Obj_Speed_X(A0)                                  ; $0018
                 move.l  #Offset_0x025EE2, (A0)
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x025EDC
                 move.l  #Offset_0x025F78, (A1)
                 move.l  #Water_Wall_Mappings, Obj_Map(A1) ; Offset_0x0262BA, $000C
@@ -314,7 +314,7 @@ Offset_0x026080:
                 subi.w  #$0080, D3
                 moveq   #$07, D1
 Offset_0x0260CA:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x026122
                 move.l  #Offset_0x025E54, (A1)
                 move.l  #Water_Wall_Debris_Mappings, Obj_Map(A1) ; Offset_0x0263B8, $000C
@@ -366,7 +366,7 @@ Offset_0x0261AA:
                 subi.w  #$000A, (Obj_Player_Two+Obj_Y).w             ; $FFFFB05E
                 jsr     (SpeedToPos)                           ; Offset_0x01111E
                 addi.w  #$0048, Obj_Speed_Y(A0)                          ; $001A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02620E
                 jsr     (PseudoRandomNumber)                   ; Offset_0x001AFA
                 move.w  D0, D1
@@ -378,7 +378,7 @@ Offset_0x0261AA:
                 move.w  D1, Obj_Speed_X(A1)                              ; $0018
                 move.w  #$F900, Obj_Speed_Y(A1)                          ; $001A
                 move.w  D0, D2
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02620E
                 bsr.s   Offset_0x026214
                 subi.w  #$0010, Obj_X(A1)                                ; $0010

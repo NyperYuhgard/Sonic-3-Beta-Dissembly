@@ -25,10 +25,10 @@ Offset_0x01FF76:
                 subq.w  #$01, Obj_Control_Var_00(A0)                     ; $0030
                 bpl.s   Offset_0x01FFBA
                 move.w  Obj_Control_Var_02(A0), Obj_Control_Var_00(A0) ; $0032, $0030
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01FFBA
                 bsr.s   Offset_0x01FFC0
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01FFBA
                 bsr.s   Offset_0x01FFC0
                 move.w  #$0080, Obj_Priority(A1)                         ; $0008

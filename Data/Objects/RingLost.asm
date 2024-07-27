@@ -33,7 +33,7 @@ Offset_0x010B08:
                 bra.s   Offset_0x010B18
 ;-------------------------------------------------------------------------------
 Offset_0x010B10:
-                bsr     SingleObjectLoad_A0                    ; Offset_0x011DE0
+                bsr     AllocateObjectAfterCurrent                    ; Offset_0x011DE0
                 bne     Offset_0x010B9E
 Offset_0x010B18:
                 move.l  #Rings_Lost, (A1)                      ; Offset_0x010AD6

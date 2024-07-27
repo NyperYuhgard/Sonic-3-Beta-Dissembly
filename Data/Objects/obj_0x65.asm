@@ -25,35 +25,35 @@
                 clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
                 clr.w   (Ring_count).w                       ; $FFFFFE20
                 clr.w   (Ring_Count_Address_P2).w                    ; $FFFFFED0
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Offset_0x02DCD6, (A1)
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Offset_0x02DCD6, (A1)
                 move.b  #$01, Obj_Subtype(A1)                            ; $002C
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Obj_Lap_Number, (A1)                  ; Offset_0x02D4A8
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Obj_Lap_Number, (A1)                  ; Offset_0x02D4A8
                 move.b  #$01, Obj_Subtype(A1)                            ; $002C
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Obj_Neon_Display, (A1)                ; Offset_0x02D588
                 move.w  #$0120, Obj_X(A1)                                ; $0010
                 move.w  #$00B8, Obj_Y(A1)                                ; $0014
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Obj_Timer_P1, (A1)                    ; Offset_0x02DAE6
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Obj_Timer_P2, (A1)                    ; Offset_0x02DB48
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Offset_0x02DDF4, (A1)
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D23C
                 move.l  #Offset_0x02DDF4, (A1)
                 move.b  #$01, Obj_Subtype(A1)                            ; $002C
@@ -391,7 +391,7 @@ Offset_0x02D684:
 Offset_0x02D6A2:
                 rts
 Offset_0x02D6A4:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02D6CC
                 move.l  #Obj_Neon_Display, (A1)                ; Offset_0x02D588
                 move.w  #$0120, Obj_X(A1)                                ; $0010

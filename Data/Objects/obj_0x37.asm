@@ -11,7 +11,7 @@
                 move.b  #$40, Obj_Width(A0)                              ; $0007
                 move.b  #$20, Obj_Height(A0)                             ; $0006
                 move.b  #$02, Obj_Map_Id(A0)                             ; $0022
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0259E8
                 move.l  #Offset_0x025A72, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

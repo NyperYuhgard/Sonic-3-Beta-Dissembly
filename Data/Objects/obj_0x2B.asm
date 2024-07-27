@@ -29,7 +29,7 @@ Offset_0x021B5E:
                 subq.b  #$01, Obj_Control_Var_07(A0)                     ; $0037
 Offset_0x021B86:
                 move.b  D1, Obj_Control_Var_06(A0)                       ; $0036
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x021C20
                 move.l  #Offset_0x021C48, (A1)
                 move.l  #Flipping_Bridge_Mappings, Obj_Map(A1) ; Offset_0x021E78, $000C

@@ -90,7 +90,7 @@ Offset_0x01CC7C:
                 addq.b  #$01, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$0007, Obj_Control_Var_08(A0)                   ; $0038
                 addq.w  #$02, Obj_Control_Var_06(A0)                     ; $0036
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01CCD4
                 move.l  #Obj_0x14_LBz_Trigger_Bridge, (A1)     ; Offset_0x01CBA2
                 move.w  Obj_Control_Var_00(A0), Obj_X(A1)         ; $0030, $0010
@@ -137,7 +137,7 @@ Offset_0x01CD0A:
                 addq.b  #$01, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$0007, Obj_Control_Var_08(A0)                   ; $0038
                 addq.w  #$02, Obj_Control_Var_06(A0)                     ; $0036
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01CD62
                 move.l  #Obj_0x14_LBz_Trigger_Bridge, (A1)     ; Offset_0x01CBA2
                 move.w  Obj_Control_Var_00(A0), Obj_X(A1)         ; $0030, $0010

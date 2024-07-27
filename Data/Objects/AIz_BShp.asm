@@ -9,7 +9,7 @@
                 move.w  #$3FBC, D1
                 moveq   #$01, D2
 Offset_0x0311D6:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0311F0
                 move.l  #Obj_AIz_Battleship_Propeller, (A1)    ; Offset_0x031288
                 move.w  D1, Obj_Timer(A1)                                ; $002E
@@ -32,7 +32,7 @@ Obj_AIz_FBz_Battleship_Main:                                   ; Offset_0x031208
                 bpl.s   Offset_0x031234
                 move.l  #Obj_AIz_Boss_Small, (A0)              ; Offset_0x03151A
                 st      (Foreground_Events_Y_Counter).w              ; $FFFFEEC4
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x031232
                 move.l  #Obj_AIz_Make_Tree, (A1)               ; Offset_0x031470
 Offset_0x031232:
@@ -59,7 +59,7 @@ Offset_0x031260:
                 move.l  Obj_Timer(A0), A2                                ; $002E
                 move.w  (A2)+, Obj_Control_Var_02(A0)                    ; $0032
                 bmi.s   Offset_0x031286
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x031286
                 move.l  #Obj_AIz_FBz_Ship_Bomb, (A1)           ; Offset_0x0312DC
                 move.w  (A2)+, Obj_Timer(A1)                             ; $002E
@@ -139,7 +139,7 @@ AIz_FBz_Ship_Bomb_Drop:                                        ; Offset_0x031358
                 move.w  #$0010, (Earthquake_Flag).w                  ; $FFFFEECC
                 moveq   #Missile_Explosion_Sfx, D0                         ; $52
                 jsr     (Play_Music)                           ; Offset_0x001176
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0313D0
                 lea     AIz_FBz_Bomb_Explosion_Data(PC), A2    ; Offset_0x031AC2
                 moveq   #$07, D1
@@ -153,7 +153,7 @@ Offset_0x0313A0:
                 add.w   D2, Obj_Y(A1)                                    ; $0014
                 move.w  (A2)+, Obj_Ani_Number(A1)                        ; $0020
                 move.w  (A2)+, Obj_Timer(A1)                             ; $002E
-                jsr     (SingleObjectLoad_A1_D0)               ; Offset_0x011DC8
+                jsr     (AllocateObject_Immediate)               ; Offset_0x011DC8
                 dbne    D1, Offset_0x0313A0
 Offset_0x0313D0:
                 move.l  #DeleteObject, (A0)                    ; Offset_0x011138
@@ -225,7 +225,7 @@ Offset_0x03149C:
                 sub.w   Obj_Timer(A0), D0                                ; $002E
                 cmp.w   (A2)+, D0
                 bcs.s   Offset_0x0314BE
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0314BE
                 move.l  #Obj_AIz_Background_Tree, (A1)         ; Offset_0x0314C0
                 move.w  (A2)+, Obj_Priority(A1)                          ; $0008
