@@ -164,7 +164,7 @@ Offset_0x023AA2:
                 move.w  #$FC00, Obj_Speed_Y(A0)                          ; $001A
                 tst.b   Obj_Control_Var_08(A0)                           ; $0038
                 bne.s   Offset_0x023B2C
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x023B26
                 move.l  #Obj_Enemy_Points, (A1)                ; Offset_0x023E42
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

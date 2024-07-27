@@ -152,7 +152,7 @@ Monitors_SpawnIcon:
 		clr.b	Obj_Status(a0)
 		addq.b	#2,Obj_Routine(a0)
 		move.b	#0,Obj_Col_Flags(a0)
-		bsr.w	SingleObjectLoad
+		bsr.w	AllocateObject
 		bne.s	Monitors_SpawnSmoke
 		move.l	#Obj_MonitorContents,(a1)		; load Obj_MonitorContents
 		move.w	Obj_X(a0),Obj_X(a1)			; set icon's position
@@ -161,7 +161,7 @@ Monitors_SpawnIcon:
 		move.w	Obj_Player_Last(a0),Obj_Player_Last(a1)	; parent gets item
 ; Offset_0x0130F6:
 Monitors_SpawnSmoke:
-		bsr.w	SingleObjectLoad
+		bsr.w	AllocateObject
 		bne.s	Offset_0x013112
 		move.l	#Object_Hit,(a1)			; load Obj_Explosion
 		addq.b	#2,Obj_Routine(a1)

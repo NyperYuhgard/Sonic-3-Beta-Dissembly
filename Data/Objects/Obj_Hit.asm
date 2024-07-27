@@ -15,7 +15,7 @@ Offset_0x013D8A:
 ;-------------------------------------------------------------------------------
 Offset_0x013D90:
                 addq.b  #$02, Obj_Routine(A0)                            ; $0005
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x013DB4
                 move.l  #Obj_Flickies, (A1)                    ; Offset_0x0238DA
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

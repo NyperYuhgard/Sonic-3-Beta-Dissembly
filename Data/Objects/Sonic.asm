@@ -1354,13 +1354,13 @@ Sonic_ThrowRings:
 		andi.b	#$20,d0
 		beq.s	@notRolling
 		move.w	Obj_Speed_X(a0),d2
-		bsr.w	SingleObjectLoad
+		bsr.w	AllocateObject
 		bne.w	@skip
 		bsr.w	Obj_ThrownRing
 		move.w	#$800,Obj_Speed_X(a1)
 		move.w	#0,Obj_Speed_Y(a1)
 		add.w	d2,Obj_Speed_X(a1)
-		bsr.w	SingleObjectLoad
+		bsr.w	AllocateObject
 		bne.w	@skip
 		bsr.w	Obj_ThrownRing
 		move.w	#-$800,Obj_Speed_X(a1)
@@ -1384,7 +1384,7 @@ Sonic_ThrowRings:
 		andi.b	#$10,d0
 		beq.s	Offset_0x00B8B6
 		move.w	Obj_Speed_X(a0),d2
-		bsr.w	SingleObjectLoad
+		bsr.w	AllocateObject
 		bne.w	Offset_0x00B870
 		bsr.w	Obj_ThrownRing
 		move.w	#$800,Obj_Speed_X(a1)

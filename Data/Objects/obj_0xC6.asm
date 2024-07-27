@@ -305,7 +305,7 @@ Offset_0x0437EE:
                 clr.w   Obj_Speed_X(A1)                                  ; $0018
                 clr.w   Obj_Speed_Y(A1)                                  ; $001A
                 clr.w   Obj_Inertia(A1)                                  ; $001C
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x04381C
                 move.l  #Obj_LevelResults, (A1)               ; Offset_0x0247D0
 Offset_0x04381C:

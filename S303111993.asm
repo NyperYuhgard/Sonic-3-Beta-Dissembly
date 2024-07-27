@@ -4811,7 +4811,7 @@ Level_FromCheckpoint:
 		beq.s	Offset_0x003CCC
 		tst.w	(Current_ZoneAndAct).w
 		bne.s	Offset_0x003CCC
-		move.l	#Obj_AIz_Intro_Surfboard, (Obj_05_Mem_Address).w
+		move.l	#Obj_AIz_Intro_Surfboard,(Obj_05_Mem_Address).w
 
 Offset_0x003CCC:
 		jsr	(ObjectsManager).l
@@ -10875,7 +10875,7 @@ Hurt_Player_D0:                                                ; Offset_0x00A40E
                 bmi.s   Offset_0x00A446
                 tst.w   D0
                 beq     Kill_Player                            ; Offset_0x00A4A4
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Hurt_Shield                            ; Offset_0x00A440
                 move.l  #Rings_Lost, (A1)                      ; Offset_0x010AD6
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -11839,44 +11839,49 @@ SpeedToPos:                                                    ; Offset_0x01111E
                 lsl.l   #$08, D0
                 add.l   D0, Obj_Y(A0)                                    ; $0014
                 rts
-                 
-;===============================================================================
-; Rotinas para limpar a mem�ria alocada pelo objeto em A0 ou A1   
-; ->>>
-;===============================================================================  
-DeleteObject:                                                  ; Offset_0x011138
-                move.l  A0, A1
-Delete_A1_Object:                                              ; Offset_0x01113A                
-                moveq   #$11, D0
-                moveq   #$00, D1
-DeleteObject_FreeRam:                                          ; Offset_0x01113E
-                move.l  D1, (A1)+
-                dbra    D0, DeleteObject_FreeRam               ; Offset_0x01113E
-                move.w  D1, (A1)+
-                rts
-;===============================================================================
-; Rotinas para limpar a mem�ria alocada pelo objeto em A0 ou A1   
-; <<<-
-;===============================================================================
 
-;===============================================================================
-; Rotinas para exibi��o do sprite   
-; ->>>
-;=============================================================================== 
-DisplaySprite:                                                 ; Offset_0x011148
-                lea     (Sprite_Table_Input).w, A1                   ; $FFFFAC00
-                adda.w  Obj_Priority(A0), A1                             ; $0008
-                cmpi.w  #$007E, (A1)
-                bcc.s   Exit_DisplaySprite                     ; Offset_0x01115C
-                addq.w  #$02, (A1)
-                adda.w  (A1), A1
-                move.w  A0, (A1)
-Exit_DisplaySprite:                                            ; Offset_0x01115C
+; ---------------------------------------------------------------------------
+; Subroutine to delete an object
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x011138:
+DeleteObject:
+		move.l	a0,a1
+; Offset_0x01113A:
+Delete_A1_Object:
+		moveq	#(Obj_Size>>2)-1,d0
+
+		moveq   #0,d1					; we want to clear up to the next object
+								; delete the object by setting all of its bytes to 0
+; Offset_0x01113E:
+DeleteObject_FreeRam:
+		move.l  d1,(a1)+
+		dbf    d0,DeleteObject_FreeRam
+		move.w  d1,(a1)+
+		rts
+; End of function DeleteObject
+
+; ---------------------------------------------------------------------------
+; Subroutine to display a sprite/object, when a0 is the object RAM
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x011148:
+DisplaySprite:
+		lea	(Sprite_Table_Input).w,a1
+		adda.w	Obj_Priority(a0),a1
+		cmpi.w	#$7E,(a1)
+		bcc.s	Exit_DisplaySprite
+		addq.w	#2,(a1)
+		adda.w	(a1),a1
+		move.w	a0,(a1)
+
+Exit_DisplaySprite:
                 rts
-;===============================================================================
-; Rotinas para exibi��o do sprite   
-; <<<-
-;=============================================================================== 
+; End of function DisplaySprite
 
 ;===============================================================================
 ; Rotina para anima��o do sprite   
@@ -12975,7 +12980,7 @@ Offset_0x011C18:
 		tst.w	(Two_Player_Flag).w
 		beq.s	Offset_0x011C60
 		addq.b	#4,(Object_Pos_Routine).w
-		jsr	SingleObjectLoad(pc)
+		jsr	AllocateObject(pc)
 		bne.s	Offset_0x011C5A
 		lea	(Object_Respawn_Table).w,a3
 		lea	(Object_List).l,a4
@@ -13061,7 +13066,7 @@ ObjectsManager_Main:
 		move.w  (Object_Respaw_Previous).w,a3
 		subi.w  #$80,d6					; look one chunk to the left
 		bcs.s   Offset_0x011D16				; branch, if camera position would be behind level's left boundary
-		jsr     SingleObjectLoad(pc)
+		jsr     AllocateObject(pc)
 		bne.s   Offset_0x011D16
 
 Offset_0x011CFE:
@@ -13110,7 +13115,7 @@ ObjectsManager_GoingForward:
 		move.l	(Object_Pos_Next).w,a0
 		move.w	(Object_Respaw_Next).w,a3		; get next object from the right
 		addi.w	#$280,d6				; look two chunks forward
-		jsr	SingleObjectLoad(pc)
+		jsr	AllocateObject(pc)
 		bne.s	Offset_0x011D62
 
 Offset_0x011D56:
@@ -13197,48 +13202,66 @@ Offset_0x011DD6:
 		rts
 ; End of function ObjectsManager
 
-;-------------------------------------------------------------------------------
-; Rotina para carregar um objeto a partir do endereco $FFFFB0DE
-; ->>>
-;-------------------------------------------------------------------------------                
-SingleObjectLoad:                                              ; Offset_0x011DD8
-                lea     (Obj_Dynamic_RAM).w, A1                      ; $FFFFB0DE
-                moveq   #Max_Dynamic_Objects, D0                          ; #$59
-                bra.s   Loop_Find_Free_Ram                     ; Offset_0x011DF0
-;-------------------------------------------------------------------------------
-SingleObjectLoad_A0:                                           ; Offset_0x011DE0
-                move.l  A0, A1
-                move.w  #Obj_Dynamic_RAM_End, D0                         ; $CAE2
-                sub.w   A0, D0
-                lsr.w   #$06, D0
-                move.b  Sprite_Table_2(PC, D0), D0             ; Offset_0x011DFC
-                bmi.s   Exit_SingleObjectLoad                  ; Offset_0x011DFA
-Loop_Find_Free_Ram:                                            ; Offset_0x011DF0
-                lea     Obj_Size(A1), A1                                 ; $004A
-                tst.l   (A1)
-                dbeq    D0, Loop_Find_Free_Ram                 ; Offset_0x011DF0
-Exit_SingleObjectLoad:                                         ; Offset_0x011DFA
-                rts     
-;-------------------------------------------------------------------------------
-Sprite_Table_2:                                                ; Offset_0x011DFC
-                dc.b    $FF, $00, $01, $02, $03, $04, $05, $05
-                dc.b    $06, $07, $08, $09, $0A, $0B, $0B, $0C
-                dc.b    $0D, $0E, $0F, $10, $11, $12, $12, $13
-                dc.b    $14, $15, $16, $17, $18, $18, $19, $1A
-                dc.b    $1B, $1C, $1D, $1E, $1E, $1F, $20, $21
-                dc.b    $22, $23, $24, $25, $25, $26, $27, $28
-                dc.b    $29, $2A, $2B, $2B, $2C, $2D, $2E, $2F
-                dc.b    $30, $31, $32, $32, $33, $34, $35, $36
-                dc.b    $37, $38, $38, $39, $3A, $3B, $3C, $3D
-                dc.b    $3E, $3E, $3F, $40, $41, $42, $43, $44
-                dc.b    $45, $45, $46, $47, $48, $49, $4A, $4B
-                dc.b    $4B, $4C, $4D, $4E, $4F, $50, $51, $52
-                dc.b    $52, $53, $54, $55, $56, $57, $58, $58                           
-;-------------------------------------------------------------------------------
-; Rotina para carregar um objeto a partir do endereco $FFFFB0DE
-; <<<-
-;-------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Single object loading subroutine
+; Find an empty object array
+; ---------------------------------------------------------------------------
 
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x011DD8: SingleObjectLoad:
+AllocateObject:
+		lea	(Obj_Dynamic_RAM).w,a1
+		moveq	#Max_Dynamic_Objects,d0
+		bra.s	Loop_Find_Free_Ram
+; End of function AllocateObject
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Single object loading subroutine
+; Find an empty object array AFTER the current one in the table
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x011DE0:
+SingleObjectLoad_A0:			; eventually get rid of references to this label
+AllocateObjectAfterCurrent:
+		move.l	a0,a1
+		move.w	#Obj_Dynamic_RAM_End,d0
+		sub.w	a0,d0
+		lsr.w	#6,d0					; divide by $40
+		move.b	Sprite_Table_2(pc,d0.w),d0		; load the right number of objects from table
+		bmi.s	Exit_SingleObjectLoad			; if negative, we have failed!
+; Offset_0x011DF0:
+Loop_Find_Free_Ram:
+		lea	Obj_Size(a1),a1				; load obj address
+		tst.l	(a1)					; is object RAM slot empty?
+		dbeq	d0,Loop_Find_Free_Ram			; if yes, branch
+; Offset_0x011DFA:
+Exit_SingleObjectLoad:
+		rts
+; End of function AllocateObjectAfterCurrent
+
+; ===========================================================================
+; Offset_0x011DFC:
+Sprite_Table_2:
+		dc.b	$FF, $00, $01, $02, $03, $04, $05, $05
+		dc.b	$06, $07, $08, $09, $0A, $0B, $0B, $0C
+		dc.b	$0D, $0E, $0F, $10, $11, $12, $12, $13
+		dc.b	$14, $15, $16, $17, $18, $18, $19, $1A
+		dc.b	$1B, $1C, $1D, $1E, $1E, $1F, $20, $21
+		dc.b	$22, $23, $24, $25, $25, $26, $27, $28
+		dc.b	$29, $2A, $2B, $2B, $2C, $2D, $2E, $2F
+		dc.b	$30, $31, $32, $32, $33, $34, $35, $36
+		dc.b	$37, $38, $38, $39, $3A, $3B, $3C, $3D
+		dc.b	$3E, $3E, $3F, $40, $41, $42, $43, $44
+		dc.b	$45, $45, $46, $47, $48, $49, $4A, $4B
+		dc.b	$4B, $4C, $4D, $4E, $4F, $50, $51, $52
+		dc.b	$52, $53, $54, $55, $56, $57, $58, $58                           
+
+; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Subroutine to load level boundaries and start locations
 ; ---------------------------------------------------------------------------
@@ -13917,7 +13940,7 @@ Offset_0x012588:
                 move.b  #$01, (Palette_Cycle_Flag).w                 ; $FFFFF72E
                 cmpi.w  #$1300, (Camera_X).w                         ; $FFFFEE78
                 bcs.s   Offset_0x0125D8
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0125BE
                 move.l  #Obj_Knuckles, (A1)                    ; Offset_0x018EA0
                 move.w  #$1450, Obj_X(A1)                                ; $0010
@@ -14032,7 +14055,7 @@ Offset_0x0126E8:
                 move.w  #$0F50, (Sonic_Level_Limits_Min_X).w         ; $FFFFEE14
                 tst.w   (Debug_Mode_Flag_Index).w                    ; $FFFFFE08
                 bne.s   Offset_0x01271E
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x01271E
                 move.l  #Obj_0xAC_AIz_Fire_Breath, (A1)        ; Offset_0x036AB4
                 move.w  #$11F0, Obj_X(A1)                                ; $0010
@@ -14189,7 +14212,7 @@ Offset_0x01288A:
                 bhi.s   Offset_0x0128E2
                 move.w  D0, (Sonic_Level_Limits_Min_X).w             ; $FFFFEE14
                 move.w  D0, (Level_Limits_Min_X).w                   ; $FFFFEE0C
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0128BE
                 move.l  #Obj_0xB0_MGz_Drill_Mobile, (A1)       ; Offset_0x039C7E
                 move.w  #$3D20, Obj_X(A1)                                ; $0010
@@ -19853,7 +19876,7 @@ AIz_2_Ship_Refresh:                                            ; Offset_0x030CD6
                 and.w   (Level_Layout_Wrap_Y).w, D0                  ; $FFFFEEAC
                 move.w  D0, (AIz_Flying_Battery_Y).w                 ; $FFFFEE9C
                 move.w  D0, (AIz_Flying_Battery_Rounded_Y).w         ; $FFFFEEA2
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x030D1C
                 move.l  #Obj_AIz_Battle_Ship, (A1)             ; Offset_0x0311BC
 Offset_0x030D1C:
@@ -21022,7 +21045,7 @@ Offset_0x0321B4:
                 clr.l   (A5)+
                 clr.l   (A6)+
                 dbra    D1, Offset_0x0321B4
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x03221A
                 move.w  #$3C90, D1
                 move.l  #$05C00790, D2
@@ -21161,7 +21184,7 @@ MGz_Quake_1:                                                   ; Offset_0x03233E
                 st      (Background_Events+$12).w                    ; $FFFFEEE4
                 addi.w  #$000C, (Background_Events+$10).w            ; $FFFFEEE2
                 st      (Earthquake_Flag).w                          ; $FFFFEECC
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x032380
                 move.l  #Obj_0xAF_MGz_Drill_Mobile, (A1)       ; Offset_0x039920
                 move.w  #$08E0, Obj_X(A1)                                ; $0010
@@ -21180,7 +21203,7 @@ MGz_Quake_2:                                                   ; Offset_0x032382
                 st      (Background_Events+$13).w                    ; $FFFFEEE5
                 addi.w  #$000C, (Background_Events+$10).w            ; $FFFFEEE2
                 st      (Earthquake_Flag).w                          ; $FFFFEECC
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0323CA
                 move.l  #Obj_0xAF_MGz_Drill_Mobile, (A1)       ; Offset_0x039920
                 bset    #$00, Obj_Flags(A1)                              ; $0004
@@ -21200,7 +21223,7 @@ MGz_Quake_3:                                                   ; Offset_0x0323CC
                 st      (Background_Events+$14).w                    ; $FFFFEEE6
                 addi.w  #$000C, (Background_Events+$10).w            ; $FFFFEEE2
                 st      (Earthquake_Flag).w                          ; $FFFFEECC
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x032412
                 move.l  #Obj_0xAF_MGz_Drill_Mobile, (A1)       ; Offset_0x039920
                 bset    #$00, Obj_Flags(A1)                              ; $0004
@@ -21445,7 +21468,7 @@ Offset_0x032790:
                 clr.l   (Horizontal_Scroll_Table+$0038).w            ; $FFFFA838
                 bra.s   Offset_0x0327B6
 Offset_0x0327AC:
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0327B6
                 move.l  D1, (A1)
 Offset_0x0327B6:
@@ -21702,7 +21725,7 @@ Offset_0x032A38:
 Offset_0x032A52:
                 move.w  D0, (Background_Events).w                    ; $FFFFEED2
                 clr.w   (Background_Events+$02).w                    ; $FFFFEED4
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x032A64
                 move.l  D1, (A1)
 Offset_0x032A64:
@@ -22491,7 +22514,7 @@ Offset_0x03344C:
                 dbra    D0, Offset_0x03344C
                 cmpi.w  #$3B60, (Screen_Pos_Buffer_X).w              ; $FFFFEE80
                 bcs.s   Offset_0x033474
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x03346E
                 move.l  #Obj_LBz_1_Invisible_Block, (A1)       ; Offset_0x0336A6
 Offset_0x03346E:
@@ -22570,7 +22593,7 @@ LBz_1_Vertical_Scroll:                                         ; Offset_0x033512
                 bpl.s   Offset_0x033536
                 move.w  #$0001, (Foreground_Events_Y_Counter).w      ; $FFFFEEC4
                 move.w  #$0002, (Special_Vint_Routine).w             ; $FFFFEEA6
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x033536
                 move.l  #Obj_LBz_1_Invisible_Block, (A1)       ; Offset_0x0336A6
 Offset_0x033536:
@@ -23999,7 +24022,7 @@ Trap_Routines_List:                                            ; Offset_0x034220
                 dc.l    Go_Delete_Slotted_3                    ; Offset_0x042C42
                 dc.l    LBz_Robotnik_Ship                      ; Offset_0x036192
                 dc.l    DMA_68KtoVRAM                          ; Offset_0x0012FC
-                dc.l    SingleObjectLoad_A0                    ; Offset_0x011DE0
+                dc.l    AllocateObjectAfterCurrent                    ; Offset_0x011DE0
                 dc.l    ObjectFall                             ; Offset_0x0110FE
                 dc.l    SpeedToPos                             ; Offset_0x01111E
                 dc.l    DisplaySprite                          ; Offset_0x011148
@@ -24032,7 +24055,7 @@ Trap_Routines_List:                                            ; Offset_0x034220
                 dc.l    Child_Get_Priority                     ; Offset_0x043230
                 dc.l    Move_0x08_Bytes_A2_A1                  ; Offset_0x04325C
                 dc.l    Swing_Setup                            ; Offset_0x03669A
-                dc.l    SingleObjectLoad                       ; Offset_0x011DD8
+                dc.l    AllocateObject                       ; Offset_0x011DD8
                 dc.l    Load_Child_Object_A2_2                 ; Offset_0x041F86
                 dc.l    Animate_Raw_Touch                      ; Offset_0x042FE6
                 dc.l    Move_0x06_Bytes_A2_A1                  ; Offset_0x043260
@@ -24302,8 +24325,9 @@ Obj_0xC7_Knuckles:                                             ; Offset_0x034BAA
                 include 'data\objects\obj_0xC7.asm'
 Obj_0xC9_Knuckles_Switch:                                      ; Offset_0x035484
                 include 'data\objects\obj_0xC9.asm'
-Obj_0xCA_AIz_Super_Sonic_Intro:                                ; Offset_0x035AD2
-                include 'data\objects\obj_0xCA.asm'  
+; Offset_0x035AD2: Obj_0xCA_AIz_Super_Sonic_Intro: ObjCA_AIZPlaneIntro:
+		include	"data\objects\obj_0xCA.asm"
+
 ;===============================================================================   
 Robotnik_Head:                                                 ; Offset_0x03605E  
                 jsr     (Refresh_Child_Position_Adjusted)      ; Offset_0x04203C
@@ -24820,12 +24844,12 @@ Obj_0x86_LBz_Beam_Rocket:                                      ; Offset_0x03F11A
                 include 'data\objects\obj_0x86.asm'
 Obj_0x8C_LBz_Ball_Shooter:                                     ; Offset_0x03FE88
                 include 'data\objects\obj_0x8C.asm'
-Obj_0x84_MVz_Hey_Ho:                                           ; Offset_0x040704
-                include 'data\objects\obj_0x84.asm'
+; Offset_0x040704: Obj_0x84_MVz_Hey_Ho: Obj84_HeyHo:
+		include	"data\objects\obj_0x84.asm"
 Obj_0x98_Sz_Guardian:                                          ; Offset_0x04107E
                 include 'data\objects\obj_0x98.asm'
-Obj_0xC5_Hidden_Monitors:                                      ; Offset_0x04178A
-                include 'data\objects\obj_0xC5.asm'
+; Offset_0x04178A: Obj_0xC5_Hidden_Monitors: ObjC5_HiddenMonitor:
+		include	"data\objects\obj_0xC5.asm"
 Obj_End_Panel:                                                 ; Offset_0x041812
                 include 'data\objects\endpanel.asm'
 ;===============================================================================
@@ -24968,7 +24992,7 @@ Load_Child_Object_A2:                                          ; Offset_0x041D9A
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041D9E:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041DE8
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -24997,7 +25021,7 @@ Load_Child_Object_Complex_A2:                                  ; Offset_0x041DEA
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041DEE:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041E4C
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -25032,7 +25056,7 @@ Load_Child_Object_Repeat_A2:                                   ; Offset_0x041E4E
                 move.w  (A2)+, D6
 Offset_0x041E52:
                 move.l  A2, A3
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041E9E
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -25062,7 +25086,7 @@ Load_Child_Object_Link_List_Repeat_A2:                         ; Offset_0x041EA0
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041EA6:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041EDE
                 move.w  A3, Obj_Child_Ref(A1)                            ; $0046
                 move.w  A1, Obj_Height_3(A3)                             ; $0044
@@ -25083,7 +25107,7 @@ Load_Child_Object_Complex_Adjusted_A2:                         ; Offset_0x041EE0
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041EE4:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041F58
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -25126,7 +25150,7 @@ Load_Child_Object_Simple_A2:                                   ; Offset_0x041F5A
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041F5E:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x041F84
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  (A2), (A1)
@@ -25143,7 +25167,7 @@ Load_Child_Object_A2_2:                                        ; Offset_0x041F86
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041F8A:
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x041FD4
                 move.w  A0, Obj_Child_Ref(A1)                            ; $0046
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -25173,7 +25197,7 @@ Load_Child_Object_Tree_List_Repeated_A2:                       ; Offset_0x041FD6
                 moveq   #$00, D2
                 move.w  (A2)+, D6
 Offset_0x041FDC:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x042014
                 move.w  A3, Obj_Child_Ref(A1)                            ; $0046
                 move.w  A0, Obj_Height_3(A1)                             ; $0044
@@ -28746,7 +28770,7 @@ Offset_0x04B34A:
 Offset_0x04B34E:
                 btst    #$05, (Control_Ports_Buffer_Data+$01).w      ; $FFFFF605
                 beq.s   Offset_0x04B39A
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x04B39A
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
                 move.w  Obj_Y(A0), Obj_Y(A1)                      ; $0014, $0014
@@ -30701,7 +30725,7 @@ Object_List:                                                   ; Offset_0x04C964
                 dc.l    Obj_0x81_AIz_Bloominator               ; Offset_0x043B3E
                 dc.l    Obj_0x82_AIz_Rhinobot                  ; Offset_0x043C2A
                 dc.l    Obj_0x83_AIz_Monkey_Dude               ; Offset_0x043F1C
-                dc.l    Obj_0x84_MVz_Hey_Ho                    ; Offset_0x040704
+                dc.l	Obj84_HeyHo
                 dc.l    Obj_0x85_LBz_Twin_Hammer               ; Offset_0x03EC12
                 dc.l    Obj_0x86_LBz_Beam_Rocket               ; Offset_0x03F11A
                 dc.l    Obj_0x87_LBz_Snale_Blaster             ; Offset_0x048436 
@@ -30766,12 +30790,12 @@ Object_List:                                                   ; Offset_0x04C964
                 dc.l    Obj_0xC2_Iz_Snow_Pile                  ; Offset_0x047B4E
                 dc.l    Obj_0xC3_Iz_Trampoline                 ; Offset_0x047D46
                 dc.l    Obj_0xC4_MGz_Tunnelbot                 ; Offset_0x045262
-                dc.l    Obj_0xC5_Hidden_Monitors               ; Offset_0x04178A
+                dc.l	ObjC5_HiddenMonitor
                 dc.l    Obj_0xC6_Egg_Prison                    ; Offset_0x043490
                 dc.l    Obj_0xC7_Knuckles                      ; Offset_0x034BAA
                 dc.l    Obj_0xC8_Iz_Trampoline_Support         ; Offset_0x046A00 ; $C8
                 dc.l    Obj_0xC9_Knuckles_Switch               ; Offset_0x035484
-                dc.l    Obj_0xCA_AIz_Super_Sonic_Intro         ; Offset_0x035AD2
+                dc.l	ObjCA_AIZPlaneIntro
                 
                 
 ;-------------------------------------------------------------------------------
@@ -30805,17 +30829,17 @@ Offset_0x04CC90:
                 dc.l    (Obj_0xC2_Iz_Snow_Pile+$7E)            ; Offset_0x047BCC
                 dc.l    (Obj_0xC3_Iz_Trampoline+$7E)           ; Offset_0x047DC4
                 dc.l    (Obj_0xC4_MGz_Tunnelbot+$7E)           ; Offset_0x0452E0
-                dc.l    (Obj_0xC5_Hidden_Monitors+$7E)         ; Offset_0x041808
+                dc.l	ObjC5_HiddenMonitor+$7E
                 dc.l    (Obj_0xC6_Egg_Prison+$7E)              ; Offset_0x04350E
                 dc.l    (Obj_0xC7_Knuckles+$7E)                ; Offset_0x034C28
                 dc.l    (Obj_0xC8_Iz_Trampoline_Support+$7E)   ; Offset_0x046A7E
                 dc.l    (Obj_0xC9_Knuckles_Switch+$7E)         ; Offset_0x035502
-                dc.l    (Obj_0xCA_AIz_Super_Sonic_Intro+$7E)   ; Offset_0x035B50  
+                dc.l	ObjCA_AIZPlaneIntro+$7E
 ;-------------------------------------------------------------------------------                
 Offset_0x04CD0E:
                 dc.w    ((Obj_0xC8_Iz_Trampoline_Support+$88)&$FFFF) ; Offset_0x046A88
                 dc.l    (Obj_0xC9_Knuckles_Switch+$88)         ; Offset_0x03550C
-                dc.l    (Obj_0xCA_AIz_Super_Sonic_Intro+$88)   ; Offset_0x035B5A                
+                dc.l    (ObjCA_AIZPlaneIntro+$88)   ; Offset_0x035B5A                
 ;-------------------------------------------------------------------------------
 ; Left over - Parte de ponteiros de objetos de uma compila��o anterior
 ; <<<-

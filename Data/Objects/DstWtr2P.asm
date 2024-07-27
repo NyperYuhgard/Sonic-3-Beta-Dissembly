@@ -87,7 +87,7 @@ Offset_0x0101D2:
                 subq.b  #$01, Obj_Control_Var_06(A0)                     ; $0036
                 bpl.s   Offset_0x010244
                 move.b  #$03, Obj_Control_Var_06(A0)                     ; $0036
-                bsr     SingleObjectLoad                       ; Offset_0x011DD8
+                bsr     AllocateObject                       ; Offset_0x011DD8
                 bne.s   Offset_0x010244
                 move.l  (A0), (A1)
                 move.w  Obj_X(A2), Obj_X(A1)                      ; $0010, $0010

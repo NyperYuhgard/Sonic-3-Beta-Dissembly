@@ -121,7 +121,7 @@ Offset_0x025682:
                 jsr     (PseudoRandomNumber)                   ; Offset_0x001AFA
                 andi.w  #$001F, D0
                 move.w  D0, Obj_Control_Var_08(A0)                       ; $0038
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0256FC
                 move.l  (A0), (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

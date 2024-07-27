@@ -67,7 +67,7 @@ Offset_0x02400C:
                 bcc     Offset_0x0240D4
                 moveq   #Check_Point_Sfx, D0                              ; -$32
                 jsr     (Play_Music)                           ; Offset_0x001176
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0240C2
                 move.l  #Obj_0x34_Star_Post, (A1)              ; Offset_0x023F76
                 move.b  #$06, Obj_Routine(A1)                            ; $0005

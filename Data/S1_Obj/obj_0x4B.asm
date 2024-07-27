@@ -44,7 +44,7 @@ Offset_0x010CC0:
 Offset_0x010CDE:
                 subq.b  #$02, Obj_Routine(A0)                            ; $0005
                 move.b  #$00, Obj_Col_Flags(A0)                          ; $0028
-                bsr     SingleObjectLoad                       ; Offset_0x011DD8
+                bsr     AllocateObject                       ; Offset_0x011DD8
                 bne     Offset_0x010D16
                 move.l  #Obj_S1_0x7C_Big_Ring_Flash, (A1)      ; Offset_0x010D26
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

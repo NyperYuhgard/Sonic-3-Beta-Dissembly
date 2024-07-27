@@ -86,7 +86,7 @@ Offset_0x0292BA:
                 moveq   #$01, D0
                 move.w  A1, A3
                 jsr     (Add_Points)                           ; Offset_0x007AEC
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0292E4
                 move.l  #Obj_Enemy_Points, (A1)                ; Offset_0x023E42
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
