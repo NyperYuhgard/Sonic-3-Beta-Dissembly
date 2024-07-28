@@ -4754,7 +4754,7 @@ Offset_0x003BAE:
 		jsr	(JmpTo_Setup_TileDrawing).l
 		move	#$2300,sr
 		jsr	(S2_FloorLog_Unk).l
-		bsr.w	Load_Collision_Index
+		bsr.w	LoadCollisionIndex
 		bsr.w	WaterEffects
 		bsr.w	InitPlayers
 		move.w	(Control_Ports_Buffer_Data+2).w,(Tmp_FF7C).w
@@ -5867,27 +5867,29 @@ Demo_End_Index: ; Left over do Sonic 1                         ; Offset_0x004982
                 dc.w    $008B, $0837, $0042, $085C, $006A, $085F, $002F, $082C
                 dc.w    $0021, $0803, $2830, $0808, $002E, $0815, $000F, $0846
                 dc.w    $001A, $08FF, $08CA, $0000, $0000, $0000, $0000, $0000                                        
-;===============================================================================
-; Rotina para carregar os indexadores das colis�es dos blocos 16x16
-; ->>>
-;===============================================================================
-Load_Collision_Index:                                          ; Offset_0x0049B2
-                moveq   #$00, D0
-                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$05, D0
-                lea     (Collision_Index), A1                  ; Offset_0x1CD240
-                adda.l  D0, A1
-                move.l  (A1), D0
-                move.l  D0, (Primary_Collision_Ptr).w                ; $FFFFF7B4
-                addi.l  #$00000600, D0
-                move.l  D0, (Secondary_Collision_Ptr).w              ; $FFFFF7B8
-                move.l  #Primary_Collision_Ptr, (Current_Collision_Ptr).w  ; $FFFFF7B4, $FFFFF796
-                rts
-;===============================================================================
-; Rotina para carregar os indexadores das colis�es dos blocos 16x16
-; <<<-
-;===============================================================================
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to load collision for 16x16 level blocks
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x0049B2:
+LoadCollisionIndex:
+		moveq	#0,d0
+		move.w	(Current_ZoneAndAct).w,d0
+		ror.b	#1,d0
+		lsr.w	#5,d0
+		lea	(Collision_Index).l,a1
+		adda.l	d0,a1
+		move.l	(a1),d0
+		move.l	d0,(Primary_Collision_Ptr).w		; load first collision set
+		addi.l	#$600,d0
+		move.l	d0,(Secondary_Collision_Ptr).w		; load second collision set ($600 bytes from start of data)
+		move.l	#Primary_Collision_Ptr, (Current_Collision_Ptr).w
+		rts
+; End of subroutine LoadCollisionIndex
 
 ;===============================================================================
 ; Rotina Oscillate_Num_Init
@@ -6144,86 +6146,97 @@ Offset_0x005034:
 		rts
 ; End of function LoadZoneTiles
 
-;===============================================================================
-; Rotina para inicializar as fases com �gua    
-; ->>>
-;===============================================================================
-Init_Water_Levels:                                             ; Offset_0x005056
-                cmpi.b  #Aiz_Id, (Current_Zone).w                   ; $00, $FFFFFE10
-                beq.s   Offset_0x005076
-                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
-                beq.s   Offset_0x005076
-                cmpi.w  #CNz_Act_2, (Current_ZoneAndAct).w              ; $0301, $FFFFFE10
-                beq.s   Offset_0x005076
-                cmpi.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
-                bne.s   Offset_0x005082
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine to load water in set levels
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Offset_0x005056:
+Init_Water_Levels:
+		cmpi.b	#Aiz_Id,(Current_Zone).w
+		beq.s	Offset_0x005076
+		cmpi.b	#Hz_Id,(Current_Zone).w
+		beq.s	Offset_0x005076
+		cmpi.w	#CNz_Act_2,(Current_ZoneAndAct).w
+		beq.s	Offset_0x005076
+		cmpi.w	#LBz_Act_2,(Current_ZoneAndAct).w
+		bne.s	Offset_0x005082
+
 Offset_0x005076:
-                move.b  #$01, (Water_Level_Flag).w                   ; $FFFFF730
-                move.w  #$0000, (Two_Player_Flag).w                  ; $FFFFFFD8
+		move.b	#1,(Water_Level_Flag).w
+		move.w	#0,(Two_Player_Flag).w
+
 Offset_0x005082:
-                tst.b   (Water_Level_Flag).w                         ; $FFFFF730
-                beq.s   LevelInit_UndewaterPalette             ; Offset_0x0050F0
-                move.w  #$4EF9, (HBlank_Ptr).w                       ; $FFFFF608
-                move.l  #Pal_To_ColorRAM, (HBlank_Ptr+$02).w ; Offset_0x000E32, $FFFFF60A
-                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
-                beq.s   Offset_0x0050B6
-                move.l  #HBlank_01, (HBlank_Ptr+$02).w       ; Offset_0x000D0C, $FFFFF60A
-                cmpi.w  #$1000, (Vertical_Frequency).w               ; $FFFFFFF6
-                bcs.s   Offset_0x0050B6
-                move.l  #HBlank_02, (HBlank_Ptr+$02).w       ; Offset_0x000DA0, $FFFFF60A
+		tst.b	(Water_Level_Flag).w
+		beq.s	LevelInit_UndewaterPalette
+		move.w	#$4EF9,(HBlank_Ptr).w
+		move.l	#Pal_To_ColorRAM,(HBlank_Ptr+2).w
+		cmpi.b	#Hz_Id,(Current_Zone).w
+		beq.s	Offset_0x0050B6
+		move.l	#HBlank_01,(HBlank_Ptr+2).w
+		cmpi.w	#$1000,(Vertical_Frequency).w
+		bcs.s	Offset_0x0050B6
+		move.l	#HBlank_02,(HBlank_Ptr+2).w
+
 Offset_0x0050B6:
-                move.l  #AIz_1_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x00472E, $FFFFF62E
-                moveq   #$00, D0
-                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$06, D0
-                andi.w  #$FFFE, D0
-                lea     (Water_Height_Array), A1               ; Offset_0x00423C
-                move.w  $00(A1, D0), D0
-                move.w  D0, (Water_Level_Move).w                     ; $FFFFF646
-                move.w  D0, (Current_Water_Level).w                  ; $FFFFF648
-                move.w  D0, (Target_Water_Level).w                   ; $FFFFF64A
-                clr.b   (Water_Entered_Counter).w                    ; $FFFFF64D
-                clr.b   (Underwater_Flag).w                          ; $FFFFF64E
-                move.b  #$01, (Water_Level_Change_Speed).w           ; $FFFFF64C
-;-------------------------------------------------------------------------------                
-LevelInit_UndewaterPalette:                                    ; Offset_0x0050F0
-                tst.b   (Water_Level_Flag).w                         ; $FFFFF730
-                beq.s   Offset_0x005174
-                moveq   #$2B, D0
-                cmpi.w  #AIz_Act_1, (Current_ZoneAndAct).w              ; $0000, $FFFFFE10
-                beq.s   Offset_0x00515C
-                moveq   #$2C, D0
-                move.l  #AIz_2_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004750, $FFFFF62E
-                cmpi.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
-                beq.s   Offset_0x00515C
-                moveq   #$31, D0
-                move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
-                beq.s   Offset_0x00515C
-                moveq   #$32, D0
-                move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #Hz_Act_2, (Current_ZoneAndAct).w               ; $0101, $FFFFFE10
-                beq.s   Offset_0x00515C
-                moveq   #$2D, D0
-                move.l  #Hz_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x004778, $FFFFF62E
-                cmpi.w  #LBz_Act_1, (Current_ZoneAndAct).w              ; $0600, $FFFFFE10
-                beq.s   Offset_0x00515C
-                moveq   #$2E, D0
-                move.l  #LBz_2_Water_Transistion, (Palette_Underwater_Ptr).w ; Offset_0x0047A2, $FFFFF62E
-                cmpi.w  #LBz_Act_2, (Current_ZoneAndAct).w              ; $0601, $FFFFFE10
-                beq.s   Offset_0x00515C
-                nop
+		move.l	#AIz_1_Water_Transistion,(Palette_Underwater_Ptr).w
+		moveq	#0,d0
+		move.w	(Current_ZoneAndAct).w,d0
+		ror.b	#1,d0
+		lsr.w	#6,d0
+		andi.w	#$FFFE,d0
+		lea	(Water_Height_Array).l,a1
+		move.w	(a1,d0.w),d0
+		move.w	d0,(Water_Level_Move).w
+		move.w	d0,(Current_Water_Level).w
+		move.w	d0,(Target_Water_Level).w
+		clr.b	(Water_Entered_Counter).w
+		clr.b	(Underwater_Flag).w
+		move.b	#1,(Water_Level_Change_Speed).w
+; Offset_0x0050F0:
+LevelInit_UndewaterPalette:
+		tst.b	(Water_Level_Flag).w
+		beq.s	Offset_0x005174
+		moveq	#$2B,d0
+		cmpi.w	#AIz_Act_1,(Current_ZoneAndAct).w	; are we in AIZ1?
+		beq.s	Offset_0x00515C				; if yes, branch
+		moveq	#$2C,d0
+		move.l	#AIz_2_Water_Transistion,(Palette_Underwater_Ptr).w
+		cmpi.w	#AIz_Act_2,(Current_ZoneAndAct).w	; are we in AIZ2?
+		beq.s	Offset_0x00515C				; if yes, branch
+		moveq	#$31,d0
+		move.l	#Hz_Water_Transistion,(Palette_Underwater_Ptr).w
+		cmpi.w	#Hz_Act_1,(Current_ZoneAndAct).w	; are we in HCZ1?
+		beq.s	Offset_0x00515C				; if yes, branch
+		moveq	#$32,d0
+		move.l	#Hz_Water_Transistion,(Palette_Underwater_Ptr).w
+		cmpi.w	#Hz_Act_2,(Current_ZoneAndAct).w	; are we in HCZ2?
+		beq.s	Offset_0x00515C				; if yes, branch
+		moveq	#$2D,d0
+		move.l	#Hz_Water_Transistion,(Palette_Underwater_Ptr).w
+		cmpi.w	#LBz_Act_1,(Current_ZoneAndAct).w	; are we in LBZ1?
+		beq.s	Offset_0x00515C				; if yes, branch
+		moveq	#$2E,d0
+		move.l	#LBz_2_Water_Transistion,(Palette_Underwater_Ptr).w
+		cmpi.w	#LBz_Act_2,(Current_ZoneAndAct).w	; are we in LBZ2?
+		beq.s	Offset_0x00515C				; if yes, branch
+		nop
+
 Offset_0x00515C:
-                move.w  D0, D1
-                bsr     PalLoad_Water_Now                         ; Offset_0x002FD2
-                move.w  D1, D0
-                bsr     PalLoad_Water_ForFade                         ; Offset_0x002FEE
-                tst.b   (Saved_Level_Flag).w                         ; $FFFFFE30
-                beq.s   Offset_0x005174
-                move.b  (Saved_Underwater_Flag).w, (Underwater_Flag).w ; $FFFFFE53, $FFFFF64E
+		move.w	d0,d1
+		bsr.w	PalLoad_Water_Now
+		move.w	d1,d0
+		bsr.w	PalLoad_Water_ForFade
+		tst.b	(Saved_Level_Flag).w
+		beq.s	Offset_0x005174
+		move.b	(Saved_Underwater_Flag).w, (Underwater_Flag).w
+
 Offset_0x005174:
-                rts 
+		rts
+; End of subroutine Init_Water_Levels
+
 ;===============================================================================
 ; Rotina para inicializar as fases com �gua    
 ; <<<-
@@ -13232,7 +13245,7 @@ AllocateObjectAfterCurrent:
 		move.w	#Obj_Dynamic_RAM_End,d0
 		sub.w	a0,d0
 		lsr.w	#6,d0					; divide by $40
-		move.b	Sprite_Table_2(pc,d0.w),d0		; load the right number of objects from table
+		move.b	Sprite_LookupTable(pc,d0.w),d0		; load the right number of objects from table
 		bmi.s	Exit_SingleObjectLoad			; if negative, we have failed!
 ; Offset_0x011DF0:
 Loop_Find_Free_Ram:
@@ -13245,21 +13258,21 @@ Exit_SingleObjectLoad:
 ; End of function AllocateObjectAfterCurrent
 
 ; ===========================================================================
-; Offset_0x011DFC:
-Sprite_Table_2:
-		dc.b	$FF, $00, $01, $02, $03, $04, $05, $05
-		dc.b	$06, $07, $08, $09, $0A, $0B, $0B, $0C
-		dc.b	$0D, $0E, $0F, $10, $11, $12, $12, $13
-		dc.b	$14, $15, $16, $17, $18, $18, $19, $1A
-		dc.b	$1B, $1C, $1D, $1E, $1E, $1F, $20, $21
-		dc.b	$22, $23, $24, $25, $25, $26, $27, $28
-		dc.b	$29, $2A, $2B, $2B, $2C, $2D, $2E, $2F
-		dc.b	$30, $31, $32, $32, $33, $34, $35, $36
-		dc.b	$37, $38, $38, $39, $3A, $3B, $3C, $3D
-		dc.b	$3E, $3E, $3F, $40, $41, $42, $43, $44
-		dc.b	$45, $45, $46, $47, $48, $49, $4A, $4B
-		dc.b	$4B, $4C, $4D, $4E, $4F, $50, $51, $52
-		dc.b	$52, $53, $54, $55, $56, $57, $58, $58                           
+; What this does is setup the right loop counter for the SST, since it is
+; $4A bytes in this game rather than $40, meaning that just using bit-shifting
+; will not suffice for properly setting up the object table
+; Offset_0x011DFC: Sprite_Table_2:
+Sprite_LookupTable:
+.a		=	Obj_Dynamic_RAM
+.b		=	Obj_Dynamic_RAM_End
+.c		=	.b					; begin from bottom of array and decrease backwards
+		; this is bugged; it should actually round *up*; as a result,
+		; the first object slot might not get an entry
+		rept	(.b-.a)/$40				; repeat for all slots, minus exception
+.c		=	.c-$40					; address for previous $40 (also skip last part)
+		dc.b	(.b-.c-1)/Obj_Size-1			; write possible slots according to object_size division + hack + dbf hack
+		endr
+		even
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -13295,7 +13308,7 @@ LevelSizeLoad:
 		move.w	#$60,(Distance_From_Top_P2).w
 		move.w	#-1,(Screen_Wrap_X).w
 		move.w	#-1,(Screen_Wrap_Y).w
-		bra.w	Level_Size_Check_Star_Post
+		bra.w	LevelSize_CheckStarPost
 ;-------------------------------------------------------------------------------
 Level_Size_Array:                                              ; Offset_0x011ECA
                 dc.l    $00006000, $00000390, $00004640, $000004F0 ; AIz
@@ -13322,69 +13335,66 @@ Level_Size_Array:                                              ; Offset_0x011ECA
                 dc.l    $00006000, $00001000, $00006000, $00001000 ; SM BS
                 dc.l    $00006000, $00001000, $00006000, $00001000 ; LRz Boss / HPz 
                 dc.l    $00006000, $00001000, $00006000, $00001000 ; DEz Boss / HPz Portal
-;-------------------------------------------------------------------------------
-; Rotina para carregar o tamanho das fases
-; <<<-
-;-------------------------------------------------------------------------------
+; ===========================================================================
+; Offset_0x01204A:
+LevelSize_CheckStarPost:
+		tst.b	(Saved_Level_Flag).w			; had we hit a checkpoint?
+		beq.s	LevelSize_SpawnPlayer			; if not, branch
+		jsr	(Star_Post_Load_Info).l
+		move.w	(Obj_Player_One+Obj_X).w,d1
+		move.w	(Obj_Player_One+Obj_Y).w,d0
+		bra.s	Offset_0x012098
+; ===========================================================================
+; Offset_0x012060:
+LevelSize_SpawnPlayer:
+		move.w	(Current_ZoneAndAct).w,d0
+		ror.b	#1,d0
+		lsr.w	#5,d0
+		lea	(Player_Start_Position_Array).l,a1
+		lea	(A1,d0.w),a1
+		moveq	#0,d1
+		move.w	(a1)+,d1
+		move.w	d1,(Obj_Player_One+Obj_X).w
+		moveq	#0,d0
+		move.w	(a1),d0
+		move.w	d0,(Obj_Player_One+Obj_Y).w
+		tst.w	(Auto_Control_Player_Flag).w		; is this the AIZ intro?
+		beq.s	Offset_0x012098				; if not, branch
+		move.w	#$40,d1
+		move.w	d1,(Obj_Player_One+Obj_X).w
+		move.w	#$420,d0
+		move.w	d0,(Obj_Player_One+Obj_Y).w
 
-;-------------------------------------------------------------------------------
-; Rotina para reiniciar de um Ponto salvo anteriormente atrav�s do Star Post
-; ->>>
-;-------------------------------------------------------------------------------
-Level_Size_Check_Star_Post:                                    ; Offset_0x01204A
-                tst.b   (Saved_Level_Flag).w                         ; $FFFFFE30
-                beq.s   Offset_0x012060
-                jsr     (Star_Post_Load_Info)                  ; Offset_0x0241EC
-                move.w  (Obj_Player_One+Obj_X).w, D1                 ; $FFFFB010
-                move.w  (Obj_Player_One+Obj_Y).w, D0                 ; $FFFFB014
-                bra.s   Offset_0x012098
-Offset_0x012060:
-                move.w  (Current_ZoneAndAct).w, D0                             ; $FFFFFE10
-                ror.b   #$01, D0
-                lsr.w   #$05, D0
-                lea     (Player_Start_Position_Array), A1      ; Offset_0x1F7018
-                lea     $00(A1, D0), A1
-                moveq   #$00, D1
-                move.w  (A1)+, D1
-                move.w  D1, (Obj_Player_One+Obj_X).w                 ; $FFFFB010
-                moveq   #$00, D0
-                move.w  (A1), D0
-                move.w  D0, (Obj_Player_One+Obj_Y).w                 ; $FFFFB014
-                tst.w   (Auto_Control_Player_Flag).w                 ; $FFFFFFF0
-                beq.s   Offset_0x012098
-                move.w  #$0040, D1
-                move.w  D1, (Obj_Player_One+Obj_X).w                 ; $FFFFB010
-                move.w  #$0420, D0
-                move.w  D0, (Obj_Player_One+Obj_Y).w                 ; $FFFFB014
 Offset_0x012098:
-                subi.w  #$00A0, D1
-                bcc.s   Offset_0x0120A0
-                moveq   #$00, D1
+		subi.w	#$A0,d1
+		bcc.s	Offset_0x0120A0
+		moveq	#0,d1
+
 Offset_0x0120A0:
-                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
-                bne.s   Offset_0x0120B0
-                move.w  (Sonic_Level_Limits_Max_X).w, D2             ; $FFFFEE16
-                cmp.w   D2, D1
-                bcs.s   Offset_0x0120B0
-                move.w  D2, D1
+		tst.w	(Two_Player_Flag).w			; are we in Competition Mode?
+		bne.s	Offset_0x0120B0				; if yes, branch
+		move.w	(Sonic_Level_Limits_Max_X).w,d2
+		cmp.w	d2,d1
+		bcs.s	Offset_0x0120B0
+		move.w	d2,d1
+
 Offset_0x0120B0:
-                move.w  D1, (Camera_X).w                             ; $FFFFEE78
-                move.w  D1, (Camera_X_P2).w                          ; $FFFFEE60
-                subi.w  #$0060, D0
-                bcc.s   Offset_0x0120C0
-                moveq   #$00, D0
+		move.w	d1,(Camera_X).w
+		move.w	d1,(Camera_X_P2).w
+		subi.w	#$60,d0
+		bcc.s	Offset_0x0120C0
+		moveq	#0,d0
+
 Offset_0x0120C0:
-                cmp.w   (Sonic_Level_Limits_Max_Y).w, D0             ; $FFFFEE1A
-                blt.s   Offset_0x0120CA
-                move.w  (Sonic_Level_Limits_Max_Y).w, D0             ; $FFFFEE1A
+		cmp.w	(Sonic_Level_Limits_Max_Y).w,d0
+		blt.s	Offset_0x0120CA
+		move.w	(Sonic_Level_Limits_Max_Y).w,d0
+
 Offset_0x0120CA:
-                move.w  D0, (Camera_Y).w                             ; $FFFFEE7C
-                move.w  D0, (Camera_Y_P2).w                          ; $FFFFEE64
-                rts 
-;-------------------------------------------------------------------------------
-; Rotina para reiniciar de um Ponto salvo anteriormente atrav�s do Star Post
-; <<<-
-;-------------------------------------------------------------------------------
+		move.w	d0,(Camera_Y).w
+		move.w	d0,(Camera_Y_P2).w
+		rts
+; End of function LevelSizeLoad
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to raster scroll the background based on character movement
@@ -19579,7 +19589,7 @@ Offset_0x030920:
                 clr.w   (Animate_Counters+$04).w                     ; $FFFFF7F4
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
-                jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
+                jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
                 jsr     (Init_Water_Levels)                    ; Offset_0x005056
                 moveq   #$0B, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
@@ -20896,7 +20906,7 @@ MGz_1_Transition:                                              ; Offset_0x031FB8
                 clr.w   (Animate_Counters+$04).w                     ; $FFFFF7F4
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
-                jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
+                jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
                 moveq   #$0F, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
@@ -22099,7 +22109,7 @@ Iz_1_Transition:                                               ; Offset_0x032F3C
                 clr.w   (Animate_Counters+$04).w                     ; $FFFFF7F4
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
-                jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
+                jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
                 moveq   #$15, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
@@ -22852,7 +22862,7 @@ LBz_1_Transition:                                              ; Offset_0x0337F6
                 clr.w   (Animate_Counters+$04).w                     ; $FFFFF7F4
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
-                jsr     (Load_Collision_Index)                 ; Offset_0x0049B2
+                jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
                 jsr     (Init_Water_Levels)                    ; Offset_0x005056
                 moveq   #$17, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
