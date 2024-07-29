@@ -4705,7 +4705,7 @@ Level_LoadPal:
 		move.l	#DMA_Buffer_List,(DMA_Buffer_List_End).w
 		moveq	#3,d0
 		bsr.w	PalLoad_Now
-		bsr.w	Init_Water_Levels
+		bsr.w	Level_InitWaterLevels
 		tst.b	(Water_Level_Flag).w
 		beq.s	Level_GetBgm
 		move.w	#$8014,(a6)
@@ -6153,8 +6153,8 @@ Offset_0x005034:
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
-; Offset_0x005056:
-Init_Water_Levels:
+; Offset_0x005056: Init_Water_Levels:
+Level_InitWaterLevels:
 		cmpi.b	#Aiz_Id,(Current_Zone).w
 		beq.s	Offset_0x005076
 		cmpi.b	#Hz_Id,(Current_Zone).w
@@ -6235,7 +6235,7 @@ Offset_0x00515C:
 
 Offset_0x005174:
 		rts
-; End of subroutine Init_Water_Levels
+; End of subroutine Level_InitWaterLevels
 
 ;===============================================================================
 ; Rotina para inicializar as fases com �gua    
@@ -19590,7 +19590,7 @@ Offset_0x030920:
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
                 jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
-                jsr     (Init_Water_Levels)                    ; Offset_0x005056
+                jsr     (Level_InitWaterLevels)                    ; Offset_0x005056
                 moveq   #$0B, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
@@ -22863,7 +22863,7 @@ LBz_1_Transition:                                              ; Offset_0x0337F6
                 movem.l D7/A0/A2/A3, -(A7)
                 jsr     (LoadLevelLayout)                    ; Offset_0x01247C
                 jsr     (LoadCollisionIndex)                 ; Offset_0x0049B2
-                jsr     (Init_Water_Levels)                    ; Offset_0x005056
+                jsr     (Level_InitWaterLevels)                    ; Offset_0x005056
                 moveq   #$17, D0
                 jsr     (PalLoad_Now)                             ; Offset_0x002FBA
                 movem.l (A7)+, D7/A0/A2/A3
@@ -31237,6 +31237,7 @@ Asm_Code_4:                                                    ; Offset_0x0DFEF2
 ;-------------------------------------------------------------------------------
 ; Offset_0xE0000:
 Z80_Driver:	incbin	"data\sounds\z80_drv.bin"
+		;include	"data\Z80_Drv.asm"
 
 ; Offset_0x0E16A0: MusicPointers:
 		rom_ptr_z80	Music_01_Ptr
