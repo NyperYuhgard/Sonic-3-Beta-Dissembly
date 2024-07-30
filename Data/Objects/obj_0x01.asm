@@ -505,19 +505,19 @@ MonAni_Broken:		dc.b	  2,  0,  1, $B,$FE,  1
 ; Sprite mappings for Monitors and Monitor Contents
 ; ---------------------------------------------------------------------------
 ; Offset_0x0134A2:
-Monitors_Mappings:	mappingsTable
-		mappingsTableEntry.w Offset_0x0134BA
-		mappingsTableEntry.w Offset_0x0134C2
-		mappingsTableEntry.w Offset_0x0134D0
-		mappingsTableEntry.w Offset_0x0134DE
-		mappingsTableEntry.w Offset_0x0134EC
-		mappingsTableEntry.w Offset_0x0134FA
-		mappingsTableEntry.w Offset_0x013508
-		mappingsTableEntry.w Offset_0x013516
-		mappingsTableEntry.w Offset_0x013524
-		mappingsTableEntry.w Offset_0x013532
-		mappingsTableEntry.w Offset_0x013540
-		mappingsTableEntry.w Offset_0x01354E
+Monitors_Mappings:
+		dc.w Offset_0x0134BA-Monitors_Mappings
+		dc.w Offset_0x0134C2-Monitors_Mappings
+		dc.w Offset_0x0134D0-Monitors_Mappings
+		dc.w Offset_0x0134DE-Monitors_Mappings
+		dc.w Offset_0x0134EC-Monitors_Mappings
+		dc.w Offset_0x0134FA-Monitors_Mappings
+		dc.w Offset_0x013508-Monitors_Mappings
+		dc.w Offset_0x013516-Monitors_Mappings
+		dc.w Offset_0x013524-Monitors_Mappings
+		dc.w Offset_0x013532-Monitors_Mappings
+		dc.w Offset_0x013540-Monitors_Mappings
+		dc.w Offset_0x01354E-Monitors_Mappings
 
 Offset_0x0134BA:
 		dc.w    $0001
