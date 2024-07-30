@@ -1068,7 +1068,7 @@ SoundDriverInput_Null:
 ; This appears to be the remnants of a 'sound input system' that Sonic 2 used,
 ; which handled its sound queues on the 68000-side; it seems like the devs
 ; retained this system when switching over to the new driver before a Z80-led
-; sound input system could be implemented
+; sound input system could be implemented. Sonic CD uses a similar system.
 		move.b	(Sound_Buffer_Id).w,($A01C0A).l
 		move.b	(Sound_Buffer_Id+1).w,($A01C0B).l
 		move.b	(Sound_Buffer_Id+2).w,($A01C0C).l
@@ -31236,8 +31236,8 @@ Asm_Code_4:                                                    ; Offset_0x0DFEF2
                 dc.b    '                Dc.b    VIEW_PLANET10,VIEW_PAL_No1,VIEW_NOT_FLIPPED,VIEW_SIZE_7'  
 ;-------------------------------------------------------------------------------
 ; Offset_0xE0000:
-Z80_Driver:	incbin	"data\sounds\z80_drv.bin"
-		;include	"Z80_Drv.asm"
+Z80_Driver:	;incbin	"data\sounds\z80_drv.bin"
+		include	"Z80_Drv.asm"
 
 ; Offset_0x0E16A0: MusicPointers:
 		rom_ptr_z80	Music_01_Ptr
