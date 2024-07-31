@@ -9,12 +9,12 @@ Offset_0x019FD6:
                 dc.b    $0C, $08, $02, $01, $0C, $08, $03, $01                  
 ;-------------------------------------------------------------------------------
 Obj_0x5F_Retracting_Spring:                                    ; Offset_0x019FF6
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01A0CC
                 move.l  #Offset_0x01A38E, (A1)
                 move.l  #Retracting_Spring_Mappings, Obj_Map(A1) ; Offset_0x01A408, $000C
                 move.w  #$0391, Obj_Art_VRAM(A1)                         ; $000A
-                cmpi.b  #EMz_Id, (Level_Id).w                   ; $12, $FFFFFE10
+                cmpi.b  #EMz_Id, (Current_Zone).w                   ; $12, $FFFFFE10
                 bne.s   Offset_0x01A024
                 move.l  #EMz_Retracting_Spring_Mappings, Obj_Map(A1) ; Offset_0x01A410, $000C
 Offset_0x01A024:

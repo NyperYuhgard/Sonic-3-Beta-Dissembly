@@ -59,7 +59,7 @@ Offset_0x02A680:
                 bra     Offset_0x02A736
 Offset_0x02A6A0:
                 move.w  #$003C, Obj_Control_Var_02(A0)                   ; $0032
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02A72E
                 move.l  #Offset_0x02A7F0, (A1)
                 tst.b   Obj_Col_Prop(A0)                                 ; $0029
@@ -94,7 +94,7 @@ Offset_0x02A736:
                 tst.b   Obj_Routine(A0)                                  ; $0005
                 beq     Offset_0x02A7CC
                 clr.b   Obj_Routine(A0)                                  ; $0005
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02A7CC
                 move.l  #Offset_0x02A7D2, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

@@ -281,7 +281,7 @@ Offset_0x00F7C0:
                 andi.w  #$000F, D0
                 addq.w  #$08, D0
                 move.w  D0, Obj_Player_Spdsh_Cnt(A0)                     ; $003E
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne     Offset_0x00F89C
                 move.l  (A0), (A1)
                 move.w  Obj_X(A2), Obj_X(A1)                      ; $0010, $0010

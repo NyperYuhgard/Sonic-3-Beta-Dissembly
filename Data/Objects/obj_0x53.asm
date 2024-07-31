@@ -12,7 +12,7 @@
                 move.w  Obj_X(A0), Obj_Control_Var_00(A0)         ; $0010, $0030
                 move.w  Obj_Y(A0), Obj_Control_Var_02(A0)         ; $0014, $0032
                 move.b  #$02, Obj_Map_Id(A0)                             ; $0022
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02A2BC
                 move.l  #Offset_0x02A30E, (A1)
                 move.l  #Swinging_Platform_Mappings, Obj_Map(A1) ; Offset_0x02A36C, $000C

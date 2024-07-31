@@ -463,8 +463,11 @@ Ring_End_Offset_Ptr              equ M68K_RAM_Start+$EE48
 Ring_Offset_Ptr                  equ M68K_RAM_Start+$EE4C
 Object_Respaw_Next               equ M68K_RAM_Start+$EE50
 Object_Respaw_Previous           equ M68K_RAM_Start+$EE52
-Level_Id_2                       equ M68K_RAM_Start+$EE54
-Act_Id_2                         equ M68K_RAM_Start+$EE55
+Apparent_ZoneAndAct:		equ M68K_RAM_Start+$EE54			; 2 bytes; unlike Current_ZoneAndAct, this is only used
+										; during level transitions where the player enters Act 2
+										; but is still stated to be in Act 1 until a later point
+Apparent_Zone:			equ M68K_RAM_Start+$EE54
+Apparent_Act:			equ M68K_RAM_Start+$EE55
 Palette_Fade_Timer               equ M68K_RAM_Start+$EE56 
 Camera_X_P2                      equ Camera_RAM+$60 
 Camera_Y_P2                      equ Camera_RAM+$64
@@ -681,24 +684,39 @@ Debug_Mode_Object_Index          equ M68K_RAM_Start+$FE06
 Debug_Mode_Flag_Index            equ M68K_RAM_Start+$FE08 
 Debug_Mode_Camera_Delay          equ M68K_RAM_Start+$FE0A
 Debug_Mode_Camera_Speed          equ M68K_RAM_Start+$FE0B 
-Vertical_Interrupt_Count         equ M68K_RAM_Start+$FE0C
-Level_Id                         equ M68K_RAM_Start+$FE10
-Act_Id                           equ M68K_RAM_Start+$FE11
-Life_Count                       equ M68K_RAM_Start+$FE12
-Special_Stage_Id                 equ M68K_RAM_Start+$FE16 
-Continue_Count                   equ M68K_RAM_Start+$FE18
-Super_Sonic_Flag                 equ M68K_RAM_Start+$FE19 
-Time_Over_Flag                   equ M68K_RAM_Start+$FE1A
-Ring_Status_Flag                 equ M68K_RAM_Start+$FE1B ; Vida extra com 100 e 200 anéis e continue
-HUD_Life_Refresh_Flag            equ M68K_RAM_Start+$FE1C
-HUD_Rings_Refresh_Flag           equ M68K_RAM_Start+$FE1D
-HUD_Timer_Refresh_Flag           equ M68K_RAM_Start+$FE1E
-HUD_Score_Refresh_Flag           equ M68K_RAM_Start+$FE1F
-Ring_Count_Address               equ M68K_RAM_Start+$FE20
-Time_Count_Address               equ M68K_RAM_Start+$FE22
-Timer_Minute_Count_Address       equ M68K_RAM_Start+$FE23
-Timer_Second_Count_Address       equ M68K_RAM_Start+$FE24
-Timer_Centiseconds_Count_Address equ M68K_RAM_Start+$FE25
+
+; Gonna eventually do the whole thing like this, but for now only a few variables
+		pusho						; save options
+		opt	ae+					; enable auto evens
+
+		rsset M68K_RAM_Start+$FE0C
+Vint_runcount:			rs.l	1					; 4 bytes
+
+Current_ZoneAndAct:		rs.w	1					; 2 bytes; not to be confused with Apparent_ZoneAndAct,
+										; this actually holds the real zone the player is in
+Current_Zone:			equ	Current_ZoneAndAct
+Current_Act:			equ	Current_ZoneAndAct+1
+Life_count:			rs.b	1					; current lives; not the lives displayed on the screen
+				rs.b	3					; unused
+Current_SpecialStage:		rs.w	1					; 2 bytes, although only the first is used
+Continue_count:			rs.b	1					; current continues
+Super_Sonic_flag:		rs.b	1					; whether or not Sonic is in his Super transformation
+Time_Over_flag:			rs.b	1					; determines if the player got a Game or Time over
+Extra_life_flags:		rs.b	1					; flag for giving the player a 1UP at 100 or 200 rings
+
+; If set, the respective HUD element will be updated.
+Update_HUD_lives:		rs.b	1
+Update_HUD_rings:		rs.b	1
+Update_HUD_timer:		rs.b	1
+Update_HUD_score:		rs.b	1
+
+Ring_count:			rs.w	1					; 2 bytes
+Timer:				rs.l	1					; 4 bytes
+Timer_minute:			equ	Timer+1
+Timer_second:			equ	Timer+2
+Timer_frame:			equ	Timer+3
+		popo						; restore options
+
 Score_Count_Address              equ M68K_RAM_Start+$FE26
 Saved_Level_Flag                 equ M68K_RAM_Start+$FE30
 Saved_Last_Start_Post_Hit        equ M68K_RAM_Start+$FE31
@@ -716,7 +734,7 @@ Saved_Ring_Status_Flag           equ M68K_RAM_Start+$FE54
 Saved_Ring_Status_Flag_P2        equ M68K_RAM_Start+$FE55
 Saved_Sonic_Level_Limits_Max_Y   equ M68K_RAM_Start+$FE56
 Saved_Dynamic_Resize_Routine     equ M68K_RAM_Start+$FE58
-CopySonicMovesForMilesIndex      equ M68K_RAM_Start+$FE5A
+Dropdash_flag:			equ M68K_RAM_Start+$FE5A			; checks if Sonic is currently 'dropdashing'
 Oscillate_Data_Buffer            equ M68K_RAM_Start+$FE5E
 Object_Frame_Timer               equ M68K_RAM_Start+$FEA2
 Object_Frame_Buffer              equ M68K_RAM_Start+$FEA3

@@ -13,7 +13,7 @@
                 move.b  #$06, Obj_Map_Id(A0)                             ; $0022
                 move.w  #$0050, Obj_Control_Var_00(A0)                   ; $0030
                 bset    #$07, Obj_Status(A0)                             ; $002A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x026B02
                 move.l  #Offset_0x026D8C, (A1)
                 move.l  #Hand_Launcher_Mappings, Obj_Map(A1) ; Offset_0x026DB8, $000C

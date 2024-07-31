@@ -1,214 +1,259 @@
-;-------------------------------------------------------------------------------
-; Tela com o nome das fases conhecido também conhecido como: 
-; ->>>     - Splash Screen, Title Cards, etc... 
-;------------------------------------------------------------------------------- 
-; Offset_0x024546:
-                moveq   #$00, D0
-                move.b  Obj_Routine(A0), D0                              ; $0005
-                move.w  Offset_0x024554(PC, D0), D1
-                jmp     Offset_0x024554(PC, D1)                                 
-;-------------------------------------------------------------------------------
-Offset_0x024554:
-                dc.w    Offset_0x02455C-Offset_0x024554
-                dc.w    Offset_0x0245B8-Offset_0x024554
-                dc.w    Offset_0x024620-Offset_0x024554
-                dc.w    Offset_0x024636-Offset_0x024554   
-;-------------------------------------------------------------------------------   
-Offset_0x02455C:
-                lea     (Title_Card_ZONE_ACT), A1              ; Offset_0x13AD10
-                move.w  #$A000, D2
-                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
-                lea     (Title_Card_Number_1), A1              ; Offset_0x13AB6C
-                tst.b   (Act_Id_2).w                                 ; $FFFFEE55
-                beq.s   Offset_0x02457E
-                lea     (Title_Card_Number_2), A1              ; Offset_0x13AC2E
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Object - Title Card
+; ---------------------------------------------------------------------------
+; Offset_0x024546: Obj_Title_Cards:
+Obj_TitleCard:
+		moveq	#0,d0
+		move.b	Obj_Routine(a0),d0
+		move.w	TitleCard_Index(pc,d0.w),d1
+		jmp	TitleCard_Index(pc,d1.w)				 
+; ===========================================================================
+; Offset_0x024554:
+TitleCard_Index:	offsetTable
+		offsetTableEntry.w TitleCard_Init
+		offsetTableEntry.w TitleCard_Main
+		offsetTableEntry.w TitleCard_Wait
+		offsetTableEntry.w TitleCard_Wait2
+; ===========================================================================
+; Offset_0x02455C:
+TitleCard_Init:
+		lea	(Title_Card_ZONE_ACT).l,a1
+		move.w	#$A000,d2
+		jsr	(Queue_Kos_Module).l
+		lea	(Title_Card_Number_1).l,a1
+		tst.b	(Apparent_Act).w			; is this "Act 2"?
+		beq.s	Offset_0x02457E				; if not, branch
+		lea	(Title_Card_Number_2).l,a1
+
 Offset_0x02457E:
-                move.w  #$A7A0, D2
-                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
-                lea     Title_Card_Letters_Ptr(PC), A1         ; Offset_0x024764
-                moveq   #$00, D0
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
-                lsl.w   #$02, D0
-                move.l  $00(A1, D0), A1
-                move.w  #$A9A0, D2
-                jsr     (Queue_Kos_Module)                 ; Offset_0x0018A8
-                move.w  #$005A, Obj_Timer(A0)                            ; $002E
-                move.w  #$0004, Obj_Control_Var_00(A0)                   ; $0030
-                clr.w   Obj_Control_Var_02(A0)                           ; $0032
-                addq.b  #$02, Obj_Routine(A0)                            ; $0005
-                rts
-Offset_0x0245B8:
-                tst.b   (Kosinski_Modules_Left).w                    ; $FFFFFF60
-                bne.s   Offset_0x02461E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
-                bne.s   Offset_0x02461E
-                lea     Title_Cards_Conf_Ptr(PC), A2           ; Offset_0x024798
-                moveq   #$03, D1
-Offset_0x0245CC:
-                move.l  (A2)+, (A1)
-                move.w  (A2)+, Obj_Control_Var_16(A1)                    ; $0046
-                move.w  (A2)+, Obj_X(A1)                                 ; $0010
-                move.w  (A2)+, Obj_Y(A1)                                 ; $0014
-                move.b  (A2)+, Obj_Map_Id(A1)                            ; $0022
-                move.b  (A2)+, Obj_Width(A1)                             ; $0007
-                move.w  (A2)+, D2
-                move.b  D2, Obj_Col_Flags(A1)                            ; $0028
-                move.b  #$40, Obj_Flags(A1)                              ; $0004
-                move.l  #Title_Cards_Mappings, Obj_Map(A1) ; Offset_0x025012, $000C
-                move.w  A0, Obj_Respaw_Ref(A1)                           ; $0048
-                jsr     (SingleObjectLoad_A1_D0)               ; Offset_0x011DC8
-                dbne    D1, Offset_0x0245CC
-                tst.w   Obj_Control_Var_0E(A0)                           ; $003E
-                beq.s   Offset_0x02461A
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
-                beq.s   Offset_0x02461A
-                cmpi.b  #Iz_Id, D0                                         ; $05
-                beq.s   Offset_0x02461A
-                st      (Level_Events_Buffer_5).w                    ; $FFFFEEC6
+		move.w	#$A7A0,d2
+		jsr	(Queue_Kos_Module).l
+		lea	TitleCard_LevelGfx(pc),a1
+		moveq	#0,d0
+		move.b	(Apparent_Zone).w,d0			; load title card based on zone
+		lsl.w	#2,d0
+		move.l	(a1,d0.w),a1
+		move.w	#$A9A0,d2
+		jsr	(Queue_Kos_Module).l
+		move.w	#90,Obj_Timer(a0)			; set wait timer to 90 frames
+		move.w	#4,Obj_Control_Var_00(a0)
+		clr.w	Obj_Control_Var_02(a0)
+		addq.b	#2,Obj_Routine(a0)
+		rts
+; ===========================================================================
+; Offset_0x0245B8:
+TitleCard_Main:
+		tst.b	(Kosinski_Modules_Left).w		; has the KosinskiM art finished decompressing?
+		bne.s	Offset_0x02461E				; if not, branch
+		jsr	(AllocateObjectAfterCurrent).l
+		bne.s	Offset_0x02461E
+		lea	TitleCard_ObjArray(pc),a2
+		moveq	#(TitleCard_ObjArray_End-TitleCard_ObjArray)/14-1,d1	; create objects
+; Offset_0x0245CC:
+TitleCard_MakeObject:
+		move.l	(a2)+,(a1)
+		move.w	(a2)+,Obj_Control_Var_16(a1)
+		move.w	(a2)+,Obj_X(a1)
+		move.w	(a2)+,Obj_Y(a1)
+		move.b	(a2)+,Obj_Map_Id(a1)
+		move.b	(a2)+,Obj_Width(a1)
+		move.w	(a2)+,d2
+		move.b	d2,Obj_Col_Flags(a1)
+		move.b	#$40,Obj_Flags(a1)
+		move.l	#Title_Cards_Mappings,Obj_Map(a1)
+		move.w	a0,Obj_Respaw_Ref(a1)
+		jsr	(AllocateObject_Immediate).l
+		dbne	d1,TitleCard_MakeObject
+		tst.w	Obj_Control_Var_0E(a0)
+		beq.s	Offset_0x02461A
+		move.b	(Apparent_Zone).w,d0
+		beq.s	Offset_0x02461A
+		cmpi.b	#Iz_Id,d0				; are we in IceCap Zone?
+		beq.s	Offset_0x02461A				; if not, branch
+		st	(Level_Events_Buffer_5).w
+
 Offset_0x02461A:
-                addq.b  #$02, Obj_Routine(A0)                            ; $0005
+		addq.b	#2,Obj_Routine(a0)
+
 Offset_0x02461E:
-                rts
-Offset_0x024620:
-                tst.w   Obj_Control_Var_04(A0)                           ; $0034
-                beq.s   Offset_0x02462C
-                clr.w   Obj_Control_Var_04(A0)                           ; $0034
-                rts
+		rts
+; ===========================================================================
+; Offset_0x024620:
+TitleCard_Wait:
+		tst.w	Obj_Control_Var_04(a0)
+		beq.s	Offset_0x02462C
+		clr.w	Obj_Control_Var_04(a0)
+		rts
+; ---------------------------------------------------------------------------
+
 Offset_0x02462C:
-                st      Obj_Respaw_Ref(A0)                               ; $0048
-                addq.b  #$02, Obj_Routine(A0)                            ; $0005
-                rts
-Offset_0x024636:
-                tst.w   Obj_Timer(A0)                                    ; $002E
-                beq.s   Offset_0x024642
-                subq.w  #$01, Obj_Timer(A0)                              ; $002E
-                rts
+		st	Obj_Respaw_Ref(a0)
+		addq.b	#2,Obj_Routine(a0)
+		rts
+; ===========================================================================
+; Offset_0x024636:
+TitleCard_Wait2:
+		tst.w	Obj_Timer(a0)
+		beq.s	Offset_0x024642
+		subq.w	#1,Obj_Timer(a0)
+		rts
+; ---------------------------------------------------------------------------
+
 Offset_0x024642:
-                tst.w   Obj_Control_Var_00(A0)                           ; $0030
-                beq.s   Offset_0x02464E
-                addq.w  #$01, Obj_Control_Var_02(A0)                     ; $0032
-                rts
-Offset_0x02464E:
-                tst.w   Obj_Control_Var_0E(A0)                           ; $003E
-                beq.s   Offset_0x024682
-                clr.l   (Time_Count_Address).w                       ; $FFFFFE22
-                clr.w   (Ring_Count_Address).w                       ; $FFFFFE20
-                clr.w   (Total_Ring_Count_Address).w                 ; $FFFFFEF0
-                clr.b   (Ring_Status_Flag).w                         ; $FFFFFE1B
-                clr.l   (Time_Count_Address_P2).w                    ; $FFFFFED2
-                clr.w   (Ring_Count_Address_P2).w                    ; $FFFFFED0
-                clr.w   (Total_Ring_Count_Address_P2).w              ; $FFFFFEF2
-                clr.b   (Ring_Status_Flag_P2).w                      ; $FFFFFEC7
-                st      (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
-                st      (HUD_Rings_Refresh_Flag).w                   ; $FFFFFE1D
-                st      (End_Level_Flag).w                           ; $FFFFFAAA
-                bra.s   Offset_0x02468E
-Offset_0x024682:
-                lea     (PLC_Spikes_Springs), A1               ; Offset_0x04192C
-                jsr     (LoadPLC_Direct)                           ; Offset_0x001502
-Offset_0x02468E:
-                move.w  (Level_Id_2).w, D0                           ; $FFFFEE54
-                jsr     Level_Load_Enemies_Art(PC)             ; Offset_0x024F46
-                moveq   #$02, D0
-                jsr     (LoadPLC)                              ; Offset_0x0014D0
-                jmp     (DeleteObject)                         ; Offset_0x011138   
-;-------------------------------------------------------------------------------
-Title_Card_Red_Bar:                                            ; Offset_0x0246A4
-                move.w  Obj_Respaw_Ref(A0), A1                           ; $0048
-                move.w  Obj_Control_Var_02(A1), D0                       ; $0032
-                beq.s   Offset_0x0246CC
-                tst.b   Obj_Flags(A0)                                    ; $0004
-                bmi.s   Offset_0x0246BE
-                subq.w  #$01, Obj_Control_Var_00(A1)                     ; $0030
-                jmp     (DeleteObject)                         ; Offset_0x011138
+		tst.w	Obj_Control_Var_00(a0)
+		beq.s	TitleCard_SetupLevel
+		addq.w	#1,Obj_Control_Var_02(a0)
+		rts
+; ---------------------------------------------------------------------------
+; Offset_0x02464E:
+TitleCard_SetupLevel:
+		tst.w	Obj_Control_Var_0E(a0)
+		beq.s	TitleCard_LoadMainGraphics
+		clr.l	(Timer).w
+		clr.w	(Ring_count).w
+		clr.w	(Total_Ring_Count_Address).w
+		clr.b	(Extra_life_flags).w
+		clr.l	(Time_Count_Address_P2).w
+		clr.w	(Ring_Count_Address_P2).w
+		clr.w	(Total_Ring_Count_Address_P2).w
+		clr.b	(Ring_Status_Flag_P2).w
+		st	(Update_HUD_timer).w
+		st	(Update_HUD_rings).w
+		st	(End_Level_Flag).w
+		bra.s	TitleCard_LoadAnimals
+; Offset_0x024682:
+TitleCard_LoadMainGraphics:
+		lea	(PLC_Spikes_Springs).l,a1
+		jsr	(LoadPLC_Direct).l
+; Offset_0x02468E:
+TitleCard_LoadAnimals:
+		move.w	(Apparent_ZoneAndAct).w,d0
+		jsr	Level_Load_Enemies_Art(pc)		; load animals based on zone
+		moveq	#2,d0
+		jsr	(LoadPLC)
+		jmp	(DeleteObject)
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Object - Title Card Red Bar
+; ---------------------------------------------------------------------------
+; Offset_0x0246A4: Title_Card_Red_Bar:
+Obj_TtlCardRedBar:
+		move.w	Obj_Respaw_Ref(a0),a1
+		move.w	Obj_Control_Var_02(a1),d0
+		beq.s	Offset_0x0246CC
+		tst.b	Obj_Flags(a0)
+		bmi.s	Offset_0x0246BE
+		subq.w	#1,Obj_Control_Var_00(a1)
+		jmp	(DeleteObject).l
+
 Offset_0x0246BE:
-                cmp.b   Obj_Col_Flags(A0), D0                            ; $0028
-                bcs.s   Offset_0x0246E2
-                subi.w  #$0020, Obj_Y(A0)                                ; $0014
-                bra.s   Offset_0x0246E2
+		cmp.b	Obj_Col_Flags(a0),d0
+		bcs.s	Offset_0x0246E2
+		subi.w	#$20,Obj_Y(a0)
+		bra.s	Offset_0x0246E2
+
 Offset_0x0246CC:
-                move.w  Obj_Y(A0), D0                                    ; $0014
-                cmp.w   Obj_Control_Var_16(A0), D0                       ; $0046
-                beq.s   Offset_0x0246E2
-                addi.w  #$0010, D0
-                move.w  D0, Obj_Y(A0)                                    ; $0014
-                st      Obj_Control_Var_04(A1)                           ; $0034
+		move.w	Obj_Y(a0),d0
+		cmp.w	Obj_Control_Var_16(a0),d0
+		beq.s	Offset_0x0246E2
+		addi.w	#$10,d0
+		move.w	d0,Obj_Y(a0)
+		st	Obj_Control_Var_04(a1)
+
 Offset_0x0246E2:
-                move.b  #$70, Obj_Height(A0)                             ; $0006
-                jmp     (DisplaySprite)                        ; Offset_0x011148
-;-------------------------------------------------------------------------------  
-Title_Card_Level_Name:                                         ; Offset_0x0246EE
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
-                add.b   D0, Obj_Map_Id(A0)                               ; $0022
-                move.l  #Title_Card_Zone, (A0)                 ; Offset_0x0246FC
-Title_Card_Zone:                                               ; Offset_0x0246FC                
-                move.w  Obj_Respaw_Ref(A0), A1                           ; $0048
-                move.w  Obj_Control_Var_02(A1), D0                       ; $0032
-                beq.s   Offset_0x024724
-                tst.b   Obj_Flags(A0)                                    ; $0004
-                bmi.s   Offset_0x024716
-                subq.w  #$01, Obj_Control_Var_00(A1)                     ; $0030
-                jmp     (DeleteObject)                         ; Offset_0x011138
+		move.b	#$70,Obj_Height(a0)
+		jmp	(DisplaySprite).l
+
+; ---------------------------------------------------------------------------
+; Object - Title Card Level Name
+; ---------------------------------------------------------------------------
+; Offset_0x0246EE: Title_Card_Level_Name:
+Obj_TtlCardName:
+		move.b	(Apparent_Zone).w,d0
+		add.b	d0,Obj_Map_Id(a0)
+		move.l	#Obj_TtlCardZone,(a0)
+
+; ---------------------------------------------------------------------------
+; Object - Title Card Zone
+; ---------------------------------------------------------------------------
+; Offset_0x0246FC: Title_Card_Zone:
+Obj_TtlCardZone:
+		move.w	Obj_Respaw_Ref(a0),a1
+		move.w	Obj_Control_Var_02(a1),d0
+		beq.s	Offset_0x024724
+		tst.b	Obj_Flags(a0)
+		bmi.s	Offset_0x024716
+		subq.w	#1,Obj_Control_Var_00(a1)
+		jmp	(DeleteObject).l
+; ---------------------------------------------------------------------------
+
 Offset_0x024716:
-                cmp.b   Obj_Col_Flags(A0), D0                            ; $0028
-                bcs.s   Offset_0x02473A
-                addi.w  #$0020, Obj_X(A0)                                ; $0010
-                bra.s   Offset_0x02473A
+		cmp.b	Obj_Col_Flags(a0),d0
+		bcs.s	Offset_0x02473A
+		addi.w	#$20,Obj_X(a0)
+		bra.s	Offset_0x02473A
+
 Offset_0x024724:
-                move.w  Obj_X(A0), D0                                    ; $0010
-                cmp.w   Obj_Control_Var_16(A0), D0                       ; $0046
-                beq.s   Offset_0x02473A
-                subi.w  #$0010, D0
-                move.w  D0, Obj_X(A0)                                    ; $0010
-                st      Obj_Control_Var_04(A1)                           ; $0034
+		move.w	Obj_X(A0),d0
+		cmp.w	Obj_Control_Var_16(a0),d0
+		beq.s	Offset_0x02473A
+		subi.w	#$10,d0
+		move.w	d0,Obj_X(a0)
+		st	Obj_Control_Var_04(a1)
+
 Offset_0x02473A:
-                jmp     (DisplaySprite)                        ; Offset_0x011148
-;-------------------------------------------------------------------------------
-Title_Card_Act_Number:                                         ; Offset_0x024740
-                move.l  #Title_Card_Zone, (A0)                 ; Offset_0x0246FC
-                move.b  (Level_Id_2).w, D0                           ; $FFFFEE54
-                cmpi.b  #$0A, D0
-                beq.s   Offset_0x024756
-                cmpi.b  #$0C, D0
-                bne.s   Title_Card_Zone                        ; Offset_0x0246FC
+		jmp	(DisplaySprite).l
+
+; ---------------------------------------------------------------------------
+; Object - Title Card Act
+; ---------------------------------------------------------------------------
+; Offset_0x024740: Title_Card_Act_Number:
+Obj_TtlCardAct:
+		move.l	#Obj_TtlCardZone,(a0)
+		move.b	(Apparent_Zone).w,d0
+		cmpi.b	#$A,d0
+		beq.s	Offset_0x024756
+		cmpi.b	#$C,d0
+		bne.s	Obj_TtlCardZone
+
 Offset_0x024756:
-                move.w  Obj_Respaw_Ref(A0), A1                           ; $0048
-                subq.w  #$01, Obj_Control_Var_00(A1)                     ; $0030
-                jmp     (DeleteObject)                         ; Offset_0x011138                                                                                
-;-------------------------------------------------------------------------------
-Title_Card_Letters_Ptr:                                        ; Offset_0x024764
-                dc.l    TC_Angel_Island                        ; Offset_0x13AEF2
-                dc.l    TC_Hidrocity                           ; Offset_0x13B004
-                dc.l    TC_Marble_Garden                       ; Offset_0x13B156
-                dc.l    TC_Carnival_Night                      ; Offset_0x13B318
-                dc.l    TC_Flying_Battery                      ; Offset_0x13B4AA
-                dc.l    TC_Icecap                              ; Offset_0x13B60C
-                dc.l    TC_Launch_Base                         ; Offset_0x13B6DE
-                dc.l    TC_Mushroom_Valley                     ; Offset_0x13B6DE
-                dc.l    TC_Sandopolis                          ; Offset_0x13B6DE
-                dc.l    TC_Lava_Reef                           ; Offset_0x13B6DE
-                dc.l    TC_Sky_Sanctuary                       ; Offset_0x13B6DE
-                dc.l    TC_Death_Egg                           ; Offset_0x13B6DE
-                dc.l    TC_The_Doomsday                        ; Offset_0x13B6DE 
-;-------------------------------------------------------------------------------
-Title_Cards_Conf_Ptr:                                          ; Offset_0x024798
-                dc.l    Title_Card_Level_Name                  ; Offset_0x0246EE
-                dc.w    $0120, $0260, $00E0
-                dc.b    $04, $80
-                dc.w    $0003
-                dc.l    Title_Card_Zone                        ; Offset_0x0246FC
-                dc.w    $017C, $02FC, $0100
-                dc.b    $03, $24
-                dc.w    $0005
-                dc.l    Title_Card_Act_Number                  ; Offset_0x024740
-                dc.w    $0184, $0344, $0120
-                dc.b    $02, $1C
-                dc.w    $0007
-                dc.l    Title_Card_Red_Bar                     ; Offset_0x0246A4
-                dc.w    $00C0, $00E0, $0010
-                dc.b    $01, $00
-                dc.w    $0001                                                   
-;-------------------------------------------------------------------------------
-; Tela com o nome das fases conhecido também conhecido como: 
-; <<<-     - Splash Screen, Title Cards, etc... 
-;-------------------------------------------------------------------------------
+		move.w	Obj_Respaw_Ref(a0),a1
+		subq.w	#1,Obj_Control_Var_00(a1)
+		jmp	(DeleteObject).l									
+; ===========================================================================
+; Offset_0x024764: Title_Card_Letters_Ptr:
+TitleCard_LevelGfx:
+		dc.l	TC_Angel_Island
+		dc.l	TC_Hidrocity
+		dc.l	TC_Marble_Garden
+		dc.l	TC_Carnival_Night
+		dc.l	TC_Flying_Battery
+		dc.l	TC_Icecap
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+		dc.l	TC_Launch_Base
+; ===========================================================================
+
+ttlResObjData macro obj,xdest,xpos,ypos,frame,width,place
+	dc.l	obj
+	dc.w	xdest
+	dc.w	xpos
+	dc.w	ypos
+	dc.b	frame
+	dc.b	width
+	dc.w	place
+	endm
+
+; Offset_0x024798: Title_Cards_Conf_Ptr:
+TitleCard_ObjArray:
+		ttlresObjData Obj_TtlCardName,		$120, $260, $E0,  4,$80,3	; Zone Name
+		ttlresObjData Obj_TtlCardZone,		$17C, $2FC,$100,  3,$24,5	; "ZONE"
+		ttlresObjData Obj_TtlCardAct,		$184, $344,$120,  2,$1C,7	; "ACT X"
+		ttlresObjData Obj_TtlCardRedBar,	 $C0,  $E0, $10,  1,  0,1	; Red Bar
+TitleCard_ObjArray_End:

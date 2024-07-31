@@ -10,13 +10,13 @@
                 move.b  #$10, Obj_Width(A0)                              ; $0007
                 move.b  #$28, Obj_Height(A0)                             ; $0006
                 move.l  #Offset_0x02168C, Obj_Control_Var_0C(A0)         ; $003C
-                cmpi.w  #AIz_Act_2, (Level_Id).w              ; $0001, $FFFFFE10
+                cmpi.w  #AIz_Act_2, (Current_ZoneAndAct).w              ; $0001, $FFFFFE10
                 bne.s   Offset_0x021220
                 move.l  #AIz_2_Breakable_Floor_Mappings, Obj_Map(A0) ; Offset_0x021770, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
                 move.b  #$2C, Obj_Height(A0)                             ; $0006
 Offset_0x021220:
-                cmpi.b  #CNz_Id, (Level_Id).w                   ; $03, $FFFFFE10
+                cmpi.b  #CNz_Id, (Current_Zone).w                   ; $03, $FFFFFE10
                 bne.s   Offset_0x02124A
                 move.l  #CNz_Breakable_Floor_Mappings, Obj_Map(A0) ; Offset_0x0217E4, $000C
                 move.w  #$4430, Obj_Art_VRAM(A0)                         ; $000A
@@ -24,7 +24,7 @@ Offset_0x021220:
                 move.b  #$20, Obj_Height(A0)                             ; $0006
                 move.l  #Offset_0x0216BC, Obj_Control_Var_0C(A0)         ; $003C
 Offset_0x02124A:
-                cmpi.b  #Iz_Id, (Level_Id).w                    ; $05, $FFFFFE10
+                cmpi.b  #Iz_Id, (Current_Zone).w                    ; $05, $FFFFFE10
                 bne.s   Offset_0x02129E
                 move.l  #Iz_Breakable_Floor_Mappings, Obj_Map(A0) ; Offset_0x02187C, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
@@ -43,7 +43,7 @@ Offset_0x02128A:
                 move.w  #$43B6, Obj_Art_VRAM(A0)                         ; $000A
                 move.b  #$10, Obj_Height(A0)                             ; $0006
 Offset_0x02129E:                                
-                cmpi.b  #LBz_Id, (Level_Id).w                   ; $06, $FFFFFE10
+                cmpi.b  #LBz_Id, (Current_Zone).w                   ; $06, $FFFFFE10
                 bne.s   Offset_0x0212C8
                 move.l  #LBz_Breakable_Floor_Mappings, Obj_Map(A0) ; Offset_0x021A84, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A

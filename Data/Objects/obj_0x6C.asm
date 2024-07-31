@@ -7,7 +7,7 @@
                 move.l  #Bridge_Mappings, Obj_Map(A0)   ; Offset_0x02EE60, $000C
                 move.w  #$4038, Obj_Art_VRAM(A0)                         ; $000A
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
-                cmpi.b  #Iz_Id, (Level_Id).w                    ; $05, $FFFFFE10
+                cmpi.b  #Iz_Id, (Current_Zone).w                    ; $05, $FFFFFE10
                 bne.s   Offset_0x02E54C
                 move.l  #Offset_0x02E6F0, (A0)
                 move.l  #Iz_Bridge_Mappings, Obj_Map(A0) ; Offset_0x02EE28, $000C
@@ -57,7 +57,7 @@ Offset_0x02E55E:
 Offset_0x02E5C0:
                 bra     Offset_0x02E64E
 Offset_0x02E5C4:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02E622
                 move.l  #Offset_0x02E6EA, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -288,7 +288,7 @@ Offset_0x02E84C:
                 bra.s   Offset_0x02E86E   
 ;-------------------------------------------------------------------------------
 Offset_0x02E866:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02E8D2
 Offset_0x02E86E:
                 move.l  D4, (A1)
@@ -305,7 +305,7 @@ Offset_0x02E86E:
                 move.b  D0, Obj_Map_Id(A1)                               ; $0022
                 move.b  (A4)+, Obj_Control_Var_04(A1)                    ; $0034
                 move.l  A1, A5
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02E8D2
                 move.l  #Obj_Dissipate, (A1)                   ; Offset_0x013E86
                 move.w  Obj_X(A5), Obj_X(A1)                      ; $0010, $0010

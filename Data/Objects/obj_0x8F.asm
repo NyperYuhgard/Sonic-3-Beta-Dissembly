@@ -171,7 +171,7 @@ Offset_0x03C464:
                 rts           
 ;-------------------------------------------------------------------------------
 Offset_0x03C46C:
-                btst    #$02, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$02, (Vint_runcount+$03).w       ; $FFFFFE0F
                 jsr     Find_Player_Eight_Way(PC)              ; Offset_0x042DC2
                 addi.w  #$0009, D4
                 move.b  D4, Obj_Map_Id(A0)                               ; $0022
@@ -928,7 +928,7 @@ Offset_0x03CD44:
                 rts
 Offset_0x03CD46:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$07, Obj_Status(A0)                             ; $002A
                 move.w  #$001F, Obj_Timer(A0)                            ; $002E
                 move.l  #Offset_0x03C36C, Obj_Child(A0)                  ; $0034

@@ -20,3 +20,14 @@ rom_ptr_z80 macro addr
 ; #(XX>>2-YY>>2)-1
 ; bytesToWcnt
 ; #(XX>>1-YY>>1)-1
+
+; macro to declare an offset table
+offsetTable macro *
+\* EQU *
+current_offset_table = \*
+    endm
+
+; macro to declare an entry in an offset table
+offsetTableEntry macro ptr
+	dc.\0 ptr-current_offset_table
+    endm

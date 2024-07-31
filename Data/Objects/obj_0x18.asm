@@ -11,7 +11,7 @@
                 move.b  #$10, Obj_Height(A0)                             ; $0006
                 move.w  Obj_X(A0), Obj_Control_Var_00(A0)         ; $0010, $0030
                 move.w  Obj_Y(A0), Obj_Control_Var_02(A0)         ; $0014, $0032
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01DA02
                 move.l  #Offset_0x01DEA8, (A1)
                 move.l  #Cup_Elevator_Mappings, Obj_Map(A1) ; Offset_0x01DF66, $000C
@@ -25,7 +25,7 @@
                 move.b  #$02, Obj_Map_Id(A1)                             ; $0022
                 move.w  A0, Obj_Control_Var_10(A1)                       ; $0040
                 move.w  A1, Obj_Control_Var_10(A0)                       ; $0040
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01DA02
                 move.l  #Offset_0x01DEB8, (A1)
                 move.l  #Cup_Elevator_Mappings, Obj_Map(A1) ; Offset_0x01DF66, $000C

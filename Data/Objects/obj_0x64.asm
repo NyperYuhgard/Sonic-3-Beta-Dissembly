@@ -529,7 +529,7 @@ Offset_0x02CF5E:
 Offset_0x02CF76:
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x02CF7C:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02CF9A
                 moveq   #$2C, D0
 Offset_0x02CF88:

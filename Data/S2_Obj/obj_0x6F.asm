@@ -118,7 +118,7 @@ Offset_0x024CC4:
                 lea     (Emerald_Collected_Flag_List).w, A1          ; $FFFFFFB2
                 tst.b   $00(A1, D6)
                 beq     Offset_0x024BC4
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x024CDE
                 jsr     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x024CDE:
@@ -225,7 +225,7 @@ Offset_0x024DF6:
                 rts
 Offset_0x024DF8:
                 jsr     (Add_Points_P1)                        ; Offset_0x007AB0
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x024DF6
                 move.w  #S2_Add_Points_Blip_Sfx, D0                      ; $00CD
@@ -247,7 +247,7 @@ Offset_0x024E3C:
                 tst.w   D0
                 beq.s   Offset_0x024E5A
                 jsr     (Add_Points_P1)                        ; Offset_0x007AB0
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x024E8A
                 move.w  #S2_Add_Points_Blip_Sfx, D0                      ; $00CD
@@ -269,7 +269,7 @@ Offset_0x024E8A:
 ;-------------------------------------------------------------------------------                  
 Offset_0x024E8C:
                 moveq   #$11, D0
-                btst    #$03, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$03, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x024E98
                 moveq   #$15, D0
 Offset_0x024E98:

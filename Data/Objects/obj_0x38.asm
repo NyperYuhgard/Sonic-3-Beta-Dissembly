@@ -8,7 +8,7 @@
                 move.l  A0, A1
                 tst.b   Obj_Subtype(A0)                                  ; $002C
                 bpl.s   Offset_0x02648A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0264D4
                 move.l  #Offset_0x02669C, (A0)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -98,7 +98,7 @@ Offset_0x02657A:
                 move.b  (Level_Frame_Count+$01).w, D0                ; $FFFFFE05
                 andi.b  #$03, D0
                 bne.s   Offset_0x0265E2
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0265E2
                 move.l  #Offset_0x026680, (A1)
                 move.l  #Sonic_Underwater_Mappings, Obj_Map(A1) ; Offset_0x025872, $000C

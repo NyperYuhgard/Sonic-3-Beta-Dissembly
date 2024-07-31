@@ -18,7 +18,7 @@ Offset_0x010AE4:
 Offset_0x010AEE:
                 move.l  A0, A1
                 moveq   #$00, D5
-                move.w  (Ring_Count_Address).w, D5                   ; $FFFFFE20
+                move.w  (Ring_count).w, D5                   ; $FFFFFE20
                 tst.b   Obj_Player_One_Or_Two(A0)                        ; $003F
                 beq.s   Offset_0x010B00
                 move.w  (Ring_Count_Address_P2).w, D5                ; $FFFFFED0
@@ -33,7 +33,7 @@ Offset_0x010B08:
                 bra.s   Offset_0x010B18
 ;-------------------------------------------------------------------------------
 Offset_0x010B10:
-                bsr     SingleObjectLoad_A0                    ; Offset_0x011DE0
+                bsr     AllocateObjectAfterCurrent                    ; Offset_0x011DE0
                 bne     Offset_0x010B9E
 Offset_0x010B18:
                 move.l  #Rings_Lost, (A1)                      ; Offset_0x010AD6
@@ -75,9 +75,9 @@ Offset_0x010B9E:
                 jsr     (Play_Music)                           ; Offset_0x001176
                 tst.b   Obj_Player_One_Or_Two(A0)                        ; $003F
                 bne.s   Offset_0x010BC2
-                move.w  #$0000, (Ring_Count_Address).w               ; $FFFFFE20
-                move.b  #$80, (HUD_Rings_Refresh_Flag).w             ; $FFFFFE1D
-                move.b  #$00, (Ring_Status_Flag).w                   ; $FFFFFE1B
+                move.w  #$0000, (Ring_count).w               ; $FFFFFE20
+                move.b  #$80, (Update_HUD_rings).w             ; $FFFFFE1D
+                move.b  #$00, (Extra_life_flags).w                   ; $FFFFFE1B
                 bra.s   Offset_0x010BD4
 Offset_0x010BC2:
                 move.w  #$0000, (Ring_Count_Address_P2).w            ; $FFFFFED0
@@ -89,7 +89,7 @@ Offset_0x010BD4:
                 bsr     SpeedToPos                             ; Offset_0x01111E
                 addi.w  #$0018, Obj_Speed_Y(A0)                          ; $001A
                 bmi.s   Offset_0x010C14
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 add.b   D7, D0
                 andi.b  #$07, D0
                 bne.s   Offset_0x010C14

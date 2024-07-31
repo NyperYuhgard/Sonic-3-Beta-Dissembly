@@ -17,7 +17,7 @@
                 move.w  D1, Obj_Control_Var_16(A0)                       ; $0046
                 moveq   #$03, D1
                 addq.w  #$01, D1
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x017B1E
                 move.w  A1, Obj_Parent_Ref(A0)                           ; $003E
                 move.l  #Offset_0x017D94, (A1)
@@ -25,7 +25,7 @@
                 bra.s   Offset_0x017AF0    
 ;-------------------------------------------------------------------------------
 Offset_0x017AD8:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x017B1E
                 move.l  #Offset_0x017E28, (A1)
                 move.w  A2, Obj_Control_Var_0C(A1)                       ; $003C

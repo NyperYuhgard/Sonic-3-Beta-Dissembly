@@ -792,7 +792,7 @@ Offset_0x02BBAA:
                 tst.b   Obj_Control_Var_04(A0)                           ; $0034
                 beq.s   Offset_0x02BC0C
                 lea     (Offset_0x02BCC8), A1
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 beq.s   Offset_0x02BBC8
                 lea     (Offset_0x02BD3A), A1
 Offset_0x02BBC8:

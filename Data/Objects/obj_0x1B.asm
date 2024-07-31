@@ -83,7 +83,7 @@ Offset_0x01E3EA:
                 beq.s   Offset_0x01E44E
                 cmpi.b  #$1F, D1
                 beq.s   Offset_0x01E422
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01E44E
                 move.l  #Obj_Automatic_Tunnel_Delayed, (A1)    ; Offset_0x0201B8
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -91,7 +91,7 @@ Offset_0x01E3EA:
                 move.b  #$07, Obj_Ani_Time(A1)                           ; $0024
                 move.b  D1, Obj_Subtype(A1)                              ; $002C
 Offset_0x01E422:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01E44E
                 move.l  #Obj_Tunnel_Exhaust_Control, (A1)      ; Offset_0x02044E
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -141,7 +141,7 @@ Offset_0x01E4B6:
                 move.b  Obj_Flags(A0), D5                                ; $0004
                 moveq   #$0B, D1
 Offset_0x01E4DC:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01E594
                 move.l  D4, (A1)
                 move.l  A3, Obj_Map(A1)                                  ; $000C
@@ -177,7 +177,7 @@ Offset_0x01E4DC:
                 bra.s   Offset_0x01E560 
 ;-------------------------------------------------------------------------------
 Offset_0x01E556:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x01E594
                 addq.w  #$06, A3
 Offset_0x01E560:

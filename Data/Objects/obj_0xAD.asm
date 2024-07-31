@@ -401,7 +401,7 @@ Offset_0x038364:
                 bne.s   Offset_0x03838A
                 btst    #$06, Obj_Control_Var_08(A1)                     ; $0038
                 bne     Offset_0x037EFA
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 bne     Offset_0x037EFA
                 jmp     (Add_To_Response_List_And_Display)     ; Offset_0x042450
 Offset_0x03838A:
@@ -875,7 +875,7 @@ Offset_0x038950:
                 rts
 Offset_0x038952:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 move.w  #$003F, Obj_Timer(A0)                            ; $002E
                 move.l  #Offset_0x0381A4, Obj_Child(A0)                  ; $0034
                 lea     (Offset_0x041D62), A2

@@ -24,7 +24,7 @@ Offset_0x02DF7E:
                 add.b   Obj_Subtype(A0), D0                              ; $002C
                 andi.b  #$7F, D0
                 bne.s   Offset_0x02DFB6
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02DFB6
                 moveq   #$2C, D0
 Offset_0x02DF98:
@@ -67,7 +67,7 @@ Offset_0x02E006:
 Offset_0x02E01A:
                 jmp     (DisplaySprite)                        ; Offset_0x011148
 Offset_0x02E020:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02E060
                 moveq   #$2C, D0
 Offset_0x02E02C:

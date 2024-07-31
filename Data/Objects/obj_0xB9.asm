@@ -60,7 +60,7 @@ Offset_0x0466C4:
 ;-------------------------------------------------------------------------------
 Offset_0x0466DA:
                 moveq   #$01, D0
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x0466E6
                 neg.w   D0
 Offset_0x0466E6:
@@ -140,7 +140,7 @@ Offset_0x04679E:
                 beq     Offset_0x046738
                 lea     Offset_0x046AEE(PC), A2
                 jsr     Load_Child_Object_Simple_A2(PC)        ; Offset_0x041F5A
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x0467D8
                 move.l  #Obj_0x07_Springs, (A1)                ; Offset_0x01921A
                 move.w  #$5D6A, Obj_X(A1)                                ; $0010

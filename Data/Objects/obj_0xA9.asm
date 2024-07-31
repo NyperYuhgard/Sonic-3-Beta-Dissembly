@@ -259,8 +259,8 @@ Offset_0x037588:
                 rts    
 ;-------------------------------------------------------------------------------
 Offset_0x03759E:
-                move.w  #Hz_Act_1, (Level_Id).w               ; $0100, $FFFFFE10
-                move.w  #Hz_Act_1, (Level_Id_2).w             ; $0100, $FFFFEE54
+                move.w  #Hz_Act_1, (Current_ZoneAndAct).w               ; $0100, $FFFFFE10
+                move.w  #Hz_Act_1, (Apparent_ZoneAndAct).w             ; $0100, $FFFFEE54
                 move.w  #$0001, (Restart_Level_Flag).w               ; $FFFFFE02
                 clr.b   (Saved_Level_Flag).w                         ; $FFFFFE30
                 clr.b   (Saved_Level_Flag_P2).w                      ; $FFFFFEE0
@@ -495,7 +495,7 @@ Offset_0x037886:
                 jsr     (SpeedToPos)                           ; Offset_0x01111E
                 subq.w  #$01, Obj_Timer(A0)                              ; $002E
                 bmi.s   Offset_0x0378B2
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x0378AC
                 lea     Offset_0x037CEA(PC), A2
@@ -731,7 +731,7 @@ Offset_0x037B9E:
                 rts
 Offset_0x037BA0:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bclr    #$06, Obj_Control_Var_08(A0)                     ; $0038
                 bset    #$07, Obj_Art_VRAM(A0)                           ; $000A
                 move.b  #$00, Obj_Map_Id(A0)                             ; $0022

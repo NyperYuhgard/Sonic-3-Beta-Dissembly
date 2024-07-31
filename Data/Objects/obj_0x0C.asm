@@ -11,7 +11,7 @@
                 move.w  Obj_Y(A0), D3                                    ; $0014
                 move.b  Obj_Subtype(A0), D1                              ; $002C
                 andi.w  #$000F, D1
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x018198
                 move.w  #$FE50, Obj_Height_3(A1)                         ; $0044
                 move.w  #$0800, Obj_Control_Var_08(A1)                   ; $0038
@@ -24,7 +24,7 @@
                 bra.s   Offset_0x01816A  
 ;-------------------------------------------------------------------------------
 Offset_0x018152:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x018198
                 move.l  #Offset_0x018292, (A1)
                 move.w  A2, Obj_Control_Var_0C(A1)                       ; $003C

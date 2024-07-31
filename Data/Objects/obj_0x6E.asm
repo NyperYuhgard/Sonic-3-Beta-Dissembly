@@ -22,7 +22,7 @@ Offset_0x02E0E6:
                 move.w  D0, Obj_Control_Var_00(A0)                       ; $0030
                 tst.b   Obj_Flags(A0)                                    ; $0004
                 bpl.s   Offset_0x02E122
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02E122
                 moveq   #$2C, D0
 Offset_0x02E10A:

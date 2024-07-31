@@ -187,7 +187,7 @@ Offset_0x0400C6:
                 addi.w  #$0200, D0
                 cmpi.w  #$0400, D0
                 bcs     Offset_0x03FF60
-                move.w  (Vertical_Interrupt_Count+$02).w, D0         ; $FFFFFE0E
+                move.w  (Vint_runcount+$02).w, D0         ; $FFFFFE0E
                 andi.w  #$0003, D0
                 bne     Offset_0x03FF60
                 lea     Offset_0x04067E(PC), A2
@@ -567,7 +567,7 @@ Offset_0x040538:
                 rts
 Offset_0x04053A:
                 move.l  #Offset_0x03FFEE, (A0)
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$04, Obj_Control_Var_08(A0)                     ; $0038
                 move.w  #$A425, Obj_Art_VRAM(A0)                         ; $000A
                 move.w  #$FE00, Obj_Speed_Y(A0)                          ; $001A

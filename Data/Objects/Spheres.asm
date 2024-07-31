@@ -22,7 +22,7 @@
                 bra.s   Offset_0x0068D2  
 ;-------------------------------------------------------------------------------
 Offset_0x0068C2:
-                jsr     (SS_SingleObjectLoad)                  ; Offset_0x0067D0
+                jsr     (SS_AllocateObject)                  ; Offset_0x0067D0
                 bne     Offset_0x0069C6
 Offset_0x0068CC:
                 move.l  #SS_Obj_Eosian_Sphere, (A1)            ; Offset_0x006C1E
@@ -41,7 +41,7 @@ Offset_0x0068D2:
                 moveq   #$00, D2
                 moveq   #$19, D3
 Offset_0x006904:
-                jsr     (SS_SingleObjectLoad)                  ; Offset_0x0067D0
+                jsr     (SS_AllocateObject)                  ; Offset_0x0067D0
                 bne     Offset_0x0069C6
                 move.l  #SS_Obj_Eosian_Sphere, (A1)            ; Offset_0x006C1E
                 bsr     Offset_0x0069CA
@@ -58,7 +58,7 @@ Offset_0x006904:
                 moveq   #$00, D2
                 moveq   #$19, D3
 Offset_0x006946:
-                jsr     (SS_SingleObjectLoad)                  ; Offset_0x0067D0
+                jsr     (SS_AllocateObject)                  ; Offset_0x0067D0
                 bne     Offset_0x0069C6
                 move.l  #SS_Obj_Eosian_Sphere, (A1)            ; Offset_0x006C1E
                 bsr     Offset_0x0069CA
@@ -75,7 +75,7 @@ Offset_0x006946:
                 moveq   #$00, D2
                 moveq   #$19, D3
 Offset_0x006988:
-                jsr     (SS_SingleObjectLoad)                  ; Offset_0x0067D0
+                jsr     (SS_AllocateObject)                  ; Offset_0x0067D0
                 bne     Offset_0x0069C6
                 move.l  #SS_Obj_Eosian_Sphere, (A1)            ; Offset_0x006C1E
                 bsr     Offset_0x0069CA

@@ -74,7 +74,7 @@ Offset_0x027650:
 Offset_0x027664:
                 rts
 Offset_0x027666:
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x0276A0
                 move.l  #Obj_0x54_Oxygen_Bubbles, (A1)         ; Offset_0x025500
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

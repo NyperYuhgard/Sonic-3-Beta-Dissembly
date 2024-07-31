@@ -105,7 +105,7 @@ Offset_0x0202F4:
                 btst    #$05, Obj_Subtype(A0)                            ; $002C
                 beq.s   Offset_0x020330
                 move.l  A1, A2
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02032E
                 move.l  #Obj_Tunnel_Exhaust_Control, (A1)      ; Offset_0x02044E
                 move.w  Obj_X(A2), Obj_X(A1)                      ; $0010, $0010
@@ -256,7 +256,7 @@ Offset_0x02049A:
                 bmi.s   Offset_0x0204AC
                 move.w  #$0012, Obj_Angle(A0)                            ; $0026
 Offset_0x0204AC:
-                tst.b   (Act_Id).w                                   ; $FFFFFE11
+                tst.b   (Current_Act).w                                   ; $FFFFFE11
                 bne.s   Offset_0x0204BC
                 move.l  #Obj_Tunnel_Exhaust_Smoke, (A0)        ; Offset_0x0206B0
                 bra     Obj_Tunnel_Exhaust_Smoke               ; Offset_0x0206B0
@@ -267,7 +267,7 @@ Obj_Tunnel_Exhaust_Control_Main:                               ; Offset_0x0204C2
                 subq.w  #$01, Obj_Timer(A0)                              ; $002E
                 bpl.s   Offset_0x020538
                 move.w  #$0003, Obj_Timer(A0)                            ; $002E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x020538
                 move.l  #Obj_Tunnel_Exhaust_Up, (A1)           ; Offset_0x02057E
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -363,7 +363,7 @@ Obj_Tunnel_Exhaust_Continuous:                                 ; Offset_0x02060C
                 move.b  (Level_Frame_Count+$01).w, D0                ; $FFFFFE05
                 andi.b  #$03, D0
                 bne.s   Offset_0x020670
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x020670
                 move.l  #Obj_Tunnel_Exhaust_Timed, (A1)        ; Offset_0x020676
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -403,7 +403,7 @@ Obj_Tunnel_Exhaust_Smoke:                                      ; Offset_0x0206B0
                 move.b  (Level_Frame_Count+$01).w, D0                ; $FFFFFE05
                 andi.b  #$03, D0
                 bne.s   Offset_0x0206E2
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0206E2
                 move.l  #Obj_Fire_Shield_Dissipate, (A1)       ; Offset_0x013E28
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -432,7 +432,7 @@ Offset_0x020726:
                 subq.w  #$01, Obj_Timer(A0)                              ; $002E
                 bpl.s   Offset_0x0207A0
                 move.w  #$0003, Obj_Timer(A0)                            ; $002E
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x0207A0
                 move.l  #Offset_0x0207B8, (A1)
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010

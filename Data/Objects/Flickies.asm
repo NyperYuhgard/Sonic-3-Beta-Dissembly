@@ -142,7 +142,7 @@ Offset_0x023A86:
                 move.w  #$0592, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x023AA2:
                 moveq   #$00, D1
-                move.b  (Level_Id).w, D1                             ; $FFFFFE10
+                move.b  (Current_Zone).w, D1                             ; $FFFFFE10
                 add.w   D1, D1
                 add.w   D0, D1
                 lea     Flickies_Type_Select(PC), A1           ; Offset_0x02391C
@@ -164,7 +164,7 @@ Offset_0x023AA2:
                 move.w  #$FC00, Obj_Speed_Y(A0)                          ; $001A
                 tst.b   Obj_Control_Var_08(A0)                           ; $0038
                 bne.s   Offset_0x023B2C
-                jsr     (SingleObjectLoad)                     ; Offset_0x011DD8
+                jsr     (AllocateObject)                     ; Offset_0x011DD8
                 bne.s   Offset_0x023B26
                 move.l  #Obj_Enemy_Points, (A1)                ; Offset_0x023E42
                 move.w  Obj_X(A0), Obj_X(A1)                      ; $0010, $0010
@@ -201,7 +201,7 @@ Offset_0x023B42:
                 move.b  D0, Obj_Routine(A0)                              ; $0005
                 tst.b   Obj_Control_Var_08(A0)                           ; $0038
                 beq.s   Offset_0x023B98
-                btst    #$04, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$04, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq.s   Offset_0x023B98
                 neg.w   Obj_Speed_X(A0)                                  ; $0018
                 bchg    #00, Obj_Flags(A0)                               ; $0004

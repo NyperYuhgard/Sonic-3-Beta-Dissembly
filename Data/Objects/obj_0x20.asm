@@ -9,7 +9,7 @@
                 move.b  #$10, Obj_Width(A0)                              ; $0007
                 move.b  #$10, Obj_Height(A0)                             ; $0006
                 move.w  #$0080, Obj_Priority(A0)                         ; $0008
-                cmpi.b  #MGz_Id, (Level_Id).w                   ; $02, $FFFFFE10
+                cmpi.b  #MGz_Id, (Current_Zone).w                   ; $02, $FFFFFE10
                 bne.s   Offset_0x01FDFE
                 move.l  #Smashing_Pillar_Mappings, Obj_Map(A0) ; Offset_0x01FEE8, $000C
                 move.w  #$4001, Obj_Art_VRAM(A0)                         ; $000A
@@ -41,7 +41,7 @@ Offset_0x01FE1C:
                 tst.b   Obj_Flags(A0)                                    ; $0004
                 bpl.s   Offset_0x01FE7C
                 moveq   #Crash_Sfx, D0                                     ; $6C
-                cmpi.b  #MGz_Id, (Level_Id).w                   ; $02, $FFFFFE10
+                cmpi.b  #MGz_Id, (Current_Zone).w                   ; $02, $FFFFFE10
                 beq.s   Offset_0x01FE60
                 moveq   #Slide_Thunk_Sfx, D0                              ; -$50
 Offset_0x01FE60:

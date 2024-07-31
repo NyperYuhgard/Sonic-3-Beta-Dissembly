@@ -47,7 +47,7 @@ Offset_0x00FA2A:
                 move.b  #$04, Obj_Control_Var_04(A0)                     ; $0034
 ;-------------------------------------------------------------------------------
 Offset_0x00FA86:                
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 bne     DeleteObject                           ; Offset_0x011138
                 move.w  Obj_Player_Last(A0), A1                          ; $0042
                 btst    #Invincibility_Type, Obj_Player_Status(A1)  ; $01, $002F
@@ -87,7 +87,7 @@ Offset_0x00FAF6:
                 bra     DisplaySprite                          ; Offset_0x011148
 ;-------------------------------------------------------------------------------
 Offset_0x00FAFE:
-                tst.b   (Super_Sonic_Flag).w                         ; $FFFFFE19
+                tst.b   (Super_Sonic_flag).w                         ; $FFFFFE19
                 bne     DeleteObject                           ; Offset_0x011138
                 move.w  Obj_Player_Last(A0), A1                          ; $0042
                 btst    #Invincibility_Type, Obj_Player_Status(A1)  ; $01, $002F

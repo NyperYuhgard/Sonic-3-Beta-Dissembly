@@ -540,7 +540,7 @@ Offset_0x03B702:
                 rts
 Offset_0x03B704:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$07, Obj_Status(A0)                             ; $002A
                 move.w  #$003F, Obj_Timer(A0)                            ; $002E
                 move.l  #Offset_0x03B1DC, Obj_Child(A0)                  ; $0034

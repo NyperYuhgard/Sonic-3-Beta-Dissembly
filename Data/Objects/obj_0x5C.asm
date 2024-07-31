@@ -17,7 +17,7 @@
                 neg.w   D0
 Offset_0x02BF12:
                 move.w  D0, Obj_Speed_X(A0)                              ; $0018
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02BF2E
                 move.l  #Obj_0x5B_MGz_Blue_Spinning_Platform, (A1) ; Offset_0x02B19A
                 move.b  #$01, Obj_Subtype(A1)                            ; $002C

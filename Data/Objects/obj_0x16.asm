@@ -16,11 +16,11 @@ Obj_0x16_LBz_Flame_Thrower:                                    ; Offset_0x01D312
                 bsr.s   Offset_0x01D2EA
                 move.l  #Offset_0x01D31C, (A0)
 Offset_0x01D31C:                
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 add.b   Obj_Subtype(A0), D0                              ; $002C
                 andi.b  #$7F, D0
                 bne.s   Offset_0x01D376
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01D376
                 move.l  #Offset_0x01D39A, (A1)
                 bsr.s   Offset_0x01D2EA

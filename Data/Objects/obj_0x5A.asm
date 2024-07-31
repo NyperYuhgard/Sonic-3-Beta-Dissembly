@@ -20,7 +20,7 @@
                 lsl.w   #$03, D0
                 move.w  D0, Obj_Control_Var_10(A0)                       ; $0040
                 move.w  D0, Obj_Control_Var_0C(A0)                       ; $003C
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x02ADD2
                 move.l  #Offset_0x02B0C0, (A1)
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C

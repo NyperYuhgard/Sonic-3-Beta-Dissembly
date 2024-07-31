@@ -76,7 +76,7 @@ Offset_0x03ECE4:
                 move.b  #$08, Obj_Routine(A0)                            ; $0005
                 rts
 Offset_0x03ECF8:
-                move.w  (Vertical_Interrupt_Count+$02).w, D0         ; $FFFFFE0E
+                move.w  (Vint_runcount+$02).w, D0         ; $FFFFFE0E
                 andi.w  #$0003, D0
                 bne.s   Offset_0x03ED1C
                 lea     (Obj_Player_One).w, A1                       ; $FFFFB000

@@ -65,7 +65,7 @@ Offset_0x00CC6E:
                 cmpa.w  #Obj_Player_One, A0                              ; $B000
                 bne.s   Offset_0x00CD20
                 move.w  #$0680, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #$12, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$12, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x00CCFA
                 ori.w   #$8000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00CCFA:
@@ -78,7 +78,7 @@ Offset_0x00CCFA:
                 bra.s   Offset_0x00CD58
 Offset_0x00CD20:
                 move.w  #$06A0, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #EMz_Id, (Level_Id).w                   ; $12, $FFFFFE10
+                cmpi.b  #EMz_Id, (Current_Zone).w                   ; $12, $FFFFFE10
                 bne.s   Offset_0x00CD34
                 ori.w   #$8000, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x00CD34:

@@ -25,7 +25,7 @@ Offset_0x041838:
                 move.b  #$18, Obj_Width_2(A0)                            ; $001F
                 move.b  #$1E, Obj_Height_2(A0)                           ; $001E
                 move.l  #Offset_0x041AB2, Obj_Control_Var_00(A0)         ; $0030
-                cmpi.b  #$06, (Level_Id).w                           ; $FFFFFE10
+                cmpi.b  #$06, (Current_Zone).w                           ; $FFFFFE10
                 bne.s   Offset_0x041866
                 move.w  #$3EC0, Obj_X(A0)                                ; $0010
 Offset_0x041866:
@@ -36,7 +36,7 @@ Offset_0x041866:
                 jmp     Load_Child_Object_A2(PC)               ; Offset_0x041D9A   
 ;-------------------------------------------------------------------------------
 Offset_0x04187A:
-                move.b  (Vertical_Interrupt_Count+$03).w, D0         ; $FFFFFE0F
+                move.b  (Vint_runcount+$03).w, D0         ; $FFFFFE0F
                 andi.b  #$03, D0
                 bne.s   Offset_0x04188C
                 lea     Offset_0x041A9E(PC), A2

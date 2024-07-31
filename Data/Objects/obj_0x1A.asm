@@ -11,7 +11,7 @@
                 move.w  #$0200, Obj_Priority(A0)                         ; $0008
                 move.b  #$80, Obj_Control_Var_12(A0)                     ; $0042
                 move.b  #$01, Obj_Map_Id(A0)                             ; $0022
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x01E058
                 move.l  #Offset_0x01E0A8, (A1)
                 move.l  #Unknow_Controled_By_P2_Mappings, Obj_Map(A1) ; Offset_0x01E2AC, $000C

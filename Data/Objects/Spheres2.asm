@@ -30,7 +30,7 @@ Offset_0x0072BA:
                 move.w  #$FF90, D4
                 moveq   #$07, D2
 Offset_0x0072C0:
-                jsr     (SS_SingleObjectLoad)                  ; Offset_0x0067D0
+                jsr     (SS_AllocateObject)                  ; Offset_0x0067D0
                 bne     Offset_0x0072FA
                 move.l  #SS_Obj_Eosian_Sphere_2, (A1)          ; Offset_0x00753A
 Offset_0x0072D0:

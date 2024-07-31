@@ -27,7 +27,7 @@ Offset_0x0223B8:
                 neg.w   D1
 Offset_0x0223C6:
                 move.w  D1, Obj_Control_Var_04(A0)                       ; $0034
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne     Offset_0x022498
                 move.l  #Offset_0x0225B2, (A1)
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -52,7 +52,7 @@ Offset_0x022418:
                 move.w  Obj_Control_Var_00(A1), Obj_X(A1)         ; $0030, $0010
                 move.w  Obj_Control_Var_02(A1), Obj_Y(A1)         ; $0032, $0014
                 move.w  A1, Obj_Control_Var_0C(A0)                       ; $003C
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x022498
                 move.l  #Offset_0x0225B2, (A1)
                 move.l  Obj_Map(A0), Obj_Map(A1)                  ; $000C, $000C
@@ -278,7 +278,7 @@ Offset_0x0226D4:
                 bra.s   Offset_0x0226F6        
 ;-------------------------------------------------------------------------------
 Offset_0x0226EE:
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02275A
 Offset_0x0226F6:
                 move.l  D4, (A1)
@@ -295,7 +295,7 @@ Offset_0x0226F6:
                 move.b  D0, Obj_Map_Id(A1)                               ; $0022
                 move.b  (A4)+, Obj_Control_Var_04(A1)                    ; $0034
                 move.l  A1, A5
-                jsr     (SingleObjectLoad_A0)                  ; Offset_0x011DE0
+                jsr     (AllocateObjectAfterCurrent)                  ; Offset_0x011DE0
                 bne.s   Offset_0x02275A
                 move.l  #Obj_Dissipate, (A1)                   ; Offset_0x013E86
                 move.w  Obj_X(A5), Obj_X(A1)                      ; $0010, $0010

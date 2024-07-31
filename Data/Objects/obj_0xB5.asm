@@ -131,7 +131,7 @@ Offset_0x038CBC:
 Offset_0x038CE6:
                 jsr     (ObjectFall)                           ; Offset_0x0110FE
                 jsr     (Run_Object_Wait_Timer_A0)             ; Offset_0x0423D2
-                btst    #$00, (Vertical_Interrupt_Count+$03).w       ; $FFFFFE0F
+                btst    #$00, (Vint_runcount+$03).w       ; $FFFFFE0F
                 beq     Offset_0x038B84
                 jmp     (DisplaySprite)                        ; Offset_0x011148   
 ;-------------------------------------------------------------------------------    
@@ -896,7 +896,7 @@ Offset_0x039676:
                 rts
 Offset_0x039678:
                 move.l  #Display_Sprite_Wait, (A0)             ; Offset_0x042F8E
-                clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
+                clr.b   (Update_HUD_timer).w                   ; $FFFFFE1E
                 bset    #$07, Obj_Status(A0)                             ; $002A
                 clr.b   Obj_Col_Flags(A0)                                ; $0028
                 clr.b   Obj_Boss_Hit(A0)                                 ; $0029

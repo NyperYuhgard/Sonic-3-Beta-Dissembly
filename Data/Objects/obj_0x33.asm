@@ -7,12 +7,12 @@
                 bne     Obj_0x33_Switch_2P                     ; Offset_0x0237AA
                 move.l  #Switch_Mappings, Obj_Map(A0)   ; Offset_0x023832, $000C
                 move.w  #$0456, Obj_Art_VRAM(A0)                         ; $000A
-                cmpi.b  #Hz_Id, (Level_Id).w                    ; $01, $FFFFFE10
+                cmpi.b  #Hz_Id, (Current_Zone).w                    ; $01, $FFFFFE10
                 bne.s   Offset_0x02368E
                 move.l  #Hz_Switch_Mappings, Obj_Map(A0) ; Offset_0x02385C, $000C
                 move.w  #$2426, Obj_Art_VRAM(A0)                         ; $000A
 Offset_0x02368E:
-                cmpi.b  #CNz_Id, (Level_Id).w                   ; $03, $FFFFFE10
+                cmpi.b  #CNz_Id, (Current_Zone).w                   ; $03, $FFFFFE10
                 bne.s   Offset_0x0236A4
                 move.l  #CNz_Switch_Mappings, Obj_Map(A0) ; Offset_0x02388C, $000C
                 move.w  #$441A, Obj_Art_VRAM(A0)                         ; $000A
