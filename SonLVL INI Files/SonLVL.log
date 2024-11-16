@@ -1,0 +1,36 @@
+Operating system: Microsoft Windows NT 6.2.9200.0
+Opening INI file "D:\Github\Dissembled By Nyper\Sonic-3-Beta-Dissembly\SonLVL INI Files\SonLVL Leftover Data.ini"...
+Game type is S3K.
+Loading Lava Reaf Zone Act 1...
+Loading 16x16 blocks from file "../Data/LRz/blocks.kos", using compression Kosinski...
+Loading 128x128 chunks from file "../Data/LRz/chunks_2.kos", using compression Kosinski...
+Loading 8x8 tiles from file "../Data/LRz/Tiles_1.kmd", using compression KosinskiM...
+Loading palette file "../Data/All/Sonic.pal"...
+Source: 0 Destination: 0 Length: 16
+Loading palette file "../Data/LRz/LRz_1.pal"...
+Source: 0 Destination: 16 Length: 48
+Loading layout from file "../Data/Aiz/AIz_Map1.dat", using compression Uncompressed...
+System.AggregateException: Se han producido uno o varios errores. ---> System.ArgumentNullException: El valor no puede ser nulo.
+Nombre del parámetro: key
+   en System.Collections.Generic.Dictionary`2.FindEntry(TKey key)
+   en System.Collections.Generic.Dictionary`2.ContainsKey(TKey key)
+   en SonicRetro.SonLVL.API.LevelData.LoadLevelLayout(String levelname) en E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:línea 489
+   en SonicRetro.SonLVL.API.LevelData.<>c__DisplayClass66_0.<LoadLevel>b__0() en E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:línea 157
+   en System.Threading.Tasks.Task.InnerInvoke()
+   en System.Threading.Tasks.Task.Execute()
+   --- Fin del seguimiento de la pila de la excepción interna ---
+   en System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   en System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   en System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   en System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   en SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) en E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:línea 157
+   en SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) en E:\AutoBuild\SonLVL\SonLVL\MainForm.cs:línea 556
+---> (Nº de excepción interna 0) System.ArgumentNullException: El valor no puede ser nulo.
+Nombre del parámetro: key
+   en System.Collections.Generic.Dictionary`2.FindEntry(TKey key)
+   en System.Collections.Generic.Dictionary`2.ContainsKey(TKey key)
+   en SonicRetro.SonLVL.API.LevelData.LoadLevelLayout(String levelname) en E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:línea 489
+   en SonicRetro.SonLVL.API.LevelData.<>c__DisplayClass66_0.<LoadLevel>b__0() en E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:línea 157
+   en System.Threading.Tasks.Task.InnerInvoke()
+   en System.Threading.Tasks.Task.Execute()<---
+

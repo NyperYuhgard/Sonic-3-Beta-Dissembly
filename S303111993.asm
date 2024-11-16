@@ -42603,24 +42603,24 @@ Angel_Island_2_Chunks_2:                                       ; Offset_0x14EA6E
 Hydrocity_1_Blocks:                                            ; Offset_0x152B8E
 Hydrocity_2_Blocks:                                            ; Offset_0x152B8E
                 incbin  'data\hz\blocks.kos'
-                dc.w     $0000   
+        ;        dc.w     $0000   
 Hydrocity_1_Tiles:                                             ; Offset_0x152F7E
 Hydrocity_2_Tiles:                                             ; Offset_0x152F7E
                 incbin  'data\hz\tiles.kmd'
-                dc.w     $0000, $0000, $0000, $0000
+        ;        dc.w     $0000, $0000, $0000, $0000
 Hydrocity_1_Chunks:                                            ; Offset_0x153B70
 Hydrocity_2_Chunks:                                            ; Offset_0x153B70
                 incbin  'data\hz\chunks.kos'
-                dc.w     $0000, $0000
+        ;        dc.w     $0000, $0000
 Hydrocity_1_Blocks_2:                                          ; Offset_0x153E60  
                 incbin  'data\hz\bl2_act1.kos'   
-                dc.w     $0000, $0000, $0000
+        ;        dc.w     $0000, $0000, $0000
 Hydrocity_1_Tiles_2:                                           ; Offset_0x1546F0
                 incbin  'data\hz\tl2_act1.kmd'  
-                dc.w     $0000, $0000, $0000, $0000, $0000                           
+        ;        dc.w     $0000, $0000, $0000, $0000, $0000                           
 Hydrocity_1_Chunks_2:                                          ; Offset_0x156742
                 incbin  'data\hz\ck2_act1.kos'
-                dc.w     $0000
+        ;        dc.w     $0000
 Hydrocity_2_Blocks_2:                                          ; Offset_0x158562
                 incbin  'data\hz\bl2_act2.kos'
                 dc.w     $0000, $0000, $0000, $0000
@@ -42878,10 +42878,12 @@ BS_Slot_Machine_Chunks:                                        ; Offset_0x1AA46E
                 dc.w    $0000, $0000, $0000, $0000, $0000, $0000  
 ; Offset_0x1ABDDC:          
                 incbin  'data\unknown\unkdata5.bin' 
-                dc.w    $0000, $0000, $0000, $0000, $0000, $0000, $0000
+        ;        dc.w    $0000, $0000, $0000, $0000, $0000, $0000, $0000
+Left_Over_Lava_Reef_Blocks:
+                incbin  'data\lrz\Blocks.kos' 
 Left_Over_Lava_Reef_Tiles:                                     ; Offset_0x1AEF34
                 incbin  'data\lrz\tiles_1.kmd'    
-                dc.w    $0000, $0000, $0000 
+        ;        dc.w    $0000, $0000, $0000 
 Left_Over_Lava_Reef_Chunks_2:                                  ; Offset_0x1B2ED6  
                 incbin  'data\lrz\chunks_2.kos'  
 Left_Over_Azure_Lake_Blocks:                                   ; Offset_0x1B5DB6
@@ -43490,11 +43492,9 @@ Pal_Bonus_Stage_Slot_Machine:                                  ; Offset_0x1EA3B4
 LRz_Rocks_Layout:                                              ; Offset_0x1EA414                                      
                 incbin  'data\lrz\rockspos.dat'
 LRz_Incomplete_Map_Part_1:                                     ; Offset_0x1EAF4A  
-                incbin  'data\lrz\incm1_p1.dat'
-LRz_Incomplete_Map_Part_2:                                     ; Offset_0x1EB2CC  
-                incbin  'data\lrz\incm1_p2.dat'                
-Unknown_Map:                                                   ; Offset_0x1EB85E  
-                incbin  'data\unknown\unkmap_1.dat'   
+                incbin  'data\lrz\IncM1.dat'      
+LRz_Map_Act_2:                                                 ; Offset_0x1EB85E  
+                incbin  'data\lrz\lrz2_map.dat'   
 LRz_Map_Act_1:                                                 ; Offset_0x1EC4CE
                 incbin  'data\lrz\lrz_map1.dat'     
 LRz_Map_Act_1_2:                                               ; Offset_0x1ED2F6
